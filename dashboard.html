@@ -21,6 +21,11 @@
         .mobile-hub-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.25); opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 180ms; z-index:1150; }
         .mobile-hub-backdrop.visible { opacity:1; visibility:visible; }
         @media (min-width:900px){ .mobile-hub{ top:54px; width:260px; } }
+        /* Sidebar header: place subtitle/meta under the title on a single line */
+        .sidebar-header { display: block; padding: 12px 15px; }
+        .sidebar-header h3 { margin: 0 0 6px 0; }
+        .sidebar-header .meta-line { display: flex; gap: 10px; align-items: center; }
+
     </style>
 </head>
 <body>
@@ -75,8 +80,12 @@
     <div class="container">
         <div class="sidebar">
             <div class="sidebar-header">
-                <h3>CLASSEMENT</h3>
-                <small style="color:#777">Par Moyenne</small>
+                <h3>CLASSEMENT     </h3>
+                <small style="color:#777;">Par Moyenne</small>
+                <div class="meta-line">
+                    <small>Cliquer sur nom pour (dé)masquer sur le graphique</small>
+                    
+                </div>
             </div>
             <ul class="rank-list" id="playerList">
                 </ul>

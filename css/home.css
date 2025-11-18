@@ -184,7 +184,7 @@
     cursor: pointer;
     position: absolute;
     right: 40px;
-    top: -5px; /* remonté vers le haut */
+    top: -0px; /* remonté vers le haut */
     line-height: 1;
     padding: 8px;
     border-radius: 6px;
