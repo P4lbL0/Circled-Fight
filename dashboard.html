@@ -13,29 +13,13 @@
     
 
     <div class="header">
-    
-    <nav class="mobile-menu" id="mobileMenu">
-        <a href="index.html">Accueil</a>
-        <a href="dashboard.html">Scores</a>
-        <a href="tournament.html">Tournoi du Week-end</a>
-        <a href="members.html">Membres du Clan</a>
-        <a href="join.html">Nous Rejoindre</a>
-    </nav>
-    <div class="header">
         <div>
             <h1>Circled fight <span style="font-size:0.5em; color:white; vertical-align:middle; border:1px solid white; padding:2px 5px; border-radius:3px;">Cf</span></h1>
             <span style="color: var(--text-muted);">Suivi des performances hebdomadaires</span>
             <div style="color: var(--text-muted); font-size:0.8em; margin-top:4px;">Site créer par Cf°3L_Angelos</div>
         </div>
         
-        <div class="hamburger-menu" id="hamburgerMenu">☰</div>
         
-        <nav class="integrated-menu">
-            <a href="index.html">Accueil</a>
-            <a href="tournament.html">Tournoi</a>
-            <a href="members.html">Membres du Clan</a>
-            <a href="join.html" class="cta-link">Rejoindre</a>
-        </nav>
         
         <div class="export-container">
             <button class="export-btn" onclick="exportChart()">📸 Export Graph</button>
@@ -48,18 +32,7 @@
     
     <script>
         // ... votre code JavaScript du dashboard ...
-
-        // LOGIQUE JS POUR LE MENU HAMBURGER
-        document.addEventListener('DOMContentLoaded', () => {
-            const hamburger = document.getElementById('hamburgerMenu');
-            const mobileMenu = document.getElementById('mobileMenu');
-            
-            if (hamburger && mobileMenu) {
-                hamburger.addEventListener('click', () => {
-                    mobileMenu.classList.toggle('active');
-                });
-            }
-        });
+        // (Menu hamburger et les liens de navigation supprimés par requête)
     </script>
 
     <div class="container">

@@ -11,32 +11,28 @@
 
     <header class="main-header">
         <div class="logo-container">
-            <a href="index.html">
-                <h1>Circled Fight <span class="tag">CF</span></h1>
-            </a>
+            <h1>Circled Fight <span class="tag">CF</span></h1>
         </div>
-        <nav class="desktop-menu">
-            <a href="dashboard.html">Scores</a>
-            <a href="tournament.html">Tournoi du Week-end</a>
-            <a href="members.html">Membres du Clan</a>
-            <a href="join.html" class="cta-button">Nous Rejoindre</a>
+        <!-- Hamburger button (aligné à droite) -->
+        <button id="hamburgerMenu" class="hamburger-menu" aria-controls="mobileHub" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
+        <!-- Panneau du menu qui s'ouvre -->
+        <nav id="mobileHub" class="mobile-hub" aria-hidden="true">
+            <ul>
+                <li><a href="dashboard.html">Scores</a></li>
+                <li><a href="tournament.html">Tournoi du Week-end</a></li>
+                <li><a href="members.html">Membres du Clan</a></li>
+                <li><a href="join.html">Nous Rejoindre</a></li>
+            </ul>
         </nav>
-        <div class="hamburger-menu" id="hamburgerMenu">☰</div>
+        <div id="mobileHubBackdrop" class="mobile-hub-backdrop" tabindex="-1" aria-hidden="true"></div>
     </header>
-    <nav class="mobile-menu" id="mobileMenu">
-        <a href="index.html">Accueil</a>
-        <a href="dashboard.html">Scores</a>
-        <a href="tournament.html">Tournoi du Week-end</a>
-        <a href="members.html">Membres du Clan</a>
-        <a href="join.html">Nous Rejoindre</a>
-    </nav>
     <main class="main-content-home">
         
         <section class="hero-section">
             <div class="hero-content">
                 <h2>L'ANALYSE DE PERFORMANCE <span class="text-neon">DU CLAN</span></h2>
                 <p>Circled Fight est l'élite. Suivez en temps réel les moyennes, les ratios, et les tendances de progression de nos meilleurs joueurs.</p>
-                <a href="dashboard.html" class="btn-main-action">VOIR LE CLASSEMENT ACTUEL</a>
+                <span class="btn-main-action">VOIR LE CLASSEMENT ACTUEL</span>
             </div>
         </section>
 
@@ -64,7 +60,7 @@
         <section class="join-callout">
             <h3>VOUS VOULEZ FAIRE PARTIE DE L'ÉLITE ?</h3>
             <p>Nous sommes toujours à la recherche de joueurs motivés. Notre force réside dans nos statistiques.</p>
-            <a href="join.html" class="btn-main-action cta-invert">REJOINDRE LE CLAN</a>
+            <span class="btn-main-action cta-invert">REJOINDRE LE CLAN</span>
         </section>
 
     </main>
@@ -72,20 +68,56 @@
     <footer class="main-footer">
         <p>&copy; 2025 Circled Fight Clan. Tous droits réservés. | Designed for the Elite.</p>
         <div class="footer-links">
-            <a href="join.html">Recrutement</a> |
+            Recrutement |
             <a href="#top">Haut de page</a>
         </div>
     </footer>
+    
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const hamburger = document.getElementById('hamburgerMenu');
-            const mobileMenu = document.getElementById('mobileMenu');
-            
-            hamburger.addEventListener('click', () => {
-                mobileMenu.classList.toggle('active');
-                hamburger.classList.toggle('is-open'); 
+        // Hamburger menu toggle (index.html only)
+        (function(){
+            const btn = document.getElementById('hamburgerMenu');
+            const hub = document.getElementById('mobileHub');
+            const backdrop = document.getElementById('mobileHubBackdrop');
+
+            if(!btn || !hub || !backdrop) return;
+
+            function openHub() {
+                hub.classList.add('open');
+                backdrop.classList.add('visible');
+                btn.setAttribute('aria-expanded', 'true');
+                hub.setAttribute('aria-hidden', 'false');
+                // move focus to first link for quick navigation
+                const firstLink = hub.querySelector('a');
+                if(firstLink) firstLink.focus();
+            }
+
+            function closeHub() {
+                hub.classList.remove('open');
+                backdrop.classList.remove('visible');
+                btn.setAttribute('aria-expanded', 'false');
+                hub.setAttribute('aria-hidden', 'true');
+                btn.focus();
+            }
+
+            btn.addEventListener('click', (e) => {
+                const opened = btn.getAttribute('aria-expanded') === 'true';
+                if(opened) closeHub(); else openHub();
             });
-        });
+
+            // Close on backdrop click
+            backdrop.addEventListener('click', closeHub);
+
+            // Close on Escape
+            document.addEventListener('keydown', (e) => {
+                if(e.key === 'Escape') closeHub();
+            });
+
+            // Close when clicking a link (navigate)
+            hub.addEventListener('click', (e) => {
+                if(e.target.tagName === 'A') closeHub();
+            });
+        })();
     </script>
 </body>
 </html>

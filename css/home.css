@@ -173,27 +173,66 @@
         max-width: 100%;
     }
 }
-@media (max-width: 768px) {
-    /* Le bouton hamburger apparaît sur mobile */
-    .hamburger-menu {
-        display: block; 
-    }
-    
-    /* On masque les autres éléments qui prennent de la place sur mobile */
-    .integrated-menu,
-    .export-container, 
-    .mvp-badge {
-        display: none !important; 
-    }
+/* Mobile hamburger/menu styles removed per request */
 
-    /* Styles pour le menu déroulant mobile */
-    .mobile-menu {
-        /* ... assurez-vous que position: fixed et z-index sont bien définis ici ... */
-        position: fixed; 
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1000;
-    }
+/* Hamburger button (index.html) */
+.hamburger-menu {
+    background: transparent;
+    border: 0;
+    color: var(--codm-yellow);
+    font-size: 1.8rem;
+    cursor: pointer;
+    position: absolute;
+    right: 16px;
+    top: 6px; /* remonté vers le haut */
+    line-height: 1;
+    padding: 8px;
+    border-radius: 6px;
+}
+.hamburger-menu:focus { outline: 2px solid rgba(255,193,7,0.25); }
+
+/* Panel du menu (petite fenêtre) */
+.mobile-hub {
+    position: absolute;
+    right: 12px;
+    top: 46px; /* ajusté pour rester sous le bouton remonté */
+    background: #1b1b1b;
+    border: 1px solid #333;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    width: 86vw; /* mobile-first: presque full width */
+    max-width: 320px;
+    transform-origin: top right;
+    transform: scale(0.95);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 180ms ease, transform 180ms ease, visibility 180ms;
+    z-index: 1200;
+}
+.mobile-hub.open {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+}
+.mobile-hub ul { list-style: none; margin: 0; padding: 8px 0; }
+.mobile-hub li { padding: 8px 14px; }
+.mobile-hub a { color: var(--text-main); text-decoration: none; display: block; font-weight: 600; }
+.mobile-hub a:hover { color: var(--codm-yellow); }
+
+/* Backdrop to catch outside clicks */
+.mobile-hub-backdrop {
+    position: fixed;
+    inset: 0; /* top/right/bottom/left:0 */
+    background: rgba(0,0,0,0.25);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 180ms ease, visibility 180ms;
+    z-index: 1100;
+}
+.mobile-hub-backdrop.visible { opacity: 1; visibility: visible; }
+
+/* Desktop tweaks: make hamburger smaller and panel narrower */
+@media (min-width: 900px) {
+    .hamburger-menu { font-size: 1.4rem; top: 12px; right: 22px; }
+    .mobile-hub { top: 52px; width: 260px; }
 }
