@@ -299,3 +299,180 @@ h1, h2, h3 {
         gap: 10px;
     }
 }
+.main-header {
+    background-color: #0d0d0d;
+    color: white;
+    padding: 15px 30px; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--codm-yellow);
+    
+    /* --- MODIFICATIONS CLÉS POUR LE HEADER FIXE ET PLEINE LARGEUR --- */
+    position: fixed; /* Remplacer 'sticky' par 'fixed' */
+    top: 0;
+    left: 0; /* Assure qu'il commence au bord gauche */
+    width: 95%; /* Assure qu'il couvre toute la largeur */
+    /* ----------------------------------------------------------------- */
+
+    z-index: 1000;
+}
+
+.logo-container a {
+    text-decoration: none;
+    color: white;
+}
+
+.main-header h1 {
+    margin: 0;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+}
+
+.main-header .tag {
+    font-size: 0.6em;
+    color: var(--codm-yellow);
+    vertical-align: middle;
+    border: 1px solid var(--codm-yellow);
+    padding: 2px 5px;
+    border-radius: 3px;
+    margin-left: 5px;
+}
+
+/* Menu Desktop */
+.desktop-menu a {
+    color: white;
+    text-decoration: none;
+    margin-left: 25px;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.desktop-menu a:hover {
+    color: var(--codm-yellow);
+}
+
+.cta-button {
+    background: var(--codm-yellow);
+    color: black !important;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Menu Hamburger */
+.hamburger-menu {
+    display: none; /* Caché par défaut sur PC */
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    color: var(--codm-yellow);
+}
+
+/* Menu Mobile (caché par défaut) */
+.mobile-menu {
+    display: none;
+    position: absolute;
+    /* Ajuster cette valeur si la hauteur de votre header est différente */
+    top: 60px; 
+    left: 0;
+    width: 100%;
+    background-color: #1a1a1a;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    flex-direction: column;
+    padding: 10px 0;
+}
+
+.mobile-menu a {
+    color: white;
+    text-decoration: none;
+    padding: 12px 30px;
+    border-bottom: 1px solid #333;
+    display: block; /* Important pour que toute la zone soit cliquable */
+}
+
+.mobile-menu a:last-child {
+    border-bottom: none;
+}
+
+.mobile-menu.active {
+    display: flex; /* Affiché quand la classe 'active' est ajoutée par JS */
+}
+
+/* =======================================
+   FOOTER COMMUN
+   ======================================= */
+.main-footer {
+    background-color: #0d0d0d;
+    color: #888;
+    padding: 20px 30px;
+    text-align: center;
+    border-top: 1px solid #222;
+    margin-top: 40px;
+}
+
+.footer-links a {
+    color: var(--codm-yellow);
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+/* =======================================
+   MEDIA QUERIES (Mobile View)
+   ======================================= */
+@media (max-width: 768px) {
+    .desktop-menu {
+        display: none;
+    }
+    .hamburger-menu {
+        display: block; /* Affiché sur mobile */
+    }
+    .main-header {
+        padding: 10px 20px;
+    }
+    .main-header h1 {
+        font-size: 1.2rem;
+    }
+}
+main {
+    padding-top: 105px; /* Ajustez cette valeur (75px est généralement suffisant pour un header standard) */
+}
+.integrated-menu {
+    display: flex;
+    gap: 25px; /* Espace entre les liens */
+    align-items: center;
+    /* Pour s'assurer qu'il s'affiche seulement sur les écrans assez larges */
+}
+
+.integrated-menu a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1em;
+    transition: color 0.3s;
+    white-space: nowrap; /* Empêche les liens de se casser sur plusieurs lignes */
+}
+
+.integrated-menu a:hover {
+    color: var(--codm-yellow);
+}
+
+.integrated-menu .cta-link {
+    /* Style du lien "Rejoindre" comme un bouton (comme cta-button) */
+    background: var(--codm-yellow);
+    color: black !important;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Gérer l'affichage sur mobile (pour éviter la saturation du header) */
+@media (max-width: 900px) {
+    /* Cache le menu intégré sur les petits écrans pour éviter les chevauchements */
+    .integrated-menu {
+        display: none;
+    }
+}

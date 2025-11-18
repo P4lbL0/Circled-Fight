@@ -3,485 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Circled Fight</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>Accueil | Circled Fight</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/home.css"> 
 </head>
 <body>
 
-    <div class="header">
-        <div>
-            <h1>Circled fight <span style="font-size:0.5em; color:white; vertical-align:middle; border:1px solid white; padding:2px 5px; border-radius:3px;">Cf</span></h1>
-            <span style="color: var(--text-muted);">Suivi des performances hebdomadaires</span>
+    <header class="main-header">
+        <div class="logo-container">
+            <a href="index.html">
+                <h1>Circled Fight <span class="tag">CF</span></h1>
+            </a>
         </div>
+        <nav class="desktop-menu">
+            <a href="dashboard.html">Scores</a>
+            <a href="tournament.html">Tournoi du Week-end</a>
+            <a href="members.html">Membres du Clan</a>
+            <a href="join.html" class="cta-button">Nous Rejoindre</a>
+        </nav>
+        <div class="hamburger-menu" id="hamburgerMenu">☰</div>
+    </header>
+    <nav class="mobile-menu" id="mobileMenu">
+        <a href="index.html">Accueil</a>
+        <a href="dashboard.html">Scores</a>
+        <a href="tournament.html">Tournoi du Week-end</a>
+        <a href="members.html">Membres du Clan</a>
+        <a href="join.html">Nous Rejoindre</a>
+    </nav>
+    <main class="main-content-home">
         
-        <div class="export-container">
-            <button class="export-btn" onclick="exportChart()">📸 Export Graph</button>
-            <div class="mvp-badge" id="mvpBadge">
-                <span>MVP SEMAINE ACTUELLE</span>
-                <strong id="mvpName">--</strong>
+        <section class="hero-section">
+            <div class="hero-content">
+                <h2>L'ANALYSE DE PERFORMANCE <span class="text-neon">DU CLAN</span></h2>
+                <p>Circled Fight est l'élite. Suivez en temps réel les moyennes, les ratios, et les tendances de progression de nos meilleurs joueurs.</p>
+                <a href="dashboard.html" class="btn-main-action">VOIR LE CLASSEMENT ACTUEL</a>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <div class="container">
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h3>CLASSEMENT</h3>
-                <small style="color:#777">Par Moyenne</small>
-            </div>
-            <ul class="rank-list" id="playerList">
-                </ul>
-            <div class="controls">
-                <button class="btn" onclick="toggleAll(true)">Tout Voir</button>
-                <button class="btn" onclick="toggleAll(false)">Masquer</button>
-            </div>
-        </div>
-
-        <div class="main-content">
-            <div class="chart-wrapper">
-                <canvas id="clanChart"></canvas>
-            </div>
-            
-            <div class="versus-panel" id="versusPanel">
-                <div class="vs-player" id="p1-container">
-                    <div class="vs-name" id="p1-name" style="color:cyan">Player 1</div>
-                    <div class="vs-score" id="p1-avg">85.5</div>
-                    <div class="vs-stat">Moyenne</div>
+        <section class="features-section">
+            <h3>CE QUE NOTRE SYSTÈME MESURE</h3>
+            <div class="features-container">
+                <div class="feature-card">
+                    <span class="icon">🛡️</span>
+                    <h4>La Régularité (Le Mur)</h4>
+                    <p>Récompense les joueurs les plus constants avec l'écart-type de score le plus faible.</p>
                 </div>
-                <div class="vs-icon">VS</div>
-                <div class="vs-player" id="p2-container">
-                    <div class="vs-name" id="p2-name" style="color:orange">Player 2</div>
-                    <div class="vs-score" id="p2-avg">82.0</div>
-                    <div class="vs-stat">Moyenne</div>
+                <div class="feature-card">
+                    <span class="icon">🔥</span>
+                    <h4>La Série de Victoires</h4>
+                    <p>Compte le nombre de semaines consécutives de participation active au tournoi.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="icon">🚀</span>
+                    <h4>La Progression</h4>
+                    <p>Badges des joueurs en nette amélioration sur leurs trois dernières semaines de jeu.</p>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <div class="legend-panel">
-        <h4>LÉGENDE DES BADGES</h4>
-        <div class="badges-list">
-            <span>🔥N : Série de victoires (N semaines de participation consécutive sans absence).</span>
-            <span>🚀 Progression : 3 semaines consécutives de hausse de score.</span>
-            <span>💤 AFK : Aucune participation enregistrée sur les 2 dernières semaines.</span>
-        </div>
-    </div>
+        <section class="join-callout">
+            <h3>VOUS VOULEZ FAIRE PARTIE DE L'ÉLITE ?</h3>
+            <p>Nous sommes toujours à la recherche de joueurs motivés. Notre force réside dans nos statistiques.</p>
+            <a href="join.html" class="btn-main-action cta-invert">REJOINDRE LE CLAN</a>
+        </section>
 
+    </main>
+    
+    <footer class="main-footer">
+        <p>&copy; 2025 Circled Fight Clan. Tous droits réservés. | Designed for the Elite.</p>
+        <div class="footer-links">
+            <a href="join.html">Recrutement</a> |
+            <a href="#top">Haut de page</a>
+        </div>
+    </footer>
     <script>
-        // --- DONNÉES (InchAngées) ---
-        const weeks = ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "S11", "S12"];
-        let rawData = [
-            { name: "Dorian", scores: [63, null, null, null, null, 44, null, null, 50.5, 72, null, null] },
-            { name: "Angelos", scores: [58, 57, 57, 70, 55, 64, 70.5, 61.5, 68.5, 68, 91, 74.5] },
-            { name: "Ghost", scores: [57, 69, 67, 49, 30, 52, 56.5, 51.5, 55.5, 64.5, 74, 68.5] },
-            { name: "Gaspard", scores: [36, null, null, 33, 21, null, null, null, null, null, null, null] },
-            { name: "Paul", scores: [31, null, 23, 32, 28, 25, 29, 20.5, null, null, 31.5, 24.5] },
-            { name: "Rico", scores: [26, 35, 46, 47, 38, 32, 34.5, 36.5, 46, 49.5, 43.5, 62] },
-            { name: "Maxence", scores: [23, null, null, 49, 40, null, null, null, null, null, null, null] },
-            { name: "Nevroz", scores: [17, null, null, 19, 17, null, null, null, null, null, null, null] },
-            { name: "Ashtax", scores: [null, 38, null, null, null, null, null, null, 43, null, null, null] },
-            { name: "Landry", scores: [null, 35, 26, null, null, null, 14.5, 34, null, null, 58.5, null] },
-            { name: "Zeroday", scores: [null, 32, null, 56, 43, null, 43.5, null, null, null, null, null] },
-            { name: "Beya", scores: [null, null, 42, null, null, 27, null, 48.5, 19, null, null, 27.5] },
-            { name: "Deadshot", scores: [null, null, 34, null, null, 40, null, null, null, 46, null, 82] },
-            { name: "Zan", scores: [null, null, null, null, null, null, 41, 45, 30.5, null, null, null] },
-            { name: "Oxy", scores: [null, null, null, null, null, null, null, null, null, 41.5, null, null] },
-            { name: "Iassonas", scores: [null, null, null, null, null, null, null, null, null, 19, 25, null] },
-            { name: "Myem", scores: [null, null, null, null, null, null, null, null, null, null, 44, null] },
-            { name: "Malo", scores: [null, null, null, null, null, null, null, null, null, null, 26.5, 42] },
-            { name: "Gabriel", scores: [null, null, null, null, null, null, null, null, null, null, null, 39.5] }
-        ];
-
-        // Fonction pour calculer l'écart-type
-        function calculateStdDev(scores) {
-            const validScores = scores.filter(s => s !== null && s !== undefined);
-            if (validScores.length < 2) return Infinity; 
-            const mean = validScores.reduce((a, b) => a + b, 0) / validScores.length;
-            const variance = validScores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / validScores.length;
-            return Math.sqrt(variance);
-        }
-
-        // --- 1. CALCULS, TRENDS & AWARDS ---
-        rawData.forEach(player => {
-            const validScores = player.scores.filter(s => s !== null);
-            const sum = validScores.reduce((a, b) => a + b, 0);
-            player.avg = validScores.length ? (sum / validScores.length).toFixed(1) : 0;
-            player.lastScore = player.scores[11] || player.scores[10] || 0; 
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburger = document.getElementById('hamburgerMenu');
+            const mobileMenu = document.getElementById('mobileMenu');
             
-            // 🏅 BADGES
-            player.stdDev = calculateStdDev(player.scores);
-
-            // 💤 AFK Check (Absence sur les 2 dernières semaines de data)
-            const lastDataIndex = player.scores.length - 1;
-            player.isAFK = (player.scores[lastDataIndex] === null && player.scores[lastDataIndex - 1] === null);
-
-            // 🚀 Progression Check (3 hausses consécutives parmi les scores enregistrés)
-            let consecutiveIncreases = 0;
-            player.isOnFire = false; // Renommé en 'isProgression' dans le titre HTML
-            for (let i = player.scores.length - 1; i >= 1; i--) {
-                const current = player.scores[i];
-                const previous = player.scores[i - 1];
-
-                if (current !== null && previous !== null) {
-                    if (current > previous) {
-                        consecutiveIncreases++;
-                        if (consecutiveIncreases >= 3) {
-                            player.isProgression = true; // Nouveau nom pour éviter confusion
-                            break;
-                        }
-                    } else if (current < previous) {
-                        consecutiveIncreases = 0;
-                    }
-                }
-            }
-
-            // 🔥N STREAK (Participation consécutive) - NOUVEAU
-            player.streak = 0;
-            for (let i = player.scores.length - 1; i >= 0; i--) {
-                if (player.scores[i] !== null && player.scores[i] !== undefined) {
-                    player.streak++;
-                } else {
-                    break; // S'arrête à la première semaine manquée
-                }
-            }
-
-            // 📈 TRENDS (Dernier score enregistré vs précédent)
-            let lastRecordedScore = null;
-            let prevRecordedScore = null;
-            for (let i = player.scores.length - 1; i >= 0; i--) {
-                if (player.scores[i] !== null) {
-                    if (lastRecordedScore === null) {
-                        lastRecordedScore = player.scores[i];
-                    } else if (prevRecordedScore === null) {
-                        prevRecordedScore = player.scores[i];
-                        break; 
-                    }
-                }
-            }
-            player.trend = lastRecordedScore !== null && prevRecordedScore !== null ? lastRecordedScore - prevRecordedScore : 0;
+            hamburger.addEventListener('click', () => {
+                mobileMenu.classList.toggle('active');
+                hamburger.classList.toggle('is-open'); 
+            });
         });
-
-        // Trouver 'Le Mur' (le plus régulier, écart-type le plus bas)
-
-
-
-        // Trier du meilleur au pire (Moyenne)
-        rawData.sort((a, b) => b.avg - a.avg);
-
-        // --- 2. MOYENNE DU CLAN (Ligne Fantôme) ---
-        const clanAverageScores = weeks.map((_, weekIndex) => {
-            let weekTotal = 0;
-            let weekCount = 0;
-            rawData.forEach(player => {
-                const score = player.scores[weekIndex];
-                if (score !== null && score !== undefined) {
-                    weekTotal += score;
-                    weekCount++;
-                }
-            });
-            return weekCount > 0 ? (weekTotal / weekCount) : null;
-        });
-
-        function getNeonColor(index) {
-            const hues = [180, 300, 60, 120, 20, 250, 0, 330]; 
-            const hue = hues[index % hues.length]; 
-            const finalHue = hue + (Math.floor(index/hues.length) * 20);
-            return `hsl(${finalHue}, 100%, 60%)`;
-        }
-
-        // Créer les datasets des joueurs
-        const playerDatasets = rawData.map((player, index) => ({
-            label: player.name,
-            data: player.scores,
-            borderColor: getNeonColor(index),
-            backgroundColor: getNeonColor(index),
-            borderWidth: 2,
-            tension: 0.3,
-            pointRadius: 4,
-            pointBackgroundColor: '#121212', 
-            pointBorderWidth: 2,
-            spanGaps: true,
-            hidden: index > 4 
-        }));
-
-        // Dataset de la moyenne du clan (TOUJOURS en premier)
-        const clanAvgDataset = {
-            label: "Moyenne du Clan",
-            data: clanAverageScores,
-            borderColor: 'rgba(255, 255, 255, 0.5)', 
-            backgroundColor: 'rgba(255, 255, 255, 0.5)',
-            borderWidth: 2,
-            borderDash: [5, 5], 
-            tension: 0.3,
-            pointRadius: 0,
-            pointHoverRadius: 0,
-            fill: false,
-            hidden: false 
-        };
-
-        const datasets = [clanAvgDataset, ...playerDatasets]; 
-
-        // --- 3. CONFIG DU GRAPH (Plugin Background) ---
-        const rankZonesPlugin = {
-            id: 'rankZones',
-            beforeDraw: (chart) => {
-                const { ctx, chartArea: { top, bottom, left, right, width, height }, scales: { y } } = chart;
-                
-                const drawZone = (yMin, yMax, color) => {
-                    const yTop = y.getPixelForValue(yMax);
-                    const yBottom = y.getPixelForValue(yMin);
-                    ctx.fillStyle = color;
-                    ctx.fillRect(left, yTop, width, yBottom - yTop);
-                };
-
-                // Dessiner les zones (Backgrounds)
-                drawZone(80, 120, 'rgba(0, 230, 118, 0.05)'); // Vert/Légendaire
-                drawZone(40, 80, 'rgba(255, 193, 7, 0.05)');  // Jaune/Pro
-                drawZone(0, 40, 'rgba(255, 23, 68, 0.05)');   // Rouge/Rookie
-            }
-        };
-
-        // --- 4. INITIALISATION CHART ---
-        const ctx = document.getElementById('clanChart').getContext('2d');
-        const chart = new Chart(ctx, {
-            type: 'line',
-            data: { labels: weeks, datasets: datasets },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                // --- NOUVEAU CODE ---
-                interaction: {
-                    mode: 'nearest', // Cherche le point le plus proche
-                    intersect: false, // Permet l'interaction même si le curseur n'est pas sur le point
-                    axis: 'x' // Limite l'interaction à l'axe des X (pour sélectionner la semaine)
-                },
-                hover: {
-                    mode: 'nearest',
-                    intersect: false,
-                    axis: 'x'
-                },
-                onTouch: {
-                    // C'est l'option clé pour le mobile. 
-                    // 'nearest' pour la détection du tapotement.
-                    mode: 'nearest',
-                    intersect: false,
-                    axis: 'x'
-                },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: 'rgba(0,0,0,0.9)',
-                        titleColor: '#ffc107',
-                        bodyFont: { family: 'Roboto' },
-                        borderColor: '#ffc107',
-                        borderWidth: 1,
-                        callbacks: {
-                             // Personnalise l'info bulle pour la moyenne du clan
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(context.parsed.y);
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                }
-            },
-            plugins: [rankZonesPlugin]
-        });
-
-        // --- 5. UI LOGIC ---
-        const listContainer = document.getElementById('playerList');
-        const versusPanel = document.getElementById('versusPanel');
-
-        function renderList() {
-            listContainer.innerHTML = '';
-            
-            // On boucle sur les datasets des joueurs (en sautant le premier qui est la moyenne du clan)
-            chart.data.datasets.slice(1).forEach((ds, i) => { 
-                const player = rawData[i];
-                const li = document.createElement('li');
-                
-                let rankClass = '';
-                if(i === 0) rankClass = 'rank-1';
-                else if(i === 1) rankClass = 'rank-2';
-                else if(i === 2) rankClass = 'rank-3';
-
-                li.className = `player-card ${!ds.hidden ? 'active' : 'inactive'}`;
-                
-                // 📈 HTML TRENDS
-                let trendHTML = '';
-                if (player.trend > 0) {
-                    trendHTML = `<span class="trend-up">+${Math.abs(player.trend).toFixed(1)} 🔼</span>`;
-                } else if (player.trend < 0) {
-                    trendHTML = `<span class="trend-down">-${Math.abs(player.trend).toFixed(1)} 🔽</span>`;
-                }
-
-                // 🏅 HTML BADGES
-                let badgeHTML = '';
-                // 1. 🔥N Streak
-                if (player.streak > 0) badgeHTML += `<span title="Série de victoires (${player.streak} semaines)">🔥${player.streak}</span>`;
-                // 3. 🚀 Progression (Ancien On Fire)
-                if (player.isProgression) badgeHTML += '<span title="Progression (3 hausses consécutives)">🚀</span>';
-                // 4. 💤 AFK
-                if (player.isAFK) badgeHTML += '<span title="AFK (Inactif)">💤</span>';
-
-
-                li.innerHTML = `
-                    <span class="rank-num ${rankClass}">#${i+1}</span>
-                    <div class="player-info">
-                        <span class="player-name" style="color:${ds.hidden ? '#aaa' : ds.borderColor}">${ds.label}</span>
-                        <span class="player-avg">Moy: ${player.avg} ${trendHTML}</span>
-                    </div>
-                    <div class="player-badges">${badgeHTML}</div>
-                `;
-
-                li.onclick = () => {
-                    // L'index dans chart.datasets est i + 1 (à cause de la moyenne du clan à l'index 0)
-                    const dsIndex = i + 1;
-                    ds.hidden = !ds.hidden;
-                    chart.update();
-                    renderList();
-                    checkVersusMode();
-                };
-                listContainer.appendChild(li);
-            });
-        }
-
-        function toggleAll(show) {
-            // Boucle à partir de 1 pour ne pas masquer la Moyenne du Clan
-            chart.data.datasets.slice(1).forEach(ds => ds.hidden = !show);
-            chart.update();
-            renderList();
-            checkVersusMode();
-        }
-
-        // --- LOGIQUE MVP & VERSUS ---
-        
-        function findMVP() {
-            let lastWeekIndex = 11; 
-            let bestScore = -1;
-            let bestPlayer = "";
-
-            rawData.forEach(p => {
-                const score = p.scores[lastWeekIndex];
-                if (score !== null && score > bestScore) {
-                    bestScore = score;
-                    bestPlayer = p.name;
-                }
-            });
-
-            if(bestPlayer) {
-                document.getElementById('mvpName').innerText = bestPlayer.toUpperCase() + " (" + bestScore + ")";
-            }
-        }
-
-        function checkVersusMode() {
-            // Filtre seulement les datasets des joueurs (index >= 1)
-            const visibleDS = chart.data.datasets.slice(1).filter(d => !d.hidden);
-            
-            if (visibleDS.length === 2) {
-                versusPanel.style.display = 'flex';
-                
-                const p1 = visibleDS[0];
-                const p1Data = rawData.find(r => r.name === p1.label);
-                
-                document.getElementById('p1-name').innerText = p1.label;
-                document.getElementById('p1-name').style.color = p1.borderColor;
-                document.getElementById('p1-avg').innerText = p1Data.avg;
-
-                const p2 = visibleDS[1];
-                const p2Data = rawData.find(r => r.name === p2.label);
-                
-                document.getElementById('p2-name').innerText = p2.label;
-                document.getElementById('p2-name').style.color = p2.borderColor;
-                document.getElementById('p2-avg').innerText = p2Data.avg;
-                
-            } else {
-                versusPanel.style.display = 'none';
-            }
-        }
-
-        // --- 📸 EXPORT FUNCTION CORRIGÉE (avec Légende) ---
-        function exportChart() {
-            const originalCanvas = document.getElementById('clanChart');
-            
-            // 1. Créer un conteneur et un canvas temporaires (cachés)
-            const tempContainer = document.createElement('div');
-            tempContainer.style.width = originalCanvas.width + 'px'; // Garde la taille originale
-            tempContainer.style.height = originalCanvas.height + 'px';
-            tempContainer.style.position = 'absolute';
-            tempContainer.style.left = '-9999px'; // On le met hors écran
-            document.body.appendChild(tempContainer);
-
-            const tempCanvas = document.createElement('canvas');
-            tempContainer.appendChild(tempCanvas);
-
-            // 2. Créer une instance temporaire du Chart, mais AVEC la légende
-            const tempChart = new Chart(tempCanvas.getContext('2d'), {
-                type: 'line',
-                data: chart.data, // Utilise les données actuelles (avec les joueurs cachés/visibles)
-                options: {
-                    ...chart.options, // Garde toutes les options (échelles, couleurs, zones, etc.)
-                    plugins: {
-                        ...chart.options.plugins,
-                        legend: { 
-                            display: true, // <--- C'EST ÇA QUI AJOUTE LA LÉGENDE !
-                            labels: { 
-                                color: 'white',
-                                font: { size: 14 }
-                            }
-                        }
-                    }
-                },
-                // Réappliquer les plugins nécessaires, comme les zones de rangs
-                plugins: [rankZonesPlugin] 
-            });
-
-            // On attend un micro-moment pour que Chart.js rende le graphique avec la légende
-            setTimeout(() => {
-                // Créer un canvas final avec un fond noir (car le plugin ne dessine que la zone du graph)
-                const finalCanvas = document.createElement('canvas');
-                finalCanvas.width = tempCanvas.width;
-                finalCanvas.height = tempCanvas.height;
-                const finalCtx = finalCanvas.getContext('2d');
-                
-                // Dessiner le fond noir
-                finalCtx.fillStyle = '#1e1e1e';
-                finalCtx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-                
-                // Dessiner le graphique temporaire (avec légende) sur le fond noir
-                finalCtx.drawImage(tempCanvas, 0, 0);
-
-                // Exportation
-                const image = finalCanvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.href = image;
-                link.download = 'CircledFight_Graph_avec_Legende.png';
-                document.body.appendChild(link);
-                link.click();
-                
-                // Nettoyage
-                tempChart.destroy(); // Détruire l'instance
-                link.remove();
-                tempContainer.remove();
-                finalCanvas.remove();
-            }, 100);
-        }
-
-
-        // Lancement
-        findMVP();
-        renderList();
-        checkVersusMode(); 
-
     </script>
 </body>
 </html>
