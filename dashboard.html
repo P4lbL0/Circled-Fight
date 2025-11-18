@@ -7,6 +7,21 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Inline CSS for a non-intrusive top-right hamburger */
+        .header { position: relative; }
+        .hamburger-menu { position: absolute; top: 8px; right: 12px; background: transparent; border: 0; color: var(--codm-yellow); font-size: 1.6rem; padding: 6px; border-radius:6px; z-index:1200; cursor:pointer; }
+        .hamburger-menu:focus { outline: 2px solid rgba(255,193,7,0.25); }
+        .mobile-hub { position: absolute; right: 12px; top: 44px; width: 86vw; max-width:320px; background:#1b1b1b; border:1px solid #333; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,.6); transform-origin:top right; transform:scale(.95); opacity:0; visibility:hidden; transition:opacity 180ms ease, transform 180ms ease, visibility 180ms; z-index:1199; }
+        .mobile-hub.open { transform:scale(1); opacity:1; visibility:visible; }
+        .mobile-hub ul { list-style:none; margin:0; padding:8px 0; }
+        .mobile-hub li { padding:8px 14px; }
+        .mobile-hub a { color:var(--text-main); text-decoration:none; display:block; font-weight:600; }
+        .mobile-hub a:hover { color:var(--codm-yellow); }
+        .mobile-hub-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.25); opacity:0; visibility:hidden; transition:opacity 180ms ease, visibility 180ms; z-index:1150; }
+        .mobile-hub-backdrop.visible { opacity:1; visibility:visible; }
+        @media (min-width:900px){ .mobile-hub{ top:54px; width:260px; } }
+    </style>
 </head>
 <body>
     
@@ -18,9 +33,7 @@
             <span style="color: var(--text-muted);">Suivi des performances hebdomadaires</span>
             <div style="color: var(--text-muted); font-size:0.8em; margin-top:4px;">Site créer par Cf°3L_Angelos</div>
         </div>
-        
-        
-        
+
         <div class="export-container">
             <button class="export-btn" onclick="exportChart()">📸 Export Graph</button>
             <div class="mvp-badge" id="mvpBadge">
@@ -28,11 +41,35 @@
                 <strong id="mvpName">--</strong>
             </div>
         </div>
+
+        <!-- Hamburger button top-right -->
+        <button id="hamburgerMenu" class="hamburger-menu" aria-controls="dashboardMobileHub" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
+        <nav id="dashboardMobileHub" class="mobile-hub" aria-hidden="true">
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="dashboard.html">Scores</a></li>
+                <li><a href="tournament.html">Tournoi du Week-end</a></li>
+                <li><a href="members.html">Membres du Clan</a></li>
+                <li><a href="join.html">Nous Rejoindre</a></li>
+            </ul>
+        </nav>
+        <div id="dashboardMobileHubBackdrop" class="mobile-hub-backdrop" tabindex="-1" aria-hidden="true"></div>
     </div>
-    
+
     <script>
-        // ... votre code JavaScript du dashboard ...
-        // (Menu hamburger et les liens de navigation supprimés par requête)
+        // Small hamburger toggle (non-intrusive)
+        (function(){
+            const btn = document.getElementById('hamburgerMenu');
+            const hub = document.getElementById('dashboardMobileHub');
+            const backdrop = document.getElementById('dashboardMobileHubBackdrop');
+            if(!btn || !hub || !backdrop) return;
+            function openHub(){ hub.classList.add('open'); backdrop.classList.add('visible'); btn.setAttribute('aria-expanded','true'); hub.setAttribute('aria-hidden','false'); const first = hub.querySelector('a'); if(first) first.focus(); }
+            function closeHub(){ hub.classList.remove('open'); backdrop.classList.remove('visible'); btn.setAttribute('aria-expanded','false'); hub.setAttribute('aria-hidden','true'); btn.focus(); }
+            btn.addEventListener('click', ()=>{ const opened = btn.getAttribute('aria-expanded')==='true'; if(opened) closeHub(); else openHub(); });
+            backdrop.addEventListener('click', closeHub);
+            document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeHub(); });
+            hub.addEventListener('click', (e)=>{ if(e.target.tagName==='A') closeHub(); });
+        })();
     </script>
 
     <div class="container">
