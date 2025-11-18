@@ -1,0 +1,84 @@
+@import url('style.css');
+
+/* Page-specific overrides + header/hamburger styles copied for this page */
+
+/* Ensure the fixed header behaves the same */
+.main-header {
+    background-color: #0d0d0d;
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--codm-yellow);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 95%;
+    z-index: 1000;
+}
+
+.logo-container a, .logo-container h1 { text-decoration: none; color: white; }
+.main-header h1 { margin: 0; font-family: 'Orbitron', sans-serif; font-size: 1.5rem; }
+.main-header .tag { font-size: 0.6em; color: var(--codm-yellow); vertical-align: middle; border: 1px solid var(--codm-yellow); padding: 2px 5px; border-radius: 3px; margin-left: 5px; }
+
+/* Hamburger button */
+.hamburger-menu {
+    background: transparent;
+    border: 0;
+    color: var(--codm-yellow);
+    font-size: 1.8rem;
+    cursor: pointer;
+    position: absolute;
+    right: 40px;
+    top: 8px;
+    line-height: 1;
+    padding: 8px;
+    border-radius: 6px;
+}
+.hamburger-menu:focus { outline: 2px solid rgba(255,193,7,0.25); }
+
+/* Panel du menu (petite fenêtre) */
+.mobile-hub {
+    position: absolute;
+    right: 12px;
+    top: 52px;
+    background: #1b1b1b;
+    border: 1px solid #333;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    width: 86vw;
+    max-width: 320px;
+    transform-origin: top right;
+    transform: scale(0.95);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 180ms ease, transform 180ms ease, visibility 180ms;
+    z-index: 1200;
+}
+.mobile-hub.open { transform: scale(1); opacity: 1; visibility: visible; }
+.mobile-hub ul { list-style: none; margin: 0; padding: 8px 0; }
+.mobile-hub li { padding: 8px 14px; }
+.mobile-hub a { color: var(--text-main); text-decoration: none; display: block; font-weight: 600; }
+.mobile-hub a:hover { color: var(--codm-yellow); }
+
+/* Backdrop to catch outside clicks */
+.mobile-hub-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.25);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 180ms ease, visibility 180ms;
+    z-index: 1100;
+}
+.mobile-hub-backdrop.visible { opacity: 1; visibility: visible; }
+
+/* Centered "Coming soon" area */
+.coming-soon-wrapper { display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 120px); padding-top: 60px; }
+.coming-soon { color: var(--text-main); font-size: 1.6rem; text-transform: uppercase; letter-spacing: 1px; background: rgba(255,255,255,0.02); padding: 20px 30px; border-radius: 8px; border: 1px solid #2a2a2a; }
+
+@media (min-width: 900px) {
+    .hamburger-menu { font-size: 1.4rem; top: 12px; right: 22px; }
+    .mobile-hub { top: 52px; width: 260px; }
+}
