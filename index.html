@@ -251,17 +251,23 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                interaction: { mode: 'index', intersect: false },
-                scales: {
-                    y: {
-                        min: 0, max: 120,
-                        grid: { color: '#333' },
-                        ticks: { color: '#888' }
-                    },
-                    x: {
-                        grid: { color: '#333' },
-                        ticks: { color: '#888' }
-                    }
+                // --- NOUVEAU CODE ---
+                interaction: {
+                    mode: 'nearest', // Cherche le point le plus proche
+                    intersect: false, // Permet l'interaction même si le curseur n'est pas sur le point
+                    axis: 'x' // Limite l'interaction à l'axe des X (pour sélectionner la semaine)
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: false,
+                    axis: 'x'
+                },
+                onTouch: {
+                    // C'est l'option clé pour le mobile. 
+                    // 'nearest' pour la détection du tapotement.
+                    mode: 'nearest',
+                    intersect: false,
+                    axis: 'x'
                 },
                 plugins: {
                     legend: { display: false },
