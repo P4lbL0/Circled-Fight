@@ -29,7 +29,7 @@
         <div id="mobileHubBackdrop" class="mobile-hub-backdrop" tabindex="-1" aria-hidden="true"></div>
     </header>
     <main class="main-content-home">
-        
+
         <section class="hero-section">
             <div class="hero-content">
                 <h2>L'ANALYSE DE PERFORMANCE <span class="text-neon">DU CLAN</span></h2>
@@ -42,28 +42,46 @@
             <h3>CE QUE NOTRE SYSTÈME MESURE</h3>
             <div class="features-container">
                 <div class="feature-card">
-                    <span class="icon">🛡️</span>
-                    <h4>La Régularité (Le Mur)</h4>
-                    <p>Récompense les joueurs les plus constants avec l'écart-type de score le plus faible.</p>
-                </div>
-                <div class="feature-card">
                     <span class="icon">🔥</span>
                     <h4>La Série de Victoires</h4>
                     <p>Compte le nombre de semaines consécutives de participation active au tournoi.</p>
-                </div>
+                </div> 
                 <div class="feature-card">
                     <span class="icon">🚀</span>
                     <h4>La Progression</h4>
                     <p>Badges des joueurs en nette amélioration sur leurs trois dernières semaines de jeu.</p>
                 </div>
+                <div class="feature-card">
+                    <span class="icon">💤</span>
+                    <h4>La Régularité</h4>
+                    <p>Attribué aux joueurs n’ayant pas participé au tournoi depuis un certain temps</p>
+                </div>
+                
+               
             </div>
         </section>
 
         <section class="join-callout">
             <h3>VOUS VOULEZ FAIRE PARTIE DE L'ÉLITE ?</h3>
-            <p>Nous sommes toujours à la recherche de joueurs motivés. Notre force réside dans nos statistiques.</p>
-            <span class="btn-main-action cta-invert">REJOINDRE LE CLAN</span>
+            <p>Nous sommes toujours à la recherche de joueurs motivés. Notre force réside dans la détermination de chaque membre.</p>
+            <a href="join.html" class="btn-main-action cta-invert" role="button" aria-label="Rejoindre le clan">REJOINDRE LE CLAN</a>
         </section>
+
+        <!-- Stat card moved below the join-callout as requested -->
+        <div id="seasonStats" class="season-stats" aria-hidden="false">
+            <div class="stat-card">
+                <div class="stat-item">
+                    <div class="stat-number" data-target="29">0</div>
+                    <div class="stat-label">membres actifs cette saison</div>
+                </div>
+                <div class="stat-divider" aria-hidden="true"></div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="12">0</div>
+                    <div class="stat-label">participants au dernier tournoi</div>
+                </div>
+            </div>
+            <div class="thanks">merci a : seveun de nous avoir rejoins</div>
+        </div>
 
     </main>
     
@@ -76,49 +94,90 @@
     </footer>
     
     <script>
-        // Hamburger menu toggle (index.html only)
+        // Small counter animation for the homepage stats card
         (function(){
-            const btn = document.getElementById('hamburgerMenu');
-            const hub = document.getElementById('mobileHub');
-            const backdrop = document.getElementById('mobileHubBackdrop');
+            const counters = document.querySelectorAll('.stat-number');
+            counters.forEach(el => {
+                const target = parseInt(el.getAttribute('data-target') || '0', 10);
+                let start = 0;
+                const duration = 900; // ms
+                const stepTime = Math.max(Math.floor(duration / Math.max(target,1)), 12);
+                const startTime = Date.now();
 
-            if(!btn || !hub || !backdrop) return;
+                function tick(){
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const value = Math.floor(progress * target);
+                    el.textContent = value;
+                    if(progress < 1) requestAnimationFrame(tick);
+                    else el.textContent = target;
+                }
 
-            function openHub() {
-                hub.classList.add('open');
-                backdrop.classList.add('visible');
-                btn.setAttribute('aria-expanded', 'true');
-                hub.setAttribute('aria-hidden', 'false');
-                // move focus to first link for quick navigation
-                const firstLink = hub.querySelector('a');
-                if(firstLink) firstLink.focus();
-            }
+                // Small delay so it doesn't start before layout
+                setTimeout(() => requestAnimationFrame(tick), 120);
+            });
+        })();
 
-            function closeHub() {
-                hub.classList.remove('open');
-                backdrop.classList.remove('visible');
-                btn.setAttribute('aria-expanded', 'false');
-                hub.setAttribute('aria-hidden', 'true');
-                btn.focus();
-            }
+        // Small counter animation for the homepage stats card + hamburger init
+        (function(){
+            // Counters
+            const counters = document.querySelectorAll('.stat-number');
+            counters.forEach(el => {
+                const target = parseInt(el.getAttribute('data-target') || '0', 10);
+                const duration = 900; // ms
+                const startTime = Date.now();
 
-            btn.addEventListener('click', (e) => {
-                const opened = btn.getAttribute('aria-expanded') === 'true';
-                if(opened) closeHub(); else openHub();
+                function tick(){
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const value = Math.floor(progress * target);
+                    el.textContent = value;
+                    if(progress < 1) requestAnimationFrame(tick);
+                    else el.textContent = target;
+                }
+                setTimeout(() => requestAnimationFrame(tick), 120);
             });
 
-            // Close on backdrop click
-            backdrop.addEventListener('click', closeHub);
+            // Hamburger menu toggle (index.html only)
+            (function(){
+                const btn = document.getElementById('hamburgerMenu');
+                const hub = document.getElementById('mobileHub');
+                const backdrop = document.getElementById('mobileHubBackdrop');
 
-            // Close on Escape
-            document.addEventListener('keydown', (e) => {
-                if(e.key === 'Escape') closeHub();
-            });
+                if(!btn || !hub || !backdrop) return;
 
-            // Close when clicking a link (navigate)
-            hub.addEventListener('click', (e) => {
-                if(e.target.tagName === 'A') closeHub();
-            });
+                function openHub() {
+                    hub.classList.add('open');
+                    backdrop.classList.add('visible');
+                    btn.setAttribute('aria-expanded', 'true');
+                    hub.setAttribute('aria-hidden', 'false');
+                    const firstLink = hub.querySelector('a');
+                    if(firstLink) firstLink.focus();
+                }
+
+                function closeHub() {
+                    hub.classList.remove('open');
+                    backdrop.classList.remove('visible');
+                    btn.setAttribute('aria-expanded', 'false');
+                    hub.setAttribute('aria-hidden', 'true');
+                    btn.focus();
+                }
+
+                btn.addEventListener('click', (e) => {
+                    const opened = btn.getAttribute('aria-expanded') === 'true';
+                    if(opened) closeHub(); else openHub();
+                });
+
+                backdrop.addEventListener('click', closeHub);
+
+                document.addEventListener('keydown', (e) => {
+                    if(e.key === 'Escape') closeHub();
+                });
+
+                hub.addEventListener('click', (e) => {
+                    if(e.target.tagName === 'A') closeHub();
+                });
+            })();
         })();
     </script>
 </body>

@@ -12,11 +12,10 @@ export const rawData = [
     { name: "Oxy",       scores: [null, 17, null, null, 24, null] },
     { name: "Beya",      scores: [null, 13, null, null, 35, 11] },
     { name: "Black",     scores: [null, 13, null, null, null, null] },
-    { name: "Excentrizc",scores: [null, null, null, 28, null, null] },
+    { name: "Excentrizc",scores: [null, null, null, 28, 21, null] },
     { name: "Seong",     scores: [null, null, null, 16, 15, null] },
     { name: "Gabriel",   scores: [null, null, null, 16, 15, 11] },
     { name: "Lucas",     scores: [null, null, null, null, 40, null] },
-    { name: "Malo",      scores: [null, null, null, null, 21, null] },
     { name: "Manu",      scores: [null, null, null, null, 15, 11] },
     { name: "Angel",     scores: [null, null, null, null, null, 61] },
 ];

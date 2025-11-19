@@ -37,10 +37,13 @@
 .form-container button { background: #ffc107; color: black; border: none; cursor: pointer; margin-top: 15px; }
 
 /* --- Liste des inscrits --- */
-#inscrits { max-width: 600px; margin: 20px auto; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background: #222; color: white; }
-#inscrits h3 { margin-top: 0; }
-#inscrits ul { list-style: none; padding: 0; }
-#inscrits li { padding: 5px 0; border-bottom: 1px solid #555; }
+#inscrits { max-width: 600px; margin: 20px auto; }
+.mode-card { background: #111; border: 1px solid #333; border-radius: 10px; padding: 15px; margin-bottom: 20px; box-shadow: 0 0 10px rgba(255,193,7,0.1); }
+.mode-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.mode-header .icon { font-size: 1.4rem; }
+.mode-header h4 { margin: 0; font-size: 1.2rem; color: #ffc107; }
+.inscrits-list { list-style: none; padding: 0; margin-top: 10px; }
+.inscrits-list li { padding: 6px 0; border-bottom: 1px solid #444; color: #ddd; }
 </style>
 </head>
 <body>
@@ -70,8 +73,7 @@
         <span class="next">&#10095;</span>
         <img src="img/MJ.png" class="active" alt="Affiche Tournoi">
         <img src="img/BR.png" alt="Affiche MJ">
-		<img src="img/HALLO.png" alt="Affiche MJ">
-		
+        <img src="img/HALLO.png" alt="Affiche MJ">
     </div>
 
     <!-- Formulaire -->
@@ -83,8 +85,7 @@
         <label for="mode">Mode :</label>
         <select id="mode">
             <option value="MJ">MJ</option>
-			<option value="BR">BR</option>
-            
+            <option value="BR">BR</option>
         </select>
 
         <label for="retard">Commentaires / Retard :</label>
@@ -93,10 +94,25 @@
         <button id="submitBtn">S'inscrire</button>
     </div>
 
-    <!-- Liste des inscrits -->
+    <!-- Liste des inscrits séparés -->
     <div id="inscrits">
         <h3>Inscriptions de la semaine</h3>
-        <ul id="inscritsList"></ul>
+
+        <div class="mode-card">
+            <div class="mode-header">
+                <span class="icon">⚔️</span>
+                <h4>MJ (<span id="countMJ">0</span>)</h4>
+            </div>
+            <ul id="inscritsMJ" class="inscrits-list"></ul>
+        </div>
+
+        <div class="mode-card">
+            <div class="mode-header">
+                <span class="icon">🎯</span>
+                <h4>BR (<span id="countBR">0</span>)</h4>
+            </div>
+            <ul id="inscritsBR" class="inscrits-list"></ul>
+        </div>
     </div>
 </main>
 
@@ -128,15 +144,12 @@
 const carousel = document.getElementById('carousel');
 const slides = carousel.querySelectorAll('img');
 let current = 0;
-
 function showSlide(index){
     slides.forEach(img => img.classList.remove('active'));
     slides[index].classList.add('active');
 }
-
 carousel.querySelector('.prev').addEventListener('click', ()=>{ current = (current -1 + slides.length)%slides.length; showSlide(current); });
 carousel.querySelector('.next').addEventListener('click', ()=>{ current = (current +1)%slides.length; showSlide(current); });
-
 // Swipe touch
 let startX = 0;
 carousel.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
@@ -147,16 +160,13 @@ carousel.addEventListener('touchend', e => {
     showSlide(current);
 });
 
-// --- Formulaire avec Google Forms ---
+// --- Formulaire Google Forms ---
 const submitBtn = document.getElementById('submitBtn');
-const inscritsList = document.getElementById('inscritsList');
 
-// **Entry IDs du formulaire Google**
+// Entry IDs Google Form
 const entryPseudo = 'entry.1892682717';
 const entryMode = 'entry.2094814093';
 const entryComment = 'entry.125117687';
-
-// **URL Google Form**
 const formUrl = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSf_X1vZ1OO0yDvAtZOn1GfBYr8BqhRjLmakvVDsDVrwkte5dQ/formResponse';
 
 submitBtn.onclick = ()=>{
@@ -180,25 +190,93 @@ submitBtn.onclick = ()=>{
         .catch(()=>alert("Erreur lors de l'inscription"));
 };
 
-// --- Charger les inscrits depuis Google Sheet publié ---
-async function loadInscrits(){
-    inscritsList.innerHTML = '<li>Chargement...</li>';
+// --- Petit parseur CSV robuste (gère les guillemets et les doubles guillemets) ---
+function parseCSV(text) {
+    const rows = [];
+    let cur = [];
+    let field = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        const nc = text[i + 1];
+
+        if (c === '"') {
+            if (inQuotes && nc === '"') { field += '"'; i++; continue; }
+            inQuotes = !inQuotes;
+            continue;
+        }
+        if (c === '\r') continue;
+        if (c === '\n' && !inQuotes) { cur.push(field); rows.push(cur); cur = []; field = ''; continue; }
+        if (c === ',' && !inQuotes) { cur.push(field); field = ''; continue; }
+        field += c;
+    }
+    if (field !== '' || cur.length) { cur.push(field); rows.push(cur); }
+    return rows;
+}
+
+// --- Charger les inscrits depuis Google Sheet (version robuste) ---
+async function loadInscrits() {
+    const mj = document.getElementById('inscritsMJ');
+    const br = document.getElementById('inscritsBR');
+    const countMJ = document.getElementById('countMJ');
+    const countBR = document.getElementById('countBR');
+
+    mj.innerHTML = '<li>Chargement...</li>';
+    br.innerHTML = '<li>Chargement...</li>';
+
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS59wx288NLzRRXUDs-6FFWdQxp2XX0FiwNyI2lnOOulTFORfqwA3SmoI7KHjuBvwDVW5J-QQ1GClHV/pub?output=csv';
-    try{
+
+    try {
         const res = await fetch(sheetUrl);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
         const text = await res.text();
-        const lines = text.split('\n').slice(1); // ignore l'en-tête
-        inscritsList.innerHTML = '';
-        lines.forEach(line=>{
-            if(!line) return;
-            const [pseudo, mode, comment] = line.split(',');
+        console.log('tournament: fetched CSV length=', text.length);
+
+        const rows = parseCSV(text);
+        if (!rows || rows.length <= 1) {
+            mj.innerHTML = '<li>Aucun inscrit</li>';
+            br.innerHTML = '<li>Aucun inscrit</li>';
+            countMJ.textContent = '0';
+            countBR.textContent = '0';
+            return;
+        }
+
+        // Détecter les indices de colonnes (header présent en première ligne)
+        const header = rows[0].map(h => (h || '').toString().trim().replace(/^"|"$/g, '').toLowerCase());
+        let pseudoIdx = header.findIndex(h => /pseudo|player|name|nom/.test(h));
+        let modeIdx = header.findIndex(h => /mode|type|gamemode/.test(h));
+        if (pseudoIdx === -1) pseudoIdx = 0;
+        if (modeIdx === -1) modeIdx = 1;
+
+        mj.innerHTML = '';
+        br.innerHTML = '';
+
+        let nbMJ = 0;
+        let nbBR = 0;
+
+        for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (!row || row.length === 0) continue;
+            const pseudo = (row[pseudoIdx] || '').toString().trim().replace(/^"|"$/g, '');
+            const mode = (row[modeIdx] || '').toString().trim().replace(/^"|"$/g, '').toUpperCase();
+            if (!pseudo) continue;
+
             const li = document.createElement('li');
-            li.textContent = `${pseudo} (${mode}) - ${comment}`;
-            inscritsList.appendChild(li);
-        });
-    } catch(err){
-        inscritsList.innerHTML = '<li>Impossible de charger les inscriptions</li>';
-        console.error(err);
+            li.textContent = pseudo;
+
+            if (mode === 'MJ') { mj.appendChild(li); nbMJ++; }
+            else if (mode === 'BR') { br.appendChild(li); nbBR++; }
+            else { mj.appendChild(li); }
+        }
+
+        countMJ.textContent = nbMJ;
+        countBR.textContent = nbBR;
+
+    } catch (err) {
+        mj.innerHTML = '<li>Erreur de chargement</li>';
+        br.innerHTML = '<li>Erreur de chargement</li>';
+        console.error('tournament: loadInscrits error', err);
     }
 }
 
