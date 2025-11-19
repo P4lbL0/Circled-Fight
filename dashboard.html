@@ -395,6 +395,9 @@
             checkVersusMode();
         }
 
+        // Expose pour les attributs inline onclick (module scope n'est pas global)
+        window.toggleAll = toggleAll;
+
         // --- LOGIQUE MVP & VERSUS ---
         
         function findMVP() {
@@ -507,6 +510,9 @@
                 finalCanvas.remove();
             }, 100);
         }
+
+        // Expose export function to global scope for header button onclick
+        window.exportChart = exportChart;
 
 
         // Lancement
