@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Circled Fight</title>
+    <title>Circled Fight - Scores Battle Royale</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css"> 
     <style>
         .header { position: relative; }
         .hamburger-menu { position: absolute; top: 8px; right: 12px; background: transparent; border: 0; color: var(--codm-yellow); font-size: 1.6rem; padding: 6px; border-radius:6px; z-index:1200; cursor:pointer; }
@@ -24,7 +24,6 @@
         .sidebar-header { display: block; padding: 12px 15px; }
         .sidebar-header h3 { margin: 0 0 6px 0; }
         .sidebar-header .meta-line { display: flex; gap: 10px; align-items: center; }
-
     </style>
 </head>
 <body>
@@ -60,7 +59,7 @@
     </div>
 
     <script>
-        // Small hamburger toggle (non-intrusive)
+        // Small hamburger toggle (réutilisé)
         (function(){
             const btn = document.getElementById('hamburgerMenu');
             const hub = document.getElementById('dashboardMobileHub');
@@ -78,7 +77,7 @@
     <div class="container">
         <div class="sidebar">
             <div class="sidebar-header">
-                <h3>CLASSEMENT MJ     </h3>
+                <h3>CLASSEMENT BR     </h3>
                 <small style="color:#777;">Par Moyenne</small>
                 <div class="meta-line">
                     <small>Cliquer sur nom pour (dé)masquer sur le graphique</small>
@@ -94,40 +93,36 @@
         </div>
 
         <div class="main-content">
-            <div class="chart-wrapper">
-                <canvas id="clanChart"></canvas>
-            </div>
-            
-            <div class="versus-panel" id="versusPanel">
-                <div class="vs-player" id="p1-container">
-                    <div class="vs-name" id="p1-name" style="color:cyan">Player 1</div>
-                    <div class="vs-score" id="p1-avg">85.5</div>
-                    <div class="vs-stat">Moyenne</div>
+            <div>
+                <div class="chart-wrapper">
+                    <canvas id="brClanChart"></canvas>
                 </div>
-                <div class="vs-icon">VS</div>
-                <div class="vs-player" id="p2-container">
-                    <div class="vs-name" id="p2-name" style="color:orange">Player 2</div>
-                    <div class="vs-score" id="p2-avg">82.0</div>
-                    <div class="vs-stat">Moyenne</div>
+                <div class="versus-panel" id="brVersusPanel">
+                    <div class="vs-player" id="br-p1-container">
+                        <div class="vs-name" id="br-p1-name" style="color:cyan">Player 1</div>
+                        <div class="vs-score" id="br-p1-avg">--</div>
+                        <div class="vs-stat">Moyenne</div>
+                    </div>
+                    <div class="vs-icon">VS</div>
+                    <div class="vs-player" id="br-p2-container">
+                        <div class="vs-name" id="br-p2-name" style="color:orange">Player 2</div>
+                        <div class="vs-score" id="br-p2-avg">--</div>
+                        <div class="vs-stat">Moyenne</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="legend-panel">
-        <h4>LÉGENDE DES BADGES</h4>
-        <div class="badges-list">
-            <span>🔥N : Série de victoires (N semaines de participation consécutive sans absence).</span>
-            <span>🚀 Progression : 3 semaines consécutives de hausse de score.</span>
-            <span>💤 AFK : Aucune participation enregistrée sur les 2 dernières semaines.</span>
-        </div>
+    <div class="legend-panel" style="color: #777; text-align: center; padding: 15px;">
+        <small>Ce tableau de bord est dédié au Battle Royale. Les badges de statut ne sont pas appliqués ici.</small>
     </div>
 
     <script type="module">
-    import { weeks, rawData } from "./js/data.js";
-    import { statWeeks, statData } from "./js/data2.js";
+    // Importation UNIQUEMENT des données BR
+    import { weeks, rawData } from "./js/data3.js";
 
-        // Fonction pour calculer l'écart-type
+    // Fonction pour calculer l'écart-type
         function calculateStdDev(scores) {
             const validScores = scores.filter(s => s !== null && s !== undefined);
             if (validScores.length < 2) return Infinity; 
@@ -276,7 +271,7 @@
         };
 
         // --- 4. INITIALISATION CHART ---
-        const ctx = document.getElementById('clanChart').getContext('2d');
+        const ctx = document.getElementById('brClanChart').getContext('2d');
         const chart = new Chart(ctx, {
             type: 'line',
             data: { labels: weeks, datasets: datasets },
@@ -331,7 +326,7 @@
 
         // --- 5. UI LOGIC ---
         const listContainer = document.getElementById('playerList');
-        const versusPanel = document.getElementById('versusPanel');
+        const versusPanel = document.getElementById('brVersusPanel');
 
         function renderList() {
             listContainer.innerHTML = '';
@@ -395,15 +390,19 @@
             checkVersusMode();
         }
 
+        // Expose toggleAll to global scope so inline `onclick` attributes work (module scope is not global)
+        window.toggleAll = toggleAll;
+
         // --- LOGIQUE MVP & VERSUS ---
         
         function findMVP() {
-            let lastWeekIndex = 11; 
+            // Use the last week from the imported `weeks` array instead of a fixed index
+            const lastWeekIndex = (Array.isArray(weeks) && weeks.length) ? (weeks.length - 1) : 11;
             let bestScore = -1;
             let bestPlayer = "";
 
             rawData.forEach(p => {
-                const score = p.scores[lastWeekIndex];
+                const score = (p.scores && p.scores.length > lastWeekIndex) ? p.scores[lastWeekIndex] : null;
                 if (score !== null && score > bestScore) {
                     bestScore = score;
                     bestPlayer = p.name;
@@ -425,16 +424,16 @@
                 const p1 = visibleDS[0];
                 const p1Data = rawData.find(r => r.name === p1.label);
                 
-                document.getElementById('p1-name').innerText = p1.label;
-                document.getElementById('p1-name').style.color = p1.borderColor;
-                document.getElementById('p1-avg').innerText = p1Data.avg;
+                document.getElementById('br-p1-name').innerText = p1.label;
+                document.getElementById('br-p1-name').style.color = p1.borderColor;
+                document.getElementById('br-p1-avg').innerText = p1Data.avg;
 
                 const p2 = visibleDS[1];
                 const p2Data = rawData.find(r => r.name === p2.label);
                 
-                document.getElementById('p2-name').innerText = p2.label;
-                document.getElementById('p2-name').style.color = p2.borderColor;
-                document.getElementById('p2-avg').innerText = p2Data.avg;
+                document.getElementById('br-p2-name').innerText = p2.label;
+                document.getElementById('br-p2-name').style.color = p2.borderColor;
+                document.getElementById('br-p2-avg').innerText = p2Data.avg;
                 
             } else {
                 versusPanel.style.display = 'none';
@@ -443,7 +442,7 @@
 
         // --- 📸 EXPORT FUNCTION CORRIGÉE (avec Légende) ---
         function exportChart() {
-            const originalCanvas = document.getElementById('clanChart');
+            const originalCanvas = document.getElementById('brClanChart');
             
             // 1. Créer un conteneur et un canvas temporaires (cachés)
             const tempContainer = document.createElement('div');
@@ -455,6 +454,15 @@
 
             const tempCanvas = document.createElement('canvas');
             tempContainer.appendChild(tempCanvas);
+            // Match the temporary canvas size to the original canvas so exported image keeps correct dimensions
+            if (originalCanvas && originalCanvas.width) {
+                tempCanvas.width = originalCanvas.width;
+                tempCanvas.height = originalCanvas.height;
+            } else {
+                // Fallback sizes if original not available
+                tempCanvas.width = 1200;
+                tempCanvas.height = 600;
+            }
 
             // 2. Créer une instance temporaire du Chart, mais AVEC la légende
             const tempChart = new Chart(tempCanvas.getContext('2d'), {
@@ -507,6 +515,9 @@
                 finalCanvas.remove();
             }, 100);
         }
+
+        // Expose export function to global scope for header button onclick
+        window.exportChart = exportChart;
 
 
         // Lancement
