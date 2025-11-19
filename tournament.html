@@ -1,84 +1,209 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Tournoi | Circled Fight</title>
-	<link rel="stylesheet" href="css/tournament.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tournoi | Circled Fight</title>
+<link rel="stylesheet" href="css/tournament.css">
+<style>
+/* --- Carrousel --- */
+.carousel { position: relative; width: 100%; max-width: 600px; margin: 20px auto; overflow: hidden; border-radius: 10px; }
+.carousel img { width: 100%; display: none; }
+.carousel img.active { display: block; }
+
+/* --- Flèches du carrousel --- */
+.carousel .prev, .carousel .next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2rem;
+    color: white;
+    background: rgba(0,0,0,0.4);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    line-height: 36px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+}
+.carousel .prev { left: 10px; }
+.carousel .next { right: 10px; }
+
+/* --- Formulaire --- */
+.form-container { max-width: 600px; margin: 20px auto; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background: #1b1b1b; color: white; }
+.form-container label { display: block; margin-top: 10px; }
+.form-container input, .form-container select, .form-container textarea, .form-container button { width: 100%; margin-top: 5px; padding: 8px; border-radius: 5px; border: 1px solid #555; background: #121212; color: white; }
+.form-container button { background: #ffc107; color: black; border: none; cursor: pointer; margin-top: 15px; }
+
+/* --- Liste des inscrits --- */
+#inscrits { max-width: 600px; margin: 20px auto; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background: #222; color: white; }
+#inscrits h3 { margin-top: 0; }
+#inscrits ul { list-style: none; padding: 0; }
+#inscrits li { padding: 5px 0; border-bottom: 1px solid #555; }
+</style>
 </head>
 <body>
 
-	<header class="main-header">
-		<div class="logo-container">
-			<h1>Circled Fight <span class="tag">CF</span></h1>
-		</div>
-		<!-- Hamburger button (aligné à droite) -->
-		<button id="hamburgerMenu" class="hamburger-menu" aria-controls="mobileHub" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
-		<!-- Panneau du menu qui s'ouvre -->
-		<nav id="mobileHub" class="mobile-hub" aria-hidden="true">
-			<ul>
-				<li><a href="index.html">Accueil</a></li>
-                <li><a href="dashboard.html">Scores MJ</a></li>
-                <li><a href="br_dashboard.html">Scores BR</a></li>
-                <li><a href="tournament.html">Tournoi du Week-end</a></li>
-                <li><a href="members.html">Membres du Clan</a></li>
-                <li><a href="join.html">Nous Rejoindre</a></li>
-			</ul>
-		</nav>
-		<div id="mobileHubBackdrop" class="mobile-hub-backdrop" tabindex="-1" aria-hidden="true"></div>
-	</header>
+<header class="main-header">
+    <div class="logo-container">
+        <h1>Circled Fight <span class="tag">CF</span></h1>
+    </div>
+    <button id="hamburgerMenu" class="hamburger-menu" aria-controls="mobileHub" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
+    <nav id="mobileHub" class="mobile-hub" aria-hidden="true">
+        <ul>
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="dashboard.html">Scores MJ</a></li>
+            <li><a href="br_dashboard.html">Scores BR</a></li>
+            <li><a href="tournament.html">Tournoi du Week-end</a></li>
+            <li><a href="members.html">Membres du Clan</a></li>
+            <li><a href="join.html">Nous Rejoindre</a></li>
+        </ul>
+    </nav>
+    <div id="mobileHubBackdrop" class="mobile-hub-backdrop" tabindex="-1" aria-hidden="true"></div>
+</header>
 
-	<main>
-		<div class="coming-soon-wrapper">
-			<div class="coming-soon">Coming soon</div>
-		</div>
-	</main>
+<main>
+    <!-- Carrousel -->
+    <div class="carousel" id="carousel">
+        <span class="prev">&#10094;</span>
+        <span class="next">&#10095;</span>
+        <img src="img/MJ.png" class="active" alt="Affiche Tournoi">
+        <img src="img/BR.png" alt="Affiche MJ">
+		<img src="img/HALLO.png" alt="Affiche MJ">
+		
+    </div>
 
-	<footer class="main-footer">
-		<p>&copy; 2025 Circled Fight Clan. Tous droits réservés.</p>
-	</footer>
+    <!-- Formulaire -->
+    <div class="form-container">
+        <h2>S'inscrire au tournoi</h2>
+        <label for="pseudo">Pseudo In-Game :</label>
+        <input type="text" id="pseudo" placeholder="Votre pseudo" required>
 
-	<script>
-		// Hamburger menu toggle (same as index.html)
-		(function(){
-			const btn = document.getElementById('hamburgerMenu');
-			const hub = document.getElementById('mobileHub');
-			const backdrop = document.getElementById('mobileHubBackdrop');
+        <label for="mode">Mode :</label>
+        <select id="mode">
+            <option value="MJ">MJ</option>
+			<option value="BR">BR</option>
+            
+        </select>
 
-			if(!btn || !hub || !backdrop) return;
+        <label for="retard">Commentaires / Retard :</label>
+        <textarea id="retard" placeholder="Ex: je serai 10min en retard..." rows="3"></textarea>
 
-			function openHub() {
-				hub.classList.add('open');
-				backdrop.classList.add('visible');
-				btn.setAttribute('aria-expanded', 'true');
-				hub.setAttribute('aria-hidden', 'false');
-				const firstLink = hub.querySelector('a');
-				if(firstLink) firstLink.focus();
-			}
+        <button id="submitBtn">S'inscrire</button>
+    </div>
 
-			function closeHub() {
-				hub.classList.remove('open');
-				backdrop.classList.remove('visible');
-				btn.setAttribute('aria-expanded', 'false');
-				hub.setAttribute('aria-hidden', 'true');
-				btn.focus();
-			}
+    <!-- Liste des inscrits -->
+    <div id="inscrits">
+        <h3>Inscriptions de la semaine</h3>
+        <ul id="inscritsList"></ul>
+    </div>
+</main>
 
-			btn.addEventListener('click', (e) => {
-				const opened = btn.getAttribute('aria-expanded') === 'true';
-				if(opened) closeHub(); else openHub();
-			});
+<script>
+// --- Hamburger menu ---
+(function(){
+    const btn = document.getElementById('hamburgerMenu');
+    const hub = document.getElementById('mobileHub');
+    const backdrop = document.getElementById('mobileHubBackdrop');
 
-			backdrop.addEventListener('click', closeHub);
+    function openHub() {
+        hub.classList.add('open');
+        backdrop.classList.add('visible');
+        btn.setAttribute('aria-expanded','true');
+        hub.setAttribute('aria-hidden','false');
+    }
+    function closeHub() {
+        hub.classList.remove('open');
+        backdrop.classList.remove('visible');
+        btn.setAttribute('aria-expanded','false');
+        hub.setAttribute('aria-hidden','true');
+    }
 
-			document.addEventListener('keydown', (e) => {
-				if(e.key === 'Escape') closeHub();
-			});
+    btn.addEventListener('click', ()=>{ hub.classList.contains('open') ? closeHub() : openHub(); });
+    backdrop.addEventListener('click', closeHub);
+})();
 
-			hub.addEventListener('click', (e) => {
-				if(e.target.tagName === 'A') closeHub();
-			});
-		})();
-	</script>
+// --- Carrousel swipe ---
+const carousel = document.getElementById('carousel');
+const slides = carousel.querySelectorAll('img');
+let current = 0;
+
+function showSlide(index){
+    slides.forEach(img => img.classList.remove('active'));
+    slides[index].classList.add('active');
+}
+
+carousel.querySelector('.prev').addEventListener('click', ()=>{ current = (current -1 + slides.length)%slides.length; showSlide(current); });
+carousel.querySelector('.next').addEventListener('click', ()=>{ current = (current +1)%slides.length; showSlide(current); });
+
+// Swipe touch
+let startX = 0;
+carousel.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+carousel.addEventListener('touchend', e => {
+    let endX = e.changedTouches[0].clientX;
+    if(endX - startX > 50) current = (current -1 + slides.length)%slides.length;
+    else if(startX - endX > 50) current = (current +1)%slides.length;
+    showSlide(current);
+});
+
+// --- Formulaire avec Google Forms ---
+const submitBtn = document.getElementById('submitBtn');
+const inscritsList = document.getElementById('inscritsList');
+
+// **Entry IDs du formulaire Google**
+const entryPseudo = 'entry.1892682717';
+const entryMode = 'entry.2094814093';
+const entryComment = 'entry.125117687';
+
+// **URL Google Form**
+const formUrl = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSf_X1vZ1OO0yDvAtZOn1GfBYr8BqhRjLmakvVDsDVrwkte5dQ/formResponse';
+
+submitBtn.onclick = ()=>{
+    const pseudo = document.getElementById('pseudo').value.trim();
+    const mode = document.getElementById('mode').value;
+    const retard = document.getElementById('retard').value.trim();
+    if(!pseudo){ alert("Merci de rentrer votre pseudo."); return; }
+
+    const formData = new FormData();
+    formData.append(entryPseudo, pseudo);
+    formData.append(entryMode, mode);
+    formData.append(entryComment, retard);
+
+    fetch(formUrl,{method:'POST', mode:'no-cors', body:formData})
+        .then(()=>{ 
+            alert("Inscription enregistrée !"); 
+            document.getElementById('pseudo').value=''; 
+            document.getElementById('retard').value='';
+            loadInscrits(); 
+        })
+        .catch(()=>alert("Erreur lors de l'inscription"));
+};
+
+// --- Charger les inscrits depuis Google Sheet publié ---
+async function loadInscrits(){
+    inscritsList.innerHTML = '<li>Chargement...</li>';
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS59wx288NLzRRXUDs-6FFWdQxp2XX0FiwNyI2lnOOulTFORfqwA3SmoI7KHjuBvwDVW5J-QQ1GClHV/pub?output=csv';
+    try{
+        const res = await fetch(sheetUrl);
+        const text = await res.text();
+        const lines = text.split('\n').slice(1); // ignore l'en-tête
+        inscritsList.innerHTML = '';
+        lines.forEach(line=>{
+            if(!line) return;
+            const [pseudo, mode, comment] = line.split(',');
+            const li = document.createElement('li');
+            li.textContent = `${pseudo} (${mode}) - ${comment}`;
+            inscritsList.appendChild(li);
+        });
+    } catch(err){
+        inscritsList.innerHTML = '<li>Impossible de charger les inscriptions</li>';
+        console.error(err);
+    }
+}
+
+loadInscrits();
+</script>
+
 </body>
 </html>
