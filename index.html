@@ -6,6 +6,104 @@
     <title>Accueil | Circled Fight</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/home.css"> 
+    
+    <style>
+        /* Définition des variables */
+        :root {
+            --codm-yellow: #FFC107;
+            --accent-red: #FF2344;
+            --text-muted: #888;
+        }
+
+        /* CSS Spécifique pour la Modale d'Annonce */
+        .announcement-modal {
+            display: none; /* Masquée par défaut */
+            position: fixed;
+            z-index: 1001; /* Doit être au-dessus de tout */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.85); /* Fond sombre */
+        }
+
+        .modal-content-announcement {
+            background-color: #1e1e1e;
+            margin: 10% auto;
+            padding: 30px;
+            border: 3px solid var(--codm-yellow); /* Cadre jaune/doré */
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(255, 193, 7, 0.5); /* Ombre lumineuse */
+            position: relative;
+            text-align: center;
+            color: white; /* Assurer que le texte est blanc */
+        }
+
+        .modal-content-announcement h2 {
+            color: var(--accent-red); /* Rouge pour l'attention */
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .modal-content-announcement p, .modal-content-announcement li {
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            text-align: left;
+            list-style-type: none; /* Enlever les puces par défaut */
+        }
+        
+        .modal-content-announcement ul {
+            padding-left: 0;
+            margin-top: 15px;
+        }
+        
+        .modal-content-announcement li::before {
+            content: "•";
+            color: var(--codm-yellow);
+            font-weight: bold;
+            display: inline-block; 
+            width: 1em;
+            margin-left: -1em;
+        }
+
+        .modal-content-announcement .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 36px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .modal-content-announcement .cta-button {
+             background-color: var(--codm-yellow);
+             color: #1e1e1e;
+             font-weight: bold;
+             padding: 10px 20px;
+             border: none;
+             border-radius: 5px;
+             cursor: pointer;
+        }
+        .update-message {
+            margin-top: 25px;
+            border-top: 1px solid #333;
+            padding-top: 15px;
+            color: var(--codm-yellow);
+            font-style: italic;
+            text-align: center;
+        }
+        .update-message p {
+            text-align: center;
+            font-style: normal;
+        }
+    </style>
 </head>
 <body>
 
@@ -13,9 +111,7 @@
         <div class="logo-container">
             <h1>Circled Fight <span class="tag">CF</span></h1>
         </div>
-        <!-- Hamburger button (aligné à droite) -->
         <button id="hamburgerMenu" class="hamburger-menu" aria-controls="mobileHub" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
-        <!-- Panneau du menu qui s'ouvre -->
         <nav id="mobileHub" class="mobile-hub" aria-hidden="true">
             <ul>
                 <li><a href="index.html">Accueil</a></li>
@@ -56,8 +152,6 @@
                     <h4>La Régularité</h4>
                     <p>Attribué aux joueurs n’ayant pas participé au tournoi depuis un certain temps</p>
                 </div>
-                
-               
             </div>
         </section>
 
@@ -67,7 +161,6 @@
             <a href="join.html" class="btn-main-action cta-invert" role="button" aria-label="Rejoindre le clan">REJOINDRE LE CLAN</a>
         </section>
 
-        <!-- Stat card moved below the join-callout as requested -->
         <div id="seasonStats" class="season-stats" aria-hidden="false">
             <div class="stat-card">
                 <div class="stat-item">
@@ -86,12 +179,41 @@
     </main>
     
     <footer class="main-footer">
-        <p>&copy; 2025 Circled Fight Clan. Tous droits réservés. | Designed for the Elite.</p>
+        <p>&copy; 2025 Circled Fight Clan V4.1.3 Tous droits réservés. | Designed for the Elite.</p>
         <div class="footer-links">
             Recrutement |
             <a href="#top">Haut de page</a>
         </div>
     </footer>
+    
+    
+    <div id="welcomeModal" class="announcement-modal">
+        <div class="modal-content-announcement">
+            <span class="close-btn" id="closeModal">&times;</span>
+            <h2 style="color: var(--codm-yellow);">BIENVENUE A CIRCLED FIGHT</h2>
+            
+            <p style="text-align: center; margin-bottom: 25px;">
+                Nous sommes ravis de vous accueillir sur l'espace officiel du clan !
+            </p>
+            <ul>
+                <li>📊 Suivre les résultats et statistiques des joueurs.</li>
+                <li>📰 Consulter les affiches des prochains évènements.</li>
+                <li>🏆 T'inscrire aux tournois internes.</li>
+                <li>🤝 Postuler pour rejoindre la grande famille que le clan représente.</li>
+            </ul>
+            
+            <div class="update-message">
+                <h3>🛠️ Notes de Patch</h3>
+                <p>Attention : une nouvelle fonctionnalité est en cours de déploiement ! Restez connectés...</p>
+                <p style="font-size: 0.9em; margin-top: 10px; color: #ff9999; font-style: italic;">
+                    ⚠️ Si vous rencontrez le moindre bug ou anomalie, veuillez en informer le support technique (Angelos).
+                </p>
+            </div>
+
+            <button class="cta-button" id="okModal" style="margin-top: 25px;">C'est parti !</button>
+        </div>
+    </div>
+    
     
     <script>
         // Small counter animation for the homepage stats card
@@ -179,6 +301,38 @@
                 });
             })();
         })();
+        
+        // --- GESTION DE LA MODALE D'ANNONCE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('welcomeModal');
+            const closeModal = document.getElementById('closeModal');
+            const okModal = document.getElementById('okModal');
+
+            // Clé V1.1 pour forcer l'affichage de cette nouvelle version
+            const ANNOUNCEMENT_KEY = 'cf_announcement_v1_1';
+
+            // Fonction pour masquer la modale et définir le marqueur
+            const hideModal = () => {
+                modal.style.display = 'none';
+                localStorage.setItem(ANNOUNCEMENT_KEY, 'true');
+            };
+
+            // 1. Vérifier si l'utilisateur a déjà vu cette version de l'annonce
+            if (localStorage.getItem(ANNOUNCEMENT_KEY) !== 'true') {
+                modal.style.display = 'block';
+            }
+
+            // 2. Événements pour fermer la modale
+            closeModal.onclick = hideModal;
+            okModal.onclick = hideModal;
+            
+            // Fermer si l'utilisateur clique en dehors de la modale
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    hideModal();
+                }
+            }
+        });
     </script>
 </body>
 </html>

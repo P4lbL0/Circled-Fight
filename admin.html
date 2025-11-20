@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Circled Fight CF Points</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --codm-yellow: #FFC107;
+            --accent-red: #FF2344;
+            --text-muted: #888;
+        }
+        body { background-color: #0d0d0d; color: white; font-family: 'Roboto', sans-serif; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background-color: #1a1a1a; border-bottom: 2px solid var(--accent-red); }
+        .header h1 { margin: 0; font-family: 'Orbitron', sans-serif; color: var(--codm-yellow); font-size: 1.8rem; }
+        .export-btn { background-color: #444; color: white; padding: 10px 15px; border-radius: 6px; text-decoration: none; font-weight: bold; transition: background-color 0.3s; }
+        .export-btn:hover { background-color: #666; }
+
+        .admin-container { max-width: 900px; margin: 30px auto; padding: 30px; background: #1e1e1e; border-radius: 12px; border: 1px solid var(--accent-red); box-shadow: 0 0 20px rgba(255, 35, 35, 0.3); color: white; }
+        .section-title { color: var(--codm-yellow); font-family: 'Orbitron', sans-serif; border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 30px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #ccc; }
+        .input-field { width: 100%; padding: 10px; background: #121212; border: 1px solid #444; color: white; border-radius: 4px; box-sizing: border-box; }
+        .cta-button { background-color: var(--accent-red); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; }
+        .cta-button:hover { background-color: #e0002b; }
+
+        .match-card { background: #252525; padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .match-info { flex-grow: 1; }
+        .match-status { font-weight: bold; padding: 5px 10px; border-radius: 4px; font-size: 0.8em;}
+        .status-open { background-color: #007bff; }
+        .status-closed { background-color: var(--accent-red); }
+        .status-settled { background-color: green; }
+        .btn-action { margin-left: 10px; padding: 8px 15px; background-color: #444; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-action:hover { background-color: #666; }
+        .select-player { margin-bottom: 15px; }
+        .select-player label { font-family: 'Orbitron', sans-serif; }
+    </style>
+</head>
+<body>
+    
+    <div class="header">
+        <div>
+            <h1>Admin CF <span style="font-size:0.5em; color:white; vertical-align:middle; border:1px solid white; padding:2px 5px; border-radius:3px;">Console</span></h1>
+            <span style="color: var(--text-muted);">Gestion des Classements & CF Points</span>
+        </div>
+        <div class="export-container">
+            <a href="paris.html" class="export-btn" style="text-decoration:none;">Espace Paris</a>
+        </div>
+    </div>
+
+    <main>
+        <div id="loading" class="admin-container" style="text-align: center;">
+            <p style="color: #ccc;">Vérification des droits d'administrateur...</p>
+        </div>
+        
+        <div id="adminPanel" class="admin-container" style="display:none;">
+            
+            <h2 class="section-title">1. Créer un Nouveau Classement Top 10</h2>
+            <div id="selectPlayerContainer">
+                </div>
+            
+            <button id="btnCreateMatch" class="cta-button action-btn" style="width: 100%;">Créer & Ouvrir le Pari de Classement</button>
+
+            <h2 class="section-title">2. Gérer les Classements Existant</h2>
+            <div id="matchList">
+                <p style="color: #888; text-align: center;">Chargement des classements...</p>
+            </div>
+            
+        </div>
+
+        <div id="denied" class="admin-container" style="display:none; text-align: center;">
+            <h2 style="color: var(--accent-red);">Accès Refusé</h2>
+            <p>Seul l'administrateur est autorisé.</p>
+            <a href="paris.html" class="btn">Retour à l'espace Paris</a>
+        </div>
+    </main>
+
+    <div id="settleModal" class="modal" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6);">
+        <div class="modal-content" style="background-color: #1e1e1e; margin: 10% auto; padding: 25px; border: 1px solid var(--accent-red); width: 80%; max-width: 600px; border-radius: 8px; color: white;">
+            <span class="close-btn" onclick="document.getElementById('settleModal').style.display='none'" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            <h2 style="color: var(--codm-yellow); margin-top: 0;">Saisir le Classement Final</h2>
+            <p id="modalInfo" style="color: #ccc; margin-bottom: 20px;">Veuillez attribuer un rang unique à chaque joueur sélectionné pour ce match.</p>
+            
+            <table id="resultsTable" style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <thead>
+                    <tr style="background-color: #333;">
+                        <th style="padding: 10px; border: 1px solid #444; text-align: left;">Joueur</th>
+                        <th style="padding: 10px; border: 1px solid #444;">Rang (1 à 10)</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTableBody">
+                    </tbody>
+            </table>
+
+            <p id="modalError" style="color: var(--accent-red); display: none; margin-bottom: 15px;"></p>
+
+            <button id="btnConfirmResults" class="cta-button action-btn" style="width: 100%;">Confirmer et Payer les Gains</button>
+        </div>
+    </div>
+    
+    <script type="module" src="js/admin.js"></script>
+    <script type="module" src="js/data.js"></script>
+    <script type="module" src="js/data-utils.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paris - Circled Fight</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --codm-yellow: #FFC107;
+            --accent-red: #FF2344;
+            --text-muted: #888;
+        }
+        body { background-color: #0d0d0d; color: white; font-family: 'Roboto', sans-serif; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background-color: #1a1a1a; border-bottom: 2px solid var(--accent-red); }
+        .header h1 { margin: 0; font-family: 'Orbitron', sans-serif; color: var(--codm-yellow); font-size: 1.8rem; }
+        .export-btn { background-color: #444; color: white; padding: 10px 15px; border-radius: 6px; text-decoration: none; font-weight: bold; transition: background-color 0.3s; }
+        .export-btn:hover { background-color: #666; }
+
+        .login-wrapper { max-width: 400px; margin: 50px auto; padding: 30px; background: #1e1e1e; border-radius: 12px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; color: var(--codm-yellow); margin-bottom: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.9em; }
+        .input-field { width: 100%; padding: 12px; background: #121212; border: 1px solid #444; color: white; border-radius: 6px; box-sizing: border-box; font-family: 'Roboto', sans-serif; transition: border-color 0.3s; }
+        .action-btn { width: 100%; padding: 12px; margin-top: 10px; font-size: 1.1rem; cursor: pointer; }
+        .switch-mode { margin-top: 20px; font-size: 0.9em; color: #888; cursor: pointer; text-decoration: underline; }
+        .error-msg { background-color: rgba(255, 23, 68, 0.1); border: 1px solid var(--accent-red); color: var(--accent-red); padding: 10px; border-radius: 4px; font-size: 0.9em; margin-bottom: 20px; display: none; }
+        .dashboard-paris { display: none; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .user-card { background: linear-gradient(145deg, #1e1e1e, #252525); border-left: 5px solid var(--codm-yellow); padding: 25px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .user-card h3 { margin: 0; font-size: 1.5rem; color: white; }
+        .cf-points { font-size: 2em; color: var(--codm-yellow); font-weight: bold; font-family: 'Orbitron'; text-shadow: 0 0 10px rgba(255, 193, 7, 0.3); }
+
+        /* Styles PARIS RANKING */
+        .ranking-card {
+            background: #252525;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+        }
+        .player-ranking-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed #333;
+        }
+        .player-ranking-row:last-child { border-bottom: none; }
+        .player-ranking-row select {
+            padding: 8px;
+            background: #121212;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 4px;
+        }
+        .bet-summary { margin-top: 20px; padding-top: 20px; border-top: 1px solid #333; }
+        .player-name { font-weight: bold; }
+        .current-cote { color: var(--codm-yellow); font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    
+    <div class="header">
+        <div>
+            <h1>Circled fight <span style="font-size:0.5em; color:white; vertical-align:middle; border:1px solid white; padding:2px 5px; border-radius:3px;">Cf</span></h1>
+            <span style="color: var(--text-muted);">Espace Paris & CF Points</span>
+        </div>
+        <div id="adminLink" style="display:none; margin-right: 10px;">
+            <a href="admin.html" class="export-btn" style="background-color: var(--accent-red);">ADMIN</a>
+        </div>
+        <div class="export-container"><a href="index.html" class="export-btn" style="text-decoration:none;">Retour Accueil</a></div>
+    </div>
+
+    <main>
+        <div id="authSection" class="login-wrapper">
+            <h2 id="authTitle" style="color: var(--codm-yellow); font-family: 'Orbitron'; margin-bottom: 10px;">CONNEXION</h2>
+            <p id="authSub" style="color:#ccc; margin-bottom:30px; font-size: 0.9rem;">Connecte-toi pour gérer tes paris</p>
+            <div id="errorMessage" class="error-msg">Erreur ici</div>
+            <div class="input-group">
+                <label>PSEUDO DU JOUEUR</label>
+                <input type="text" id="pseudoInput" class="input-field" placeholder="Ex: Angelos">
+            </div>
+            <div class="input-group">
+                <label>MOT DE PASSE</label>
+                <input type="password" id="mdpInput" class="input-field" placeholder="******">
+            </div>
+            <button id="btnAction" class="cta-button action-btn">SE CONNECTER</button>
+            <p class="switch-mode" id="toggleMode">Pas encore de compte ? Créer un compte</p>
+        </div>
+
+        <div id="bettingSection" class="dashboard-paris">
+            <div class="user-card">
+                <div>
+                    <h3 id="displayPseudo">Chargement...</h3>
+                    <small style="color:#aaa; text-transform: uppercase; letter-spacing: 1px;">Membre du Clan</small>
+                </div>
+                <div class="cf-points">
+                    <span id="userPoints">...</span> <span style="font-size:0.5em; vertical-align: middle;">CF</span>
+                </div>
+            </div>
+            
+            <div id="matchListContainer">
+                <h3 style="margin-bottom: 20px; color: white; font-family: 'Orbitron';">CLASSEMENTS OUVERTS AUX PARIS</h3>
+                <div id="openMatchList">
+                    <p style="color: #888; text-align: center;">Chargement des classements en cours...</p>
+                </div>
+            </div>
+            
+            <button id="btnLogout" class="btn" style="background:#333; margin-top:40px; border: 1px solid #555;">Déconnexion</button>
+        </div>
+    </main>
+
+    <script type="module">
+        import { auth, db, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, onAuthStateChanged, signOut } from './js/firebase.js';
+        import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        
+        const ADMIN_UID = "CZ0UeiyrPNVufTVnnYSH4YTnGP13"; 
+
+        const authSection = document.getElementById('authSection');
+        const bettingSection = document.getElementById('bettingSection');
+        const pseudoInput = document.getElementById('pseudoInput');
+        const mdpInput = document.getElementById('mdpInput');
+        const btnAction = document.getElementById('btnAction');
+        const toggleMode = document.getElementById('toggleMode');
+        const authTitle = document.getElementById('authTitle');
+        const errorMsg = document.getElementById('errorMessage');
+        const adminLink = document.getElementById('adminLink');
+        const openMatchList = document.getElementById('openMatchList');
+
+        let isLoginMode = true;
+        let currentUserData = null; 
+        
+        window.userPredictions = {}; 
+        window.matchDataCache = {}; 
+
+        // --- Fonctions d'authentification ---
+        toggleMode.addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            errorMsg.style.display = 'none';
+            if (isLoginMode) {
+                authTitle.innerText = "CONNEXION";
+                btnAction.innerText = "SE CONNECTER";
+                toggleMode.innerText = "Pas encore de compte ? Créer un compte";
+            } else {
+                authTitle.innerText = "INSCRIPTION";
+                btnAction.innerText = "S'INSCRIRE (1000 CF OFFERTS)";
+                toggleMode.innerText = "Déjà un compte ? Se connecter";
+            }
+        });
+
+        btnAction.addEventListener('click', async () => {
+            const pseudo = pseudoInput.value.trim();
+            const mdp = mdpInput.value;
+            if (pseudo.length < 3 || mdp.length < 6) { showError("Pseudo trop court ou mot de passe < 6 caractères."); return; }
+            const fakeEmail = pseudo.toLowerCase().replace(/\s/g, '') + "@circledfight.clan";
+
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, fakeEmail, mdp);
+                } else {
+                    const userCredential = await createUserWithEmailAndPassword(auth, fakeEmail, mdp);
+                    const user = userCredential.user;
+                    await setDoc(doc(db, "users", user.uid), {
+                        pseudo: pseudo, 
+                        email: fakeEmail,
+                        cfPoints: 1000, 
+                        joinedAt: new Date()
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+                if (error.code === 'auth/email-already-in-use') showError("Ce pseudo est déjà pris !");
+                else if (error.code === 'auth/invalid-credential') showError("Pseudo ou mot de passe incorrect.");
+                else showError("Erreur : " + error.message);
+            }
+        });
+
+        function showError(msg) {
+            errorMsg.innerText = msg;
+            errorMsg.style.display = 'block';
+        }
+
+        document.getElementById('btnLogout').addEventListener('click', () => {
+            signOut(auth).then(() => location.reload());
+        });
+        
+        // --- LOGIQUE DE PARI CLASSEMENT ---
+        
+        async function loadOpenMatches(userId) {
+            openMatchList.innerHTML = '<p style="color: #888; text-align: center;">Recherche de classements en cours...</p>';
+            
+            const q = query(collection(db, "matches"), where("status", "==", "open"), where("type", "==", "ranking"));
+            const snapshot = await getDocs(q);
+            
+            if (snapshot.empty) {
+                openMatchList.innerHTML = '<p style="color: #888; text-align: center;">Aucun classement n\'est actuellement ouvert aux paris.</p>';
+                return;
+            }
+
+            let html = '';
+            for (const docMatch of snapshot.docs) {
+                const match = docMatch.data();
+                const matchId = docMatch.id;
+                const numPlayers = Object.keys(match.players).length;
+                
+                window.matchDataCache[matchId] = match;
+
+                const rankOptions = Array.from({length: numPlayers}, (_, i) => `<option value="${i+1}">Rang ${i+1}</option>`).join('');
+
+                // Vérifier si l'utilisateur a déjà parié
+                const betQuery = query(collection(db, "bets"), 
+                    where("matchId", "==", matchId),
+                    where("userId", "==", userId)
+                );
+                const betSnapshot = await getDocs(betQuery);
+                const hasUserBet = !betSnapshot.empty;
+                const userBet = hasUserBet ? betSnapshot.docs[0].data() : null;
+                
+                if (hasUserBet) {
+                    let summaryHtml = `<p style="font-weight: bold; margin-bottom: 5px;">Votre Prédiction (${Object.keys(userBet.prediction).length} paris) :</p>`;
+                    for (const [player, rank] of Object.entries(userBet.prediction)) {
+                        // Utilisation du '??' pour une cote de secours si non trouvée
+                        const cote = userBet.odds[player][rank] ?? 1.00; 
+                        summaryHtml += `<small>• ${player} prédit à la ${rank}e place. (Cote: x${cote.toFixed(2)})</small><br>`;
+                    }
+
+                    html += `
+                        <div class="ranking-card" style="border-left: 5px solid green;">
+                            <h4>PRÉDICTION CLASSEMENT OUVERTE (Top ${numPlayers} joueurs)</h4>
+                            <p class="bet-status-msg" style="color: green;">✅ Pari déjà placé ! Mise : ${userBet.amount} CF.</p>
+                            ${summaryHtml}
+                        </div>
+                    `;
+                    continue;
+                }
+                
+                // Affichage du formulaire de prédiction
+                html += `
+                    <div class="ranking-card" id="card-${matchId}">
+                        <h4>PRÉDICTION CLASSEMENT TOP ${numPlayers}</h4>
+                        <p style="color: #aaa;">Sélectionnez le rang que vous prédisez pour chaque joueur (laisser vide si vous ne pariez pas).</p>
+
+                        <div id="ranking-grid-${matchId}">
+                            <div class="player-ranking-row" style="font-weight: bold; border-bottom: 2px solid #555;">
+                                <span>Joueur</span>
+                                <span>Prédiction</span>
+                                <span>Cote Actuelle</span>
+                            </div>
+                `;
+
+                // Liste des joueurs sélectionnés par l'admin
+                for (const playerName in match.players) {
+                    // AFFICHAGE INITIAL DE LA COTE DU RANG 1
+                    const defaultCote = match.allOdds[playerName][1] || match.allOdds[playerName][numPlayers] || 1.05; 
+
+                    html += `
+                        <div class="player-ranking-row">
+                            <span class="player-name">${playerName}</span>
+                            <select id="select-${matchId}-${playerName}" data-player="${playerName}" onchange="updateBetSummary('${matchId}')">
+                                <option value="">Choisir...</option>
+                                ${rankOptions}
+                            </select>
+                            <span class="current-cote" id="cote-${matchId}-${playerName}">x${defaultCote.toFixed(2)}</span>
+                        </div>
+                    `;
+                }
+
+                html += `
+                        </div>
+                        
+                        <div class="bet-summary">
+                            <p style="font-weight: bold; color: #ccc;">Prédictions choisies :</p>
+                            <div id="selected-bets-${matchId}" style="margin-bottom: 10px; font-size: 0.9em; color: #999;">Aucune sélection.</div>
+                            
+                            <div class="input-group">
+                                <label>Votre mise totale (Max: ${currentUserData.cfPoints} CF)</label>
+                                <input type="number" id="amount-${matchId}" class="input-field" min="10" max="${currentUserData.cfPoints}" placeholder="Minimum 10 CF">
+                            </div>
+                        </div>
+                        
+                        <button class="cta-button action-btn" style="margin-top: 20px;" onclick="placeRankingBet('${matchId}')">CONFIRMER LE PARI</button>
+
+                        <p class="bet-status-msg" id="msg-${matchId}"></p>
+                    </div>
+                `;
+            }
+            openMatchList.innerHTML = html;
+        }
+        
+        // Mise à jour de la cote et du récapitulatif
+        window.updateBetSummary = (matchId) => {
+            const card = document.getElementById(`card-${matchId}`);
+            const amount = parseInt(document.getElementById(`amount-${matchId}`).value) || 0;
+            const msgElement = document.getElementById(`msg-${matchId}`);
+            const selectedBetsDiv = document.getElementById(`selected-bets-${matchId}`);
+
+            const selectedRanks = {};
+            const selectedRankElements = card.querySelectorAll('select[data-player]');
+            let summaryText = '';
+            
+            selectedRankElements.forEach(select => {
+                const playerName = select.getAttribute('data-player');
+                const selectedRank = parseInt(select.value);
+                const coteElement = document.getElementById(`cote-${matchId}-${playerName}`);
+                const numPlayers = Object.keys(matchDataCache[matchId].players).length;
+                
+                if (selectedRank && matchDataCache[matchId]) {
+                    const cote = matchDataCache[matchId].allOdds[playerName][selectedRank];
+                    coteElement.innerHTML = `x${cote.toFixed(2)}`;
+                    selectedRanks[playerName] = selectedRank;
+                    summaryText += `• ${playerName} Rang ${selectedRank} (x${cote.toFixed(2)})<br>`;
+                } else if (matchDataCache[matchId]) {
+                    // Afficher la cote du rang 1 ou la cote max par défaut
+                    const defaultCote = matchDataCache[matchId].allOdds[playerName][1] || matchDataCache[matchId].allOdds[playerName][numPlayers] || 1.05;
+                    coteElement.innerHTML = `x${defaultCote.toFixed(2)}`;
+                }
+            });
+            
+            selectedBetsDiv.innerHTML = summaryText || "Aucune sélection.";
+
+            // Vérifier les doublons de rangs
+            const ranksSelected = Object.values(selectedRanks);
+            const uniqueRanks = new Set(ranksSelected);
+            
+            if (ranksSelected.length > 1 && ranksSelected.length !== uniqueRanks.size) {
+                 msgElement.style.color = 'red';
+                 msgElement.innerText = "Chaque rang sélectionné doit être unique pour ce match !";
+            } else {
+                 msgElement.innerText = "";
+            }
+            
+            window.userPredictions[matchId] = {
+                prediction: selectedRanks,
+                amount: amount
+            };
+        };
+        
+        // Fonction pour placer le pari (déclenchée par le bouton CONFIRMER)
+        window.placeRankingBet = async (matchId) => {
+            const predictionData = window.userPredictions[matchId];
+            const msgElement = document.getElementById(`msg-${matchId}`);
+            
+            if (!predictionData) {
+                msgElement.innerText = "Veuillez faire au moins une prédiction.";
+                return;
+            }
+            
+            const selectedPredictions = predictionData.prediction;
+            const numPredictions = Object.keys(selectedPredictions).length;
+            const amount = parseInt(document.getElementById(`amount-${matchId}`).value);
+
+            if (numPredictions === 0) {
+                 msgElement.innerText = "Veuillez sélectionner au moins un joueur/rang.";
+                 return;
+            }
+            
+            if (isNaN(amount) || amount < 10) {
+                msgElement.innerText = "Le montant minimum est de 10 CF.";
+                return;
+            }
+            if (amount > currentUserData.cfPoints) {
+                msgElement.innerText = "Fonds insuffisants !";
+                return;
+            }
+            
+            // Re-vérification des rangs uniques
+            const ranksSelected = Object.values(selectedPredictions);
+            const uniqueRanks = new Set(ranksSelected);
+            
+            if (ranksSelected.length > 1 && ranksSelected.length !== uniqueRanks.size) {
+                 msgElement.innerText = "Chaque rang sélectionné doit être unique pour ce match !";
+                 return;
+            }
+
+            try {
+                // 1. Déduire les CF Points de l'utilisateur
+                const newPoints = currentUserData.cfPoints - amount;
+                await updateDoc(doc(db, "users", auth.currentUser.uid), { cfPoints: newPoints });
+
+                // 2. Enregistrer le pari 
+                const matchData = matchDataCache[matchId];
+                const oddsAtBet = {};
+                
+                for (const player in selectedPredictions) {
+                     const rank = selectedPredictions[player];
+                     oddsAtBet[player] = {};
+                     oddsAtBet[player][rank] = matchData.allOdds[player][rank];
+                }
+
+                await setDoc(doc(db, "bets", `BET-${auth.currentUser.uid}-${matchId}`), {
+                    matchId: matchId,
+                    userId: auth.currentUser.uid,
+                    amount: amount,
+                    isSettled: false,
+                    prediction: selectedPredictions, // {PlayerName: Rank}
+                    odds: oddsAtBet, 
+                    betTime: new Date().toISOString()
+                });
+
+                // 3. Mise à jour de l'interface
+                msgElement.style.color = 'green';
+                msgElement.innerText = `Pari placé sur ${numPredictions} rang(s). Solde mis à jour.`;
+                currentUserData.cfPoints = newPoints;
+                document.getElementById('userPoints').innerText = newPoints;
+                loadOpenMatches(auth.currentUser.uid); 
+
+            } catch (e) {
+                console.error("Erreur lors du pari:", e);
+                msgElement.style.color = 'red';
+                msgElement.innerText = "Erreur critique lors du pari.";
+                await updateDoc(doc(db, "users", auth.currentUser.uid), { cfPoints: currentUserData.cfPoints });
+            }
+        };
+
+
+        // --- ÉCOUTEUR D'ÉTAT ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                authSection.style.display = 'none';
+                bettingSection.style.display = 'block';
+                
+                if (user.uid === ADMIN_UID) {
+                    adminLink.style.display = 'block';
+                }
+
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    currentUserData = userSnap.data();
+                    document.getElementById('displayPseudo').innerText = currentUserData.pseudo;
+                    document.getElementById('userPoints').innerText = currentUserData.cfPoints;
+                    
+                    loadOpenMatches(user.uid);
+                }
+            } else {
+                authSection.style.display = 'block';
+                bettingSection.style.display = 'none';
+                adminLink.style.display = 'none';
+            }
+        });
+
+    </script>
+</body>
+</html>
