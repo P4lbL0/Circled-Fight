@@ -26,6 +26,7 @@
     text-align: center;
     cursor: pointer;
     user-select: none;
+    z-index: 10; /* Au-dessus de l'image */
 }
 .carousel .prev { left: 10px; }
 .carousel .next { right: 10px; }
@@ -44,6 +45,94 @@
 .mode-header h4 { margin: 0; font-size: 1.2rem; color: #ffc107; }
 .inscrits-list { list-style: none; padding: 0; margin-top: 10px; }
 .inscrits-list li { padding: 6px 0; border-bottom: 1px solid #444; color: #ddd; }
+
+
+/* ================================================= */
+/* --- NOUVEAUX STYLES : Bouton et Modale Règles --- */
+/* ================================================= */
+
+.rules-button {
+    display: block;
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto 30px auto;
+    padding: 12px;
+    background-color: #FF2344; /* Rouge visible */
+    color: white;
+    border: 2px solid #ffc107; /* Contour jaune */
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    text-transform: uppercase;
+    transition: background-color 0.3s;
+}
+
+.rules-button:hover {
+    background-color: #c91c36;
+}
+
+/* MODALE DES RÈGLES */
+.rules-modal {
+    display: none; /* Masquée par défaut */
+    position: fixed;
+    z-index: 2000; /* Très haut pour être au-dessus de tout */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.95); /* Fond très sombre */
+    padding-top: 20px;
+}
+
+.modal-content-rules {
+    position: relative;
+    margin: 5% auto; /* Centrer légèrement */
+    padding: 0;
+    width: 90%;
+    max-width: 800px; /* Taille maximale pour l'image */
+}
+
+.modal-content-rules img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
+}
+
+.rules-close {
+    color: white;
+    position: absolute;
+    top: -30px; /* Déplacer la croix au-dessus du coin */
+    right: 0px;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.rules-close:hover,
+.rules-close:focus {
+    color: #ffc107;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Ajustement mobile pour la croix */
+@media (max-width: 600px) {
+    .rules-close {
+        top: -20px;
+        right: 10px;
+        font-size: 30px;
+    }
+    .modal-content-rules {
+        margin: 10% auto;
+    }
+}
 </style>
 </head>
 <body>
@@ -67,7 +156,6 @@
 </header>
 
 <main>
-    <!-- Carrousel -->
     <div class="carousel" id="carousel">
         <span class="prev">&#10094;</span>
         <span class="next">&#10095;</span>
@@ -76,7 +164,10 @@
         <img src="img/HALLO.png" alt="Affiche MJ">
     </div>
 
-    <!-- Formulaire -->
+    <button class="rules-button" id="openRulesBtn">
+        Consulter les Règles du Tournoi MJ
+    </button>
+    
     <div class="form-container">
         <h2>S'inscrire au tournoi</h2>
         <label for="pseudo">Pseudo In-Game :</label>
@@ -94,7 +185,6 @@
         <button id="submitBtn">S'inscrire</button>
     </div>
 
-    <!-- Liste des inscrits séparés -->
     <div id="inscrits">
         <h3>Inscriptions de la semaine</h3>
 
@@ -115,6 +205,13 @@
         </div>
     </div>
 </main>
+
+<div id="rulesModal" class="rules-modal">
+  <div class="modal-content-rules">
+    <span class="rules-close" id="closeRulesBtn">&times;</span>
+    <img src="img/REGLE.png" alt="Règles du Tournoi MJ - Circled Fight"> 
+  </div>
+</div>
 
 <script>
 // --- Hamburger menu ---
@@ -160,7 +257,26 @@ carousel.addEventListener('touchend', e => {
     showSlide(current);
 });
 
-// --- Formulaire Google Forms ---
+// --- Gestion de la Modale des Règles ---
+const rulesModal = document.getElementById('rulesModal');
+const openRulesBtn = document.getElementById('openRulesBtn');
+const closeRulesBtn = document.getElementById('closeRulesBtn');
+
+openRulesBtn.onclick = function() {
+  rulesModal.style.display = "block";
+}
+
+closeRulesBtn.onclick = function() {
+  rulesModal.style.display = "none";
+}
+
+window.onclick = function(event) {
+  if (event.target == rulesModal) {
+    rulesModal.style.display = "none";
+  }
+}
+
+// --- Formulaire Google Forms et Chargement des inscrits (inchangé) ---
 const submitBtn = document.getElementById('submitBtn');
 
 // Entry IDs Google Form
