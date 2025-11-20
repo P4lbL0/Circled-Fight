@@ -30,20 +30,20 @@
 
         .modal-content-announcement {
             background-color: #1e1e1e;
-            margin: 10% auto;
+            margin: 10% auto; /* Marge supérieure/inférieure par défaut */
             padding: 30px;
-            border: 3px solid var(--codm-yellow); /* Cadre jaune/doré */
+            border: 3px solid var(--codm-yellow);
             width: 90%;
             max-width: 500px;
             border-radius: 12px;
-            box-shadow: 0 0 25px rgba(255, 193, 7, 0.5); /* Ombre lumineuse */
+            box-shadow: 0 0 25px rgba(255, 193, 7, 0.5);
             position: relative;
             text-align: center;
-            color: white; /* Assurer que le texte est blanc */
+            color: white;
         }
 
         .modal-content-announcement h2 {
-            color: var(--accent-red); /* Rouge pour l'attention */
+            color: var(--accent-red);
             font-family: 'Orbitron', sans-serif;
             margin-bottom: 15px;
             font-size: 1.8rem;
@@ -54,7 +54,7 @@
             line-height: 1.6;
             margin-bottom: 10px;
             text-align: left;
-            list-style-type: none; /* Enlever les puces par défaut */
+            list-style-type: none;
         }
         
         .modal-content-announcement ul {
@@ -102,6 +102,25 @@
         .update-message p {
             text-align: center;
             font-style: normal;
+        }
+
+        /* ===================================== */
+        /* SECTION RESPONSIVE (MOBILE)           */
+        /* ===================================== */
+        @media (max-width: 600px) {
+            .modal-content-announcement {
+                width: 95%; /* Utiliser presque toute la largeur */
+                margin: 5% auto; /* Réduire la marge supérieure/inférieure */
+                padding: 20px; /* Réduire le padding */
+            }
+
+            .modal-content-announcement h2 {
+                font-size: 1.5rem; /* Réduire la taille du titre */
+            }
+            
+            .modal-content-announcement p {
+                 font-size: 0.95rem; /* Taille de police légèrement plus petite */
+            }
         }
     </style>
 </head>
@@ -179,7 +198,7 @@
     </main>
     
     <footer class="main-footer">
-        <p>&copy; 2025 Circled Fight Clan V4.1.3 Tous droits réservés. | Designed for the Elite.</p>
+        <p>&copy; 2025 Circled Fight Clan V4.1. Tous droits réservés. | Designed for the Elite.</p>
         <div class="footer-links">
             Recrutement |
             <a href="#top">Haut de page</a>
@@ -190,23 +209,23 @@
     <div id="welcomeModal" class="announcement-modal">
         <div class="modal-content-announcement">
             <span class="close-btn" id="closeModal">&times;</span>
-            <h2 style="color: var(--codm-yellow);">BIENVENUE A CIRCLED FIGHT</h2>
+            <h2 style="color: var(--codm-yellow);">BIENVENUE CLAN CIRCLED FIGHT</h2>
             
             <p style="text-align: center; margin-bottom: 25px;">
                 Nous sommes ravis de vous accueillir sur l'espace officiel du clan !
             </p>
             <ul>
-                <li>📊 Suivre les résultats et statistiques des joueurs.</li>
-                <li>📰 Consulter les affiches des prochains évènements.</li>
-                <li>🏆 T'inscrire aux tournois internes.</li>
-                <li>🤝 Postuler pour rejoindre la grande famille que le clan représente.</li>
+                <li>📊 Suivre les **résultats** et **statistiques** des joueurs.</li>
+                <li>📰 Consulter les **affiches** des prochains évènements.</li>
+                <li>🏆 T'**inscrire** aux tournois internes.</li>
+                <li>🤝 **Postuler** pour rejoindre la grande famille que le clan représente.</li>
             </ul>
             
             <div class="update-message">
                 <h3>🛠️ Notes de Patch</h3>
-                <p>Attention : une nouvelle fonctionnalité est en cours de déploiement ! Restez connectés...</p>
+                <p>Attention : une **nouvelle fonctionnalité** est en cours de déploiement ! Restez connectés...</p>
                 <p style="font-size: 0.9em; margin-top: 10px; color: #ff9999; font-style: italic;">
-                    ⚠️ Si vous rencontrez le moindre bug ou anomalie, veuillez en informer le support technique (Angelos).
+                    ⚠️ Si vous rencontrez le moindre bug ou anomalie, veuillez en informer le support technique (**Angelos**).
                 </p>
             </div>
 
