@@ -1,8 +1,8 @@
 // js/admin.js
 
 import { auth, db, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, onAuthStateChanged } from './firebase.js';
-import { rawData } from './data.js';
-import { getAllPlayersWithStats, calculateDynamicCote } from './data-utils.js';
+// On garde getAllPlayers pour la liste déroulante, mais on n'a plus besoin du calculateur de cotes ici
+import { getAllPlayersWithStats } from './data-utils.js';
 
 // ----------------------------------------------------
 // ⚠️ VOTRE ID D'ADMINISTRATEUR
@@ -19,7 +19,7 @@ const selectPlayerContainer = document.getElementById('selectPlayerContainer');
 
 let allPlayers = getAllPlayersWithStats(); 
 const MAX_RANKINGS = 10;
-const MIN_PLAYERS = 8; // Minimum de joueurs requis
+const MIN_PLAYERS = 8; 
 let playerSelects = []; 
 
 // --- 1. CONTRÔLE D'ACCÈS ---
@@ -34,18 +34,19 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// --- 2. CRÉATION DES SELECTEURS DE CLASSEMENT ---
+// --- 2. CRÉATION DES SELECTEURS ---
 function setupRankingSelects() {
     let html = '';
-    const playerOptions = allPlayers.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+    // On trie alphabétiquement pour faciliter la recherche admin
+    const sortedPlayers = [...allPlayers].sort((a,b) => a.name.localeCompare(b.name));
+    const playerOptions = sortedPlayers.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
 
     for (let i = 1; i <= MAX_RANKINGS; i++) {
-        const selectId = `rank-${i}`;
         html += `
             <div class="form-group select-player">
-                <label>Rang ${i} ${i <= MIN_PLAYERS ? '(Minimum)' : ''}</label>
-                <select id="${selectId}" class="input-field">
-                    <option value="">-- Choisir un joueur --</option>
+                <label>Joueur ${i} ${i <= MIN_PLAYERS ? '(Requis)' : '(Optionnel)'}</label>
+                <select id="rank-${i}" class="input-field">
+                    <option value="">-- Sélectionner --</option>
                     ${playerOptions}
                 </select>
             </div>
@@ -53,108 +54,108 @@ function setupRankingSelects() {
     }
     selectPlayerContainer.innerHTML = html;
     
-    playerSelects = []; // Réinitialiser le tableau
+    playerSelects = [];
     for (let i = 1; i <= MAX_RANKINGS; i++) {
         playerSelects.push(document.getElementById(`rank-${i}`));
     }
 }
 
-// --- 3. FONCTION DE CRÉATION DE MATCH (Classement) ---
+// --- 3. CRÉATION DE MATCH (SIMPLIFIÉE) ---
 btnCreateMatch.addEventListener('click', async () => {
     const selectedPlayers = playerSelects.map(s => s.value).filter(name => name !== "");
 
     if (selectedPlayers.length < MIN_PLAYERS) {
-        alert(`Veuillez sélectionner au moins ${MIN_PLAYERS} joueurs pour ce classement.`);
+        alert(`Il faut au moins ${MIN_PLAYERS} joueurs pour lancer un classement.`);
         return;
     }
     
     const uniquePlayers = new Set(selectedPlayers);
     if (uniquePlayers.size !== selectedPlayers.length) {
-        alert("Attention: Le même joueur ne peut pas être sélectionné deux fois !");
+        alert("Erreur : Vous avez sélectionné le même joueur plusieurs fois !");
         return;
     }
 
-    const odds = {};
+    // On prépare juste la liste des joueurs
     const matchPlayers = {};
-
     selectedPlayers.forEach((playerName) => {
         matchPlayers[playerName] = { name: playerName };
     });
 
-    for (const playerName of selectedPlayers) {
-        const playerStats = allPlayers.find(p => p.name === playerName);
-        odds[playerName] = {};
-        for (let rank = 1; rank <= MAX_RANKINGS; rank++) {
-             odds[playerName][rank] = calculateDynamicCote(playerStats, rank);
-        }
-    }
+    // NOTE : On ne calcule PLUS les cotes ici. C'est le client (index.html) qui le fera en temps réel.
+    // Cela allège considérablement la base de données.
 
     try {
         const matchId = `C-${Date.now()}`;
         await setDoc(doc(db, "matches", matchId), {
             type: 'ranking',
             players: matchPlayers, 
-            allOdds: odds, 
+            // allOdds: odds,  <-- SUPPRIMÉ (Optimisation)
             status: 'open',
             finalRanking: {}, 
             createdAt: new Date().toISOString()
         });
-        alert(`Classement ${matchId} créé avec ${selectedPlayers.length} joueurs et ouvert aux paris !`);
+        alert(`Classement ${matchId} ouvert aux paris !`);
         loadMatches();
+        // Reset des sélecteurs
+        playerSelects.forEach(s => s.value = "");
     } catch (e) {
-        console.error("Erreur création de match:", e);
-        alert("Erreur lors de la création du classement.");
+        console.error("Erreur création:", e);
+        alert("Erreur technique lors de la création.");
     }
 });
 
-// --- 4. CHARGEMENT ET AFFICHAGE DES MATCHS (Classements) ---
+// --- 4. LISTE DES MATCHS ---
 async function loadMatches() {
     matchList.innerHTML = '<p style="color: #888; text-align: center;">Chargement...</p>';
-    const q = query(collection(db, "matches"));
+    // On prend les 20 derniers matchs pour éviter de surcharger
+    const q = query(collection(db, "matches")); // Vous pourrez ajouter un orderBy/limit plus tard
     const querySnapshot = await getDocs(q);
     
     if (querySnapshot.empty) {
-        matchList.innerHTML = '<p style="color: #888; text-align: center;">Aucun classement trouvé.</p>';
+        matchList.innerHTML = '<p style="color: #888; text-align: center;">Aucun match.</p>';
         return;
     }
 
     matchList.innerHTML = '';
-    querySnapshot.forEach((doc) => {
+    // On inverse pour avoir les plus récents en haut (si l'ID est basé sur le temps)
+    const docs = querySnapshot.docs.reverse(); 
+
+    docs.forEach((doc) => {
         const match = doc.data();
         const matchId = doc.id;
         
         let statusClass, statusText, actionButton = '';
-        const numPlayers = Object.keys(match.players).length;
+        const numPlayers = match.players ? Object.keys(match.players).length : 0;
 
         if (match.status === 'open') {
             statusClass = 'status-open';
-            statusText = 'OUVERT';
-            actionButton = `<button class="btn btn-action" onclick="closeBets('${matchId}')">Fermer les paris</button>`;
+            statusText = 'EN COURS';
+            actionButton = `<button class="btn btn-action" onclick="closeBets('${matchId}')">STOP PARIS</button>`;
         } else if (match.status === 'closed') {
             statusClass = 'status-closed';
-            statusText = 'CLOS (À PAYER)';
-            actionButton = `<button class="btn btn-action" style="background-color: green;" onclick="openSettleModal('${matchId}')">Entrer le Classement Final</button>`;
+            statusText = 'ATTENTE RÉSULTATS';
+            actionButton = `<button class="btn btn-action" style="background-color: green;" onclick="openSettleModal('${matchId}')">SAISIR RÉSULTATS</button>`;
         } else { 
             statusClass = 'status-settled';
-            statusText = `PAYÉ`;
+            statusText = `TERMINÉ`;
         }
 
         matchList.innerHTML += `
             <div class="match-card">
                 <div class="match-info">
-                    <strong>Classement Top ${numPlayers}</strong>
-                    <br><small style="color: #aaa;">Participants: ${numPlayers} joueurs | ID: ${matchId}</small>
+                    <strong>${matchId}</strong>
+                    <br><small style="color: #aaa;">${numPlayers} Joueurs</small>
                 </div>
-                <div>
-                    <span class="match-status ${statusClass}">${statusText}</span>
-                    ${actionButton}
+                <div style="text-align:right;">
+                    <span class="match-status ${statusClass}" style="display:inline-block; margin-bottom:5px;">${statusText}</span>
+                    <br>${actionButton}
                 </div>
             </div>
         `;
     });
 }
 
-// --- 5. DISTRIBUTION DES GAINS (Nouvelle version avec modale) ---
+// --- 5. DISTRIBUTION DES GAINS ---
 
 let currentSettleMatchId = null;
 
@@ -168,10 +169,10 @@ window.openSettleModal = async (matchId) => {
         const players = Object.keys(matchData.players);
         const numPlayers = players.length;
 
-        document.getElementById('modalInfo').innerText = `Veuillez attribuer un rang unique à chaque joueur sélectionné (Top ${numPlayers}).`;
+        document.getElementById('modalInfo').innerText = `Entrez le classement final (1 à ${numPlayers})`;
 
         const tableBody = document.getElementById('resultsTableBody');
-        tableBody.innerHTML = ''; // Nettoyer l'ancien contenu
+        tableBody.innerHTML = ''; 
 
         players.forEach((playerName) => {
             const row = tableBody.insertRow();
@@ -180,28 +181,21 @@ window.openSettleModal = async (matchId) => {
             row.insertCell().innerHTML = `<strong>${playerName}</strong>`;
             
             const inputCell = row.insertCell();
-            inputCell.style.textAlign = 'center';
             inputCell.innerHTML = `
-                <input type="number" 
-                       min="1" 
-                       max="${numPlayers}" 
-                       data-player="${playerName}" 
-                       class="rank-input input-field" 
-                       style="width: 70px; text-align: center;" 
-                       placeholder="Rang">
+                <input type="number" min="1" max="${numPlayers}" data-player="${playerName}" 
+                       class="rank-input input-field" style="width: 60px; text-align: center; padding:5px;">
             `;
         });
         
-        document.getElementById('btnConfirmResults').onclick = () => confirmSettleModal(matchData.allOdds);
+        document.getElementById('btnConfirmResults').onclick = () => confirmSettleModal();
         document.getElementById('settleModal').style.display = 'block';
 
     } catch (e) {
-        console.error("Erreur chargement modale:", e);
-        alert("Erreur lors du chargement des données du match.");
+        console.error("Erreur modale:", e);
     }
 };
 
-function confirmSettleModal(allOdds) {
+function confirmSettleModal() {
     const tableBody = document.getElementById('resultsTableBody');
     const rows = tableBody.querySelectorAll('tr');
     const finalRankingArray = [];
@@ -215,35 +209,31 @@ function confirmSettleModal(allOdds) {
         const rankValue = parseInt(input.value);
 
         if (isNaN(rankValue) || rankValue < 1 || rankValue > rows.length) {
-            modalError.innerText = `Erreur: Le rang de ${playerName} doit être entre 1 et ${rows.length}.`;
+            modalError.innerText = `Erreur: Rang invalide pour ${playerName}`;
             modalError.style.display = 'block';
             return;
         }
 
         if (ranksUsed.has(rankValue)) {
-            modalError.innerText = `Erreur: Le rang ${rankValue} a été attribué deux fois !`;
+            modalError.innerText = `Erreur: Le rang ${rankValue} est utilisé deux fois.`;
             modalError.style.display = 'block';
             return;
         }
 
         ranksUsed.add(rankValue);
-        // On construit un tableau de noms indexé par le rang 
         finalRankingArray[rankValue] = playerName; 
     }
     
-    // Si toutes les vérifications passent
     document.getElementById('settleModal').style.display = 'none';
-    
-    // finalRankingArray est un tableau creux : [empty, 1er_nom, 2eme_nom, ...]
-    settleRankingMatch(matchId, finalRankingArray.slice(1), allOdds); 
+    settleRankingMatch(matchId, finalRankingArray.slice(1)); 
 }
 
 
-async function settleRankingMatch(matchId, finalRankingArray, allOdds) {
-    if (!confirm("Confirmer le classement final et distribuer les gains ?")) return;
+async function settleRankingMatch(matchId, finalRankingArray) {
+    if (!confirm("⚠️ ATTENTION : Cette action va payer les joueurs et est irréversible. Confirmer ?")) return;
 
     try {
-        // 1. Mettre à jour le match avec le résultat
+        // 1. Sauvegarder le résultat final dans le match
         const finalRanking = finalRankingArray.reduce((acc, name, index) => {
             acc[index + 1] = name; 
             return acc;
@@ -254,80 +244,68 @@ async function settleRankingMatch(matchId, finalRankingArray, allOdds) {
             finalRanking: finalRanking
         });
 
-        // 2. Trouver tous les paris pour ce match
+        // 2. Récupérer et payer les paris
         const betsQuery = query(collection(db, "bets"), where("matchId", "==", matchId));
         const betsSnapshot = await getDocs(betsQuery);
         
         let totalWinningsPaid = 0;
-        let totalCorrectPredictions = 0;
+        let totalBetsProcessed = 0;
 
-        if (!betsSnapshot.empty) {
-            for (const betDoc of betsSnapshot.docs) {
-                const bet = betDoc.data();
-                
-                const userPredictions = bet.prediction; 
-                if (Object.keys(userPredictions).length === 0) continue; // Ignorer si le pari est vide
+        for (const betDoc of betsSnapshot.docs) {
+            const bet = betDoc.data();
+            if (bet.isSettled) continue; // Déjà payé (sécurité)
 
-                let totalGainForBet = 0;
-                
-                // On vérifie chaque prédiction individuelle
-                for (const predictedPlayer in userPredictions) {
-                    const predictedRank = userPredictions[predictedPlayer];
+            const userPredictions = bet.prediction; 
+            let totalGainForBet = 0;
+            
+            // Calcul des gains basé sur les cotes DANS LE TICKET (Historique)
+            for (const predictedPlayer in userPredictions) {
+                const predictedRank = userPredictions[predictedPlayer];
+                const isCorrect = finalRanking[predictedRank] === predictedPlayer;
+
+                if (isCorrect) {
+                    // On récupère la cote qui était valide AU MOMENT DU PARI
+                    const cote = bet.odds[predictedPlayer][predictedRank];
                     
-                    // Vérification : Le nom à ce rang dans le classement final est-il le nom prédit ?
-                    const isCorrect = finalRanking[predictedRank] === predictedPlayer;
-
-                    if (isCorrect) {
-                        totalCorrectPredictions++;
-                        
-                        const cote = bet.odds[predictedPlayer][predictedRank];
-
-                        // La mise est partagée entre les prédictions
-                        const miseParPrediction = bet.amount / Object.keys(userPredictions).length;
-                        const gainPartiel = Math.round(miseParPrediction * cote); 
-                        totalGainForBet += gainPartiel;
-                    }
-                }
-                
-                if (totalGainForBet > 0) {
-                     totalWinningsPaid += totalGainForBet;
-                     const userId = bet.userId;
+                    // Calcul au prorata de la mise (si pari combiné implicite ou split)
+                    // Dans ta logique actuelle, on divise la mise par le nombre de lignes
+                    const miseParLigne = bet.amount / Object.keys(userPredictions).length;
                     
-                     const userRef = doc(db, "users", userId);
-                     const userSnap = await getDoc(userRef);
-                    
-                     if (userSnap.exists()) {
-                         const currentPoints = userSnap.data().cfPoints;
-                         const newPoints = currentPoints + totalGainForBet; 
-                         
-                         await updateDoc(userRef, { cfPoints: newPoints });
-                         await updateDoc(betDoc.ref, { isSettled: true, gain: totalGainForBet });
-                     }
-                } else {
-                     await updateDoc(betDoc.ref, { isSettled: true, gain: 0 });
+                    totalGainForBet += Math.floor(miseParLigne * cote); 
                 }
             }
+            
+            // Paiement
+            await updateDoc(betDoc.ref, { isSettled: true, gain: totalGainForBet });
+
+            if (totalGainForBet > 0) {
+                 totalWinningsPaid += totalGainForBet;
+                 const userRef = doc(db, "users", bet.userId);
+                 const userSnap = await getDoc(userRef);
+                 if (userSnap.exists()) {
+                     const newPoints = userSnap.data().cfPoints + totalGainForBet;
+                     await updateDoc(userRef, { cfPoints: newPoints });
+                 }
+            }
+            totalBetsProcessed++;
         }
 
-        alert(`Règlement effectué ! Total des prédictions correctes: ${totalCorrectPredictions}. Total des gains distribués: ${totalWinningsPaid} CF.`);
+        alert(`SUCCÈS !\n${totalBetsProcessed} paris traités.\n${totalWinningsPaid} CF distribués.`);
         loadMatches();
+
     } catch (e) {
-        console.error("Erreur règlement des gains:", e);
-        alert("Erreur critique lors du règlement. Vérifiez la console.");
+        console.error("Erreur paiement:", e);
+        alert("Erreur critique lors du paiement. Vérifiez la console.");
     }
 }
 
-// Expose les fonctions de gestion des matchs à la fenêtre
+// Expose les fonctions globales
 window.loadMatches = loadMatches;
 window.closeBets = async (matchId) => {
-    if (!confirm("Êtes-vous sûr de vouloir fermer les paris pour ce classement ?")) return;
+    if (!confirm("Fermer les paris ?")) return;
     try {
         await updateDoc(doc(db, "matches", matchId), { status: 'closed' });
-        alert(`Classement ${matchId} fermé. Prêt pour l'entrée des résultats.`);
         loadMatches();
-    } catch (e) {
-        console.error("Erreur fermeture:", e);
-        alert("Erreur lors de la fermeture des paris.");
-    }
+    } catch (e) { console.error(e); }
 };
 window.openSettleModal = window.openSettleModal;

@@ -2,118 +2,322 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Paris - Circled Fight</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    
     <style>
         :root {
             --codm-yellow: #FFC107;
+            --codm-yellow-glow: rgba(255, 193, 7, 0.4);
             --accent-red: #FF2344;
-            --text-muted: #888;
+            --accent-red-glow: rgba(255, 35, 68, 0.4);
+            --bg-dark: #0a0a0a;
+            --bg-panel: #141414;
+            --border-color: #333;
+            --text-main: #e0e0e0;
         }
-        body { background-color: #0d0d0d; color: white; font-family: 'Roboto', sans-serif; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background-color: #1a1a1a; border-bottom: 2px solid var(--accent-red); }
-        .header h1 { margin: 0; font-family: 'Orbitron', sans-serif; color: var(--codm-yellow); font-size: 1.8rem; }
-        .export-btn { background-color: #444; color: white; padding: 10px 15px; border-radius: 6px; text-decoration: none; font-weight: bold; transition: background-color 0.3s; }
-        .export-btn:hover { background-color: #666; }
 
-        .login-wrapper { max-width: 400px; margin: 50px auto; padding: 30px; background: #1e1e1e; border-radius: 12px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
-        .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; color: var(--codm-yellow); margin-bottom: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.9em; }
-        .input-field { width: 100%; padding: 12px; background: #121212; border: 1px solid #444; color: white; border-radius: 6px; box-sizing: border-box; font-family: 'Roboto', sans-serif; transition: border-color 0.3s; }
-        .action-btn { width: 100%; padding: 12px; margin-top: 10px; font-size: 1.1rem; cursor: pointer; }
-        .switch-mode { margin-top: 20px; font-size: 0.9em; color: #888; cursor: pointer; text-decoration: underline; }
-        .error-msg { background-color: rgba(255, 23, 68, 0.1); border: 1px solid var(--accent-red); color: var(--accent-red); padding: 10px; border-radius: 4px; font-size: 0.9em; margin-bottom: 20px; display: none; }
-        .dashboard-paris { display: none; padding: 20px; max-width: 800px; margin: 0 auto; }
-        .user-card { background: linear-gradient(145deg, #1e1e1e, #252525); border-left: 5px solid var(--codm-yellow); padding: 25px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .user-card h3 { margin: 0; font-size: 1.5rem; color: white; }
-        .cf-points { font-size: 2em; color: var(--codm-yellow); font-weight: bold; font-family: 'Orbitron'; text-shadow: 0 0 10px rgba(255, 193, 7, 0.3); }
+        /* --- GLOBAL & PREVENION --- */
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text-main); 
+            font-family: 'Rajdhani', sans-serif; 
+            margin: 0; 
+            padding-top: 60px; /* Espace pour le bandeau prévention */
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 35, 68, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 193, 7, 0.05) 0%, transparent 20%);
+        }
 
-        /* Styles PARIS RANKING */
-        .ranking-card {
-            background: #252525;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        .prevention-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f5f5f5;
+            color: #111;
+            font-size: 0.75rem;
+            text-align: center;
+            padding: 8px 10px;
+            z-index: 1000;
+            font-weight: bold;
+            border-bottom: 3px solid var(--accent-red);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .prevention-banner span { margin: 0 5px; }
+        .warning-icon { color: var(--accent-red); font-weight: 900; margin-right: 5px; font-size: 1.2em; }
+
+        /* --- HEADER FUTURISTE --- */
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 20px 5%; 
+            background: rgba(20, 20, 20, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 40px; /* Juste sous le bandeau */
+            z-index: 900;
+        }
+        .header h1 { 
+            margin: 0; 
+            font-family: 'Orbitron', sans-serif; 
+            color: white; 
+            font-size: 1.5rem; 
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .header h1 span { color: var(--codm-yellow); text-shadow: 0 0 10px var(--codm-yellow-glow); }
+        .sub-header { font-size: 0.8rem; color: #666; letter-spacing: 1px; }
+
+        .btn-nav {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: #aaa;
+            padding: 8px 15px;
+            font-family: 'Orbitron';
+            font-size: 0.7rem;
+            text-decoration: none;
+            transition: 0.3s;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+        }
+        .btn-nav:hover { background: var(--codm-yellow); color: black; border-color: var(--codm-yellow); }
+        .btn-admin { border-color: var(--accent-red); color: var(--accent-red); }
+        .btn-admin:hover { background: var(--accent-red); color: white; }
+
+        /* --- LOGIN PANEL --- */
+        .login-wrapper { 
+            max-width: 90%; 
+            width: 380px;
+            margin: 60px auto; 
+            padding: 40px 30px; 
+            background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
             border: 1px solid #333;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+        .login-wrapper::before {
+            content: ''; position: absolute; top: -1px; left: -1px; right: -1px; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--codm-yellow), transparent);
+        }
+
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; color: var(--codm-yellow); margin-bottom: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.75em; letter-spacing: 1px; }
+        .input-field { 
+            width: 100%; 
+            padding: 15px; 
+            background: #080808; 
+            border: 1px solid #333; 
+            color: white; 
+            font-family: 'Rajdhani', sans-serif; 
+            font-size: 1.1rem;
+            box-sizing: border-box; 
+            transition: 0.3s;
+        }
+        .input-field:focus { border-color: var(--codm-yellow); outline: none; box-shadow: 0 0 10px var(--codm-yellow-glow); }
+
+        .action-btn { 
+            width: 100%; 
+            padding: 15px; 
+            margin-top: 10px; 
+            font-size: 1.2rem; 
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            cursor: pointer; 
+            background: var(--codm-yellow);
+            border: none;
+            color: black;
+            clip-path: polygon(5% 0, 100% 0, 100% 80%, 95% 100%, 0 100%, 0 20%);
+            transition: 0.2s;
+        }
+        .action-btn:active { transform: scale(0.98); }
+        
+        /* --- DASHBOARD --- */
+        .dashboard-paris { display: none; padding: 20px; max-width: 800px; margin: 0 auto; }
+        
+        .user-card { 
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-left: 4px solid var(--codm-yellow); 
+            padding: 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+            backdrop-filter: blur(5px);
+        }
+        .user-pseudo { font-family: 'Orbitron'; font-size: 1.4rem; color: white; }
+        .cf-points { font-size: 2em; color: var(--codm-yellow); font-family: 'Orbitron'; font-weight: 700; text-shadow: 0 0 15px var(--codm-yellow-glow); }
+
+        /* --- RANKING CARDS (Design Futuriste) --- */
+        .ranking-card {
+            background: #161616;
+            padding: 0;
+            margin-bottom: 30px;
+            border: 1px solid #333;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 15px 20px;
+            background: linear-gradient(90deg, #1f1f1f, #161616);
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-header h4 { margin: 0; font-family: 'Orbitron'; color: white; letter-spacing: 1px; font-size: 1rem; }
+        
+        .card-body { padding: 20px; }
+
+        /* LISTE DES JOUEURS (Responsive) */
+        .player-ranking-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         .player-ranking-row {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 10px;
+            grid-template-columns: 2fr 1.5fr 1fr; /* Desktop: Nom | Select | Cote */
+            gap: 15px;
             align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px dashed #333;
+            background: #0f0f0f;
+            padding: 12px;
+            border: 1px solid #222;
+            transition: border-color 0.3s;
         }
-        .player-ranking-row:last-child { border-bottom: none; }
+        .player-ranking-row:hover { border-color: #444; }
+        
+        .player-name { font-weight: bold; font-size: 1.1rem; color: #ddd; }
+        
         .player-ranking-row select {
-            padding: 8px;
-            background: #121212;
+            padding: 10px;
+            background: #1a1a1a;
             border: 1px solid #444;
-            color: white;
-            border-radius: 4px;
+            color: var(--codm-yellow);
+            font-family: 'Rajdhani';
+            font-weight: bold;
+            font-size: 1rem;
+            width: 100%;
         }
-        .bet-summary { margin-top: 20px; padding-top: 20px; border-top: 1px solid #333; }
-        .player-name { font-weight: bold; }
-        .current-cote { color: var(--codm-yellow); font-size: 0.9em; }
+        
+        .current-cote { 
+            color: #888; 
+            font-size: 0.9em; 
+            text-align: right; 
+            font-family: 'Orbitron'; 
+        }
+        .current-cote span { color: var(--codm-yellow); font-size: 1.2em; }
+
+        .bet-summary { 
+            margin-top: 20px; 
+            padding: 15px; 
+            background: rgba(0,0,0,0.3); 
+            border-top: 1px dashed #333; 
+        }
+
+        /* --- MEDIA QUERIES (MOBILE) --- */
+        @media (max-width: 600px) {
+            .header { padding: 15px 20px; flex-direction: column; gap: 10px; align-items: flex-start; }
+            .export-container { width: 100%; display: flex; justify-content: flex-end; }
+            
+            .user-card { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .cf-points { align-self: flex-end; }
+
+            /* Transformation du tableau en cartes pour mobile */
+            .player-ranking-row {
+                grid-template-columns: 1fr auto; 
+                grid-template-areas: 
+                    "name cote"
+                    "select select";
+                gap: 5px;
+            }
+            .player-name { grid-area: name; font-size: 1.2rem; }
+            .current-cote { grid-area: cote; }
+            .player-ranking-row select { grid-area: select; margin-top: 5px; height: 45px; } /* Plus gros pour le doigt */
+            
+            .action-btn { font-size: 1rem; padding: 12px; }
+        }
+
+        .error-msg { color: var(--accent-red); margin-bottom: 10px; display: none; font-weight: bold; }
+        .success-msg { color: #4CAF50; font-weight: bold; }
     </style>
 </head>
 <body>
     
+    <div class="prevention-banner">
+        <span class="warning-icon">⚠</span>
+        <span>JOUER COMPORTE DES RISQUES : ENDETTEMENT, DÉPENDANCE... APPELEZ LE 09 74 75 13 13.</span>
+    </div>
+
     <div class="header">
         <div>
-            <h1>Circled fight <span style="font-size:0.5em; color:white; vertical-align:middle; border:1px solid white; padding:2px 5px; border-radius:3px;">Cf</span></h1>
-            <span style="color: var(--text-muted);">Espace Paris & CF Points</span>
+            <h1>Circled <span>Fight</span></h1>
+            <div class="sub-header">ESPACE PARIS & CLASSEMENT</div>
         </div>
-        <div id="adminLink" style="display:none; margin-right: 10px;">
-            <a href="admin.html" class="export-btn" style="background-color: var(--accent-red);">ADMIN</a>
+        <div class="export-container">
+            <span id="adminLink" style="display:none; margin-right: 5px;">
+                <a href="admin.html" class="btn-nav btn-admin">CMD</a>
+            </span>
+            <a href="index.html" class="btn-nav">QUITTER</a>
         </div>
-        <div class="export-container"><a href="index.html" class="export-btn" style="text-decoration:none;">Retour Accueil</a></div>
     </div>
 
     <main>
         <div id="authSection" class="login-wrapper">
-            <h2 id="authTitle" style="color: var(--codm-yellow); font-family: 'Orbitron'; margin-bottom: 10px;">CONNEXION</h2>
-            <p id="authSub" style="color:#ccc; margin-bottom:30px; font-size: 0.9rem;">Connecte-toi pour gérer tes paris</p>
+            <h2 id="authTitle" style="color: white; font-family: 'Orbitron'; margin: 0 0 10px 0; text-align: center;">IDENTIFICATION</h2>
+            <p id="authSub" style="color:#666; margin-bottom:30px; text-align: center; font-size: 0.9rem;">Accès au réseau neural des paris</p>
+            
             <div id="errorMessage" class="error-msg">Erreur ici</div>
+            
             <div class="input-group">
-                <label>PSEUDO DU JOUEUR</label>
-                <input type="text" id="pseudoInput" class="input-field" placeholder="Ex: Angelos">
+                <label>IDENTIFIANT (PSEUDO)</label>
+                <input type="text" id="pseudoInput" class="input-field" placeholder="Angelos...">
             </div>
             <div class="input-group">
-                <label>MOT DE PASSE</label>
-                <input type="password" id="mdpInput" class="input-field" placeholder="******">
+                <label>CODE D'ACCÈS (MDP)</label>
+                <input type="password" id="mdpInput" class="input-field" placeholder="••••••">
             </div>
-            <button id="btnAction" class="cta-button action-btn">SE CONNECTER</button>
-            <p class="switch-mode" id="toggleMode">Pas encore de compte ? Créer un compte</p>
+            
+            <button id="btnAction" class="action-btn">CONNEXION</button>
+            <p style="text-align: center; margin-top: 20px; font-size: 0.8rem; color: #666; cursor: pointer; text-decoration: underline;" id="toggleMode">Pas de compte ? S'enrôler</p>
         </div>
 
         <div id="bettingSection" class="dashboard-paris">
             <div class="user-card">
                 <div>
-                    <h3 id="displayPseudo">Chargement...</h3>
-                    <small style="color:#aaa; text-transform: uppercase; letter-spacing: 1px;">Membre du Clan</small>
+                    <div id="displayPseudo" class="user-pseudo">Chargement...</div>
+                    <small style="color: var(--accent-red); font-family: 'Orbitron';">STATUS: EN LIGNE</small>
                 </div>
                 <div class="cf-points">
-                    <span id="userPoints">...</span> <span style="font-size:0.5em; vertical-align: middle;">CF</span>
+                    <span id="userPoints">---</span> <span style="font-size:0.4em; color: #fff;">CF</span>
                 </div>
             </div>
             
             <div id="matchListContainer">
-                <h3 style="margin-bottom: 20px; color: white; font-family: 'Orbitron';">CLASSEMENTS OUVERTS AUX PARIS</h3>
+                <h3 style="margin-bottom: 20px; color: white; font-family: 'Orbitron'; border-left: 3px solid var(--accent-red); padding-left: 10px;">CLASSEMENTS EN COURS</h3>
                 <div id="openMatchList">
-                    <p style="color: #888; text-align: center;">Chargement des classements en cours...</p>
+                    <p style="color: #666; text-align: center; margin-top: 50px;">Scan des données en cours...</p>
                 </div>
             </div>
             
-            <button id="btnLogout" class="btn" style="background:#333; margin-top:40px; border: 1px solid #555;">Déconnexion</button>
+            <button id="btnLogout" class="btn-nav" style="width: 100%; margin-top: 40px; text-align: center; display: block;">DÉCONNEXION SYSTÈME</button>
         </div>
     </main>
 
     <script type="module">
         import { auth, db, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, onAuthStateChanged, signOut } from './js/firebase.js';
         import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        
+        // ⚠️ IMPORT DES NOUVEAUX CALCULATEURS DE COTES (TEMPS RÉEL)
+        import { getAllPlayersWithStats, calculateRealTimeOdds } from './js/data-utils.js';
         
         const ADMIN_UID = "CZ0UeiyrPNVufTVnnYSH4YTnGP13"; 
 
@@ -133,26 +337,29 @@
         
         window.userPredictions = {}; 
         window.matchDataCache = {}; 
+        
+        // On charge les stats de tout le monde UNE SEULE FOIS pour éviter de recalculer en boucle
+        const globalStats = getAllPlayersWithStats();
 
         // --- Fonctions d'authentification ---
         toggleMode.addEventListener('click', () => {
             isLoginMode = !isLoginMode;
             errorMsg.style.display = 'none';
             if (isLoginMode) {
-                authTitle.innerText = "CONNEXION";
-                btnAction.innerText = "SE CONNECTER";
-                toggleMode.innerText = "Pas encore de compte ? Créer un compte";
+                authTitle.innerText = "IDENTIFICATION";
+                btnAction.innerText = "CONNEXION";
+                toggleMode.innerText = "Pas de compte ? S'enrôler";
             } else {
-                authTitle.innerText = "INSCRIPTION";
-                btnAction.innerText = "S'INSCRIRE (1000 CF OFFERTS)";
-                toggleMode.innerText = "Déjà un compte ? Se connecter";
+                authTitle.innerText = "ENRÔLEMENT";
+                btnAction.innerText = "S'INSCRIRE (+1000 CF)";
+                toggleMode.innerText = "Déjà soldat ? Connexion";
             }
         });
 
         btnAction.addEventListener('click', async () => {
             const pseudo = pseudoInput.value.trim();
             const mdp = mdpInput.value;
-            if (pseudo.length < 3 || mdp.length < 6) { showError("Pseudo trop court ou mot de passe < 6 caractères."); return; }
+            if (pseudo.length < 3 || mdp.length < 6) { showError("Pseudo > 3 car. et MDP > 6 car. requis."); return; }
             const fakeEmail = pseudo.toLowerCase().replace(/\s/g, '') + "@circledfight.clan";
 
             try {
@@ -170,9 +377,9 @@
                 }
             } catch (error) {
                 console.error(error);
-                if (error.code === 'auth/email-already-in-use') showError("Ce pseudo est déjà pris !");
-                else if (error.code === 'auth/invalid-credential') showError("Pseudo ou mot de passe incorrect.");
-                else showError("Erreur : " + error.message);
+                if (error.code === 'auth/email-already-in-use') showError("Ce pseudo est déjà utilisé.");
+                else if (error.code === 'auth/invalid-credential') showError("Accès refusé. Vérifiez vos infos.");
+                else showError("Erreur système : " + error.message);
             }
         });
 
@@ -188,13 +395,13 @@
         // --- LOGIQUE DE PARI CLASSEMENT ---
         
         async function loadOpenMatches(userId) {
-            openMatchList.innerHTML = '<p style="color: #888; text-align: center;">Recherche de classements en cours...</p>';
+            openMatchList.innerHTML = '<p style="color: #666; text-align: center;">Synchronisation des données...</p>';
             
             const q = query(collection(db, "matches"), where("status", "==", "open"), where("type", "==", "ranking"));
             const snapshot = await getDocs(q);
             
             if (snapshot.empty) {
-                openMatchList.innerHTML = '<p style="color: #888; text-align: center;">Aucun classement n\'est actuellement ouvert aux paris.</p>';
+                openMatchList.innerHTML = '<div style="padding: 20px; border: 1px dashed #444; text-align: center; color: #666;">Aucun événement ouvert pour le moment.</div>';
                 return;
             }
 
@@ -206,7 +413,7 @@
                 
                 window.matchDataCache[matchId] = match;
 
-                const rankOptions = Array.from({length: numPlayers}, (_, i) => `<option value="${i+1}">Rang ${i+1}</option>`).join('');
+                const rankOptions = Array.from({length: numPlayers}, (_, i) => `<option value="${i+1}">Rang #${i+1}</option>`).join('');
 
                 // Vérifier si l'utilisateur a déjà parié
                 const betQuery = query(collection(db, "bets"), 
@@ -218,77 +425,81 @@
                 const userBet = hasUserBet ? betSnapshot.docs[0].data() : null;
                 
                 if (hasUserBet) {
-                    let summaryHtml = `<p style="font-weight: bold; margin-bottom: 5px;">Votre Prédiction (${Object.keys(userBet.prediction).length} paris) :</p>`;
+                    let summaryHtml = `<p style="font-weight: bold; margin-bottom: 10px; color:#aaa;">RÉCAPITULATIF DE MISSION :</p>`;
                     for (const [player, rank] of Object.entries(userBet.prediction)) {
-                        // Utilisation du '??' pour une cote de secours si non trouvée
                         const cote = userBet.odds[player][rank] ?? 1.00; 
-                        summaryHtml += `<small>• ${player} prédit à la ${rank}e place. (Cote: x${cote.toFixed(2)})</small><br>`;
+                        summaryHtml += `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:5px 0;"><span style="color:white;">${player}</span> <span style="color:var(--codm-yellow);">Rang ${rank} (x${cote.toFixed(2)})</span></div>`;
                     }
 
                     html += `
-                        <div class="ranking-card" style="border-left: 5px solid green;">
-                            <h4>PRÉDICTION CLASSEMENT OUVERTE (Top ${numPlayers} joueurs)</h4>
-                            <p class="bet-status-msg" style="color: green;">✅ Pari déjà placé ! Mise : ${userBet.amount} CF.</p>
-                            ${summaryHtml}
+                        <div class="ranking-card" style="border-left: 4px solid #4CAF50;">
+                            <div class="card-header">
+                                <h4>✅ PARI VALIDÉ</h4>
+                                <span style="font-size:0.8rem; color:#4CAF50;">MISE: ${userBet.amount} CF</span>
+                            </div>
+                            <div class="card-body">
+                                ${summaryHtml}
+                                <div style="margin-top:15px; text-align:center; font-size:0.8rem; color:#666;">Attente des résultats finaux...</div>
+                            </div>
                         </div>
                     `;
                     continue;
                 }
                 
-                // Affichage du formulaire de prédiction
+                // Formulaire de prédiction
                 html += `
                     <div class="ranking-card" id="card-${matchId}">
-                        <h4>PRÉDICTION CLASSEMENT TOP ${numPlayers}</h4>
-                        <p style="color: #aaa;">Sélectionnez le rang que vous prédisez pour chaque joueur (laisser vide si vous ne pariez pas).</p>
+                        <div class="card-header">
+                            <h4>PRÉDICTION CLASSEMENT (TOP ${numPlayers})</h4>
+                        </div>
+                        <div class="card-body">
+                            <p style="color: #888; font-size: 0.85rem; margin-bottom: 15px;">Assignez un rang final à chaque joueur. Laissez vide si incertain.</p>
 
-                        <div id="ranking-grid-${matchId}">
-                            <div class="player-ranking-row" style="font-weight: bold; border-bottom: 2px solid #555;">
-                                <span>Joueur</span>
-                                <span>Prédiction</span>
-                                <span>Cote Actuelle</span>
-                            </div>
+                            <div class="player-ranking-grid" id="ranking-grid-${matchId}">
                 `;
 
-                // Liste des joueurs sélectionnés par l'admin
+                // Liste des joueurs
                 for (const playerName in match.players) {
-                    // AFFICHAGE INITIAL DE LA COTE DU RANG 1
-                    const defaultCote = match.allOdds[playerName][1] || match.allOdds[playerName][numPlayers] || 1.05; 
+                    // CALCUL TEMPS RÉEL DE LA COTE PAR DÉFAUT (RANG 1)
+                    const playerStats = globalStats.find(p => p.name === playerName);
+                    let defaultCote = 1.01;
+                    if(playerStats) {
+                        defaultCote = calculateRealTimeOdds(playerStats, 1, numPlayers);
+                    }
 
                     html += `
                         <div class="player-ranking-row">
                             <span class="player-name">${playerName}</span>
                             <select id="select-${matchId}-${playerName}" data-player="${playerName}" onchange="updateBetSummary('${matchId}')">
-                                <option value="">Choisir...</option>
+                                <option value="">-- Choisir Rang --</option>
                                 ${rankOptions}
                             </select>
-                            <span class="current-cote" id="cote-${matchId}-${playerName}">x${defaultCote.toFixed(2)}</span>
+                            <div class="current-cote" id="cote-${matchId}-${playerName}">Cote: <span>x${defaultCote.toFixed(2)}</span></div>
                         </div>
                     `;
                 }
 
                 html += `
-                        </div>
-                        
-                        <div class="bet-summary">
-                            <p style="font-weight: bold; color: #ccc;">Prédictions choisies :</p>
-                            <div id="selected-bets-${matchId}" style="margin-bottom: 10px; font-size: 0.9em; color: #999;">Aucune sélection.</div>
-                            
-                            <div class="input-group">
-                                <label>Votre mise totale (Max: ${currentUserData.cfPoints} CF)</label>
-                                <input type="number" id="amount-${matchId}" class="input-field" min="10" max="${currentUserData.cfPoints}" placeholder="Minimum 10 CF">
                             </div>
+                            
+                            <div class="bet-summary">
+                                <div id="selected-bets-${matchId}" style="margin-bottom: 15px; font-size: 0.9em; color: #aaa; font-style: italic;">Aucune sélection active.</div>
+                                
+                                <div class="input-group" style="margin-bottom:0;">
+                                    <label style="color:white;">MISE TOTALE (Max: ${currentUserData.cfPoints} CF)</label>
+                                    <input type="number" id="amount-${matchId}" class="input-field" min="10" max="${currentUserData.cfPoints}" placeholder="Montant..." style="border: 1px solid var(--codm-yellow);">
+                                </div>
+                            </div>
+                            
+                            <p class="error-msg" id="msg-${matchId}" style="text-align:center; margin-top:10px;"></p>
+                            <button class="action-btn" style="margin-top: 10px;" onclick="placeRankingBet('${matchId}')">CONFIRMER ORDRE</button>
                         </div>
-                        
-                        <button class="cta-button action-btn" style="margin-top: 20px;" onclick="placeRankingBet('${matchId}')">CONFIRMER LE PARI</button>
-
-                        <p class="bet-status-msg" id="msg-${matchId}"></p>
                     </div>
                 `;
             }
             openMatchList.innerHTML = html;
         }
         
-        // Mise à jour de la cote et du récapitulatif
         window.updateBetSummary = (matchId) => {
             const card = document.getElementById(`card-${matchId}`);
             const amount = parseInt(document.getElementById(`amount-${matchId}`).value) || 0;
@@ -305,28 +516,33 @@
                 const coteElement = document.getElementById(`cote-${matchId}-${playerName}`);
                 const numPlayers = Object.keys(matchDataCache[matchId].players).length;
                 
-                if (selectedRank && matchDataCache[matchId]) {
-                    const cote = matchDataCache[matchId].allOdds[playerName][selectedRank];
-                    coteElement.innerHTML = `x${cote.toFixed(2)}`;
+                // Récupération des stats du joueur spécifique
+                const playerStats = globalStats.find(p => p.name === playerName);
+                
+                if (selectedRank && playerStats) {
+                    // CALCUL TEMPS RÉEL : On calcule la cote pour ce rang spécifique
+                    const cote = calculateRealTimeOdds(playerStats, selectedRank, numPlayers);
+                    
+                    coteElement.innerHTML = `Cote: <span>x${cote.toFixed(2)}</span>`;
                     selectedRanks[playerName] = selectedRank;
-                    summaryText += `• ${playerName} Rang ${selectedRank} (x${cote.toFixed(2)})<br>`;
-                } else if (matchDataCache[matchId]) {
-                    // Afficher la cote du rang 1 ou la cote max par défaut
-                    const defaultCote = matchDataCache[matchId].allOdds[playerName][1] || matchDataCache[matchId].allOdds[playerName][numPlayers] || 1.05;
-                    coteElement.innerHTML = `x${defaultCote.toFixed(2)}`;
+                    summaryText += `<span style="color:var(--codm-yellow)">${playerName}</span> ➝ Rang ${selectedRank} (x${cote.toFixed(2)})<br>`;
+                } else if (playerStats) {
+                    // Retour à la cote par défaut (Rang 1)
+                    const defaultCote = calculateRealTimeOdds(playerStats, 1, numPlayers);
+                    coteElement.innerHTML = `Cote: <span>x${defaultCote.toFixed(2)}</span>`;
                 }
             });
             
-            selectedBetsDiv.innerHTML = summaryText || "Aucune sélection.";
+            selectedBetsDiv.innerHTML = summaryText || "Aucune sélection active.";
 
-            // Vérifier les doublons de rangs
             const ranksSelected = Object.values(selectedRanks);
             const uniqueRanks = new Set(ranksSelected);
             
             if (ranksSelected.length > 1 && ranksSelected.length !== uniqueRanks.size) {
-                 msgElement.style.color = 'red';
-                 msgElement.innerText = "Chaque rang sélectionné doit être unique pour ce match !";
+                 msgElement.style.display = 'block';
+                 msgElement.innerText = "ATTENTION: Impossible de mettre deux joueurs au même rang !";
             } else {
+                 msgElement.style.display = 'none';
                  msgElement.innerText = "";
             }
             
@@ -336,13 +552,13 @@
             };
         };
         
-        // Fonction pour placer le pari (déclenchée par le bouton CONFIRMER)
         window.placeRankingBet = async (matchId) => {
             const predictionData = window.userPredictions[matchId];
             const msgElement = document.getElementById(`msg-${matchId}`);
+            msgElement.style.display = 'block';
             
             if (!predictionData) {
-                msgElement.innerText = "Veuillez faire au moins une prédiction.";
+                msgElement.innerText = "Sélection vide.";
                 return;
             }
             
@@ -350,42 +566,36 @@
             const numPredictions = Object.keys(selectedPredictions).length;
             const amount = parseInt(document.getElementById(`amount-${matchId}`).value);
 
-            if (numPredictions === 0) {
-                 msgElement.innerText = "Veuillez sélectionner au moins un joueur/rang.";
-                 return;
-            }
+            if (numPredictions === 0) { msgElement.innerText = "Sélectionnez au moins un joueur."; return; }
+            if (isNaN(amount) || amount < 10) { msgElement.innerText = "Mise minimum : 10 CF."; return; }
+            if (amount > currentUserData.cfPoints) { msgElement.innerText = "Fonds insuffisants."; return; }
             
-            if (isNaN(amount) || amount < 10) {
-                msgElement.innerText = "Le montant minimum est de 10 CF.";
-                return;
-            }
-            if (amount > currentUserData.cfPoints) {
-                msgElement.innerText = "Fonds insuffisants !";
-                return;
-            }
-            
-            // Re-vérification des rangs uniques
             const ranksSelected = Object.values(selectedPredictions);
             const uniqueRanks = new Set(ranksSelected);
-            
             if (ranksSelected.length > 1 && ranksSelected.length !== uniqueRanks.size) {
-                 msgElement.innerText = "Chaque rang sélectionné doit être unique pour ce match !";
+                 msgElement.innerText = "Erreur: Rangs dupliqués détectés.";
                  return;
             }
 
             try {
-                // 1. Déduire les CF Points de l'utilisateur
                 const newPoints = currentUserData.cfPoints - amount;
                 await updateDoc(doc(db, "users", auth.currentUser.uid), { cfPoints: newPoints });
 
-                // 2. Enregistrer le pari 
                 const matchData = matchDataCache[matchId];
+                const numPlayers = Object.keys(matchData.players).length;
                 const oddsAtBet = {};
                 
+                // ON FIGE LES COTES ICI AU MOMENT DU PAIEMENT
                 for (const player in selectedPredictions) {
-                     const rank = selectedPredictions[player];
-                     oddsAtBet[player] = {};
-                     oddsAtBet[player][rank] = matchData.allOdds[player][rank];
+                      const rank = selectedPredictions[player];
+                      const playerStats = globalStats.find(p => p.name === player);
+                      
+                      if(playerStats) {
+                          oddsAtBet[player] = {};
+                          // On recalcule une dernière fois pour être sûr
+                          const finalCote = calculateRealTimeOdds(playerStats, rank, numPlayers);
+                          oddsAtBet[player][rank] = finalCote;
+                      }
                 }
 
                 await setDoc(doc(db, "bets", `BET-${auth.currentUser.uid}-${matchId}`), {
@@ -393,26 +603,22 @@
                     userId: auth.currentUser.uid,
                     amount: amount,
                     isSettled: false,
-                    prediction: selectedPredictions, // {PlayerName: Rank}
-                    odds: oddsAtBet, 
+                    prediction: selectedPredictions,
+                    odds: oddsAtBet, // On stocke les cotes calculées
                     betTime: new Date().toISOString()
                 });
 
-                // 3. Mise à jour de l'interface
-                msgElement.style.color = 'green';
-                msgElement.innerText = `Pari placé sur ${numPredictions} rang(s). Solde mis à jour.`;
+                msgElement.className = "success-msg";
+                msgElement.innerText = "Pari enregistré avec succès.";
                 currentUserData.cfPoints = newPoints;
                 document.getElementById('userPoints').innerText = newPoints;
-                loadOpenMatches(auth.currentUser.uid); 
+                setTimeout(() => loadOpenMatches(auth.currentUser.uid), 1500);
 
             } catch (e) {
-                console.error("Erreur lors du pari:", e);
-                msgElement.style.color = 'red';
-                msgElement.innerText = "Erreur critique lors du pari.";
-                await updateDoc(doc(db, "users", auth.currentUser.uid), { cfPoints: currentUserData.cfPoints });
+                console.error("Erreur:", e);
+                msgElement.innerText = "Erreur système critique.";
             }
         };
-
 
         // --- ÉCOUTEUR D'ÉTAT ---
         onAuthStateChanged(auth, async (user) => {
@@ -421,7 +627,7 @@
                 bettingSection.style.display = 'block';
                 
                 if (user.uid === ADMIN_UID) {
-                    adminLink.style.display = 'block';
+                    adminLink.style.display = 'inline-block';
                 }
 
                 const userRef = doc(db, "users", user.uid);
@@ -431,7 +637,6 @@
                     currentUserData = userSnap.data();
                     document.getElementById('displayPseudo').innerText = currentUserData.pseudo;
                     document.getElementById('userPoints').innerText = currentUserData.cfPoints;
-                    
                     loadOpenMatches(user.uid);
                 }
             } else {
