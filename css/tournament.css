@@ -1,7 +1,30 @@
-@import url('style.css');
+/* =========================================
+   1. VARIABLES & GLOBAL
+   ========================================= */
+:root {
+    --codm-yellow: #FFC107;
+    --accent-red: #FF2344;
+    --bg-dark: #0a0a0a;
+    --bg-panel: #141414;
+    --text-main: #e0e0e0;
+}
 
-/* Page-specific overrides + header/hamburger styles copied for this page */
-.main-header { background-color: #0d0d0d; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--codm-yellow); position: fixed; top: 0; left: 0; width: 95%; z-index: 1000; }
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Rajdhani', sans-serif;
+    margin: 0;
+    /* On laisse de la place pour ton header fixe */
+    padding-top: 80px; 
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(255, 35, 68, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(255, 193, 7, 0.05) 0%, transparent 20%);
+}
+
+/* =========================================
+   2. TON HEADER ORIGINAL (Intouché)
+   ========================================= */
+.main-header { background-color: #0d0d0d; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--codm-yellow); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-sizing: border-box; }
 .logo-container a, .logo-container h1 { text-decoration: none; color: white; }
 .main-header h1 { margin: 0; font-family: 'Orbitron', sans-serif; font-size: 1.5rem; }
 .main-header .tag { font-size: 0.6em; color: var(--codm-yellow); vertical-align: middle; border: 1px solid var(--codm-yellow); padding: 2px 5px; border-radius: 3px; margin-left: 5px; }
@@ -15,45 +38,131 @@
 .mobile-hub a:hover { color: var(--codm-yellow); }
 .mobile-hub-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.25); opacity: 0; visibility: hidden; transition: opacity 180ms ease, visibility 180ms; z-index: 1100; }
 .mobile-hub-backdrop.visible { opacity: 1; visibility: visible; }
-.coming-soon-wrapper { display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 120px); padding-top: 60px; }
-.coming-soon { color: var(--text-main); font-size: 1.6rem; text-transform: uppercase; letter-spacing: 1px; background: rgba(255,255,255,0.02); padding: 20px 30px; border-radius: 8px; border: 1px solid #2a2a2a; }
 @media (min-width: 900px) { .hamburger-menu { font-size: 1.4rem; top: 12px; right: 22px; } .mobile-hub { top: 52px; width: 260px; } }
 
-/* Cartes des modes */
-.mode-card {
-    background: #111;
+/* =========================================
+   3. CARROUSEL ORIGINAL (Style ajusté pour centrage)
+   ========================================= */
+.carousel { 
+    position: relative; 
+    width: 95%; 
+    max-width: 600px; 
+    margin: 20px auto; 
+    overflow: hidden; 
+    border-radius: 10px; 
     border: 1px solid #333;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 20px;
-    box-shadow: 0 0 10px rgba(255,193,7,0.1);
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
 }
-
-.mode-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
+.carousel img { width: 100%; display: none; }
+.carousel img.active { display: block; }
+.carousel .prev, .carousel .next {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    font-size: 2rem; color: white; background: rgba(0,0,0,0.4);
+    border-radius: 50%; width: 40px; height: 40px;
+    line-height: 36px; text-align: center; cursor: pointer;
+    user-select: none; z-index: 10;
 }
+.carousel .prev { left: 10px; }
+.carousel .next { right: 10px; }
 
-.mode-header .icon {
-    font-size: 1.4rem;
+/* =========================================
+   4. BOUTONS RÈGLES (Nouveau Style)
+   ========================================= */
+.rules-actions {
+    display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;
+    margin: 20px auto; max-width: 800px; padding: 0 10px;
 }
-
-.mode-header h4 {
-    margin: 0;
-    font-size: 1.2rem;
-    color: var(--codm-yellow);
+.rules-btn {
+    flex: 1; min-width: 280px; padding: 15px;
+    font-family: 'Orbitron', sans-serif; font-weight: bold; text-transform: uppercase;
+    cursor: pointer; color: white; text-align: center;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    transition: 0.3s; border: 1px solid transparent;
 }
+.btn-red { background: linear-gradient(45deg, #FF2344, #800000); border-color: #FF2344; }
+.btn-yellow { background: linear-gradient(45deg, #FFC107, #B38600); color: black; border-color: #FFC107; }
+.rules-btn:hover { transform: scale(1.02); filter: brightness(1.2); }
 
-.inscrits-list {
-    list-style: none;
-    padding: 0;
-    margin-top: 10px;
+/* =========================================
+   5. FORMULAIRE FUTURISTE
+   ========================================= */
+.form-container {
+    max-width: 600px; margin: 0 auto 40px auto; padding: 30px;
+    background: linear-gradient(145deg, #1a1a1a, #111);
+    border: 1px solid #333; border-left: 4px solid var(--codm-yellow);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
+.form-container h2 { margin-top: 0; color: white; font-family: 'Orbitron'; border-bottom: 1px dashed #444; padding-bottom: 10px; }
+.form-container label { color: #aaa; font-size: 0.9rem; margin-top: 15px; display: block; }
+.form-container input, .form-container select, .form-container textarea {
+    width: 100%; background: #080808; border: 1px solid #333; color: white;
+    padding: 12px; margin-top: 5px; font-family: 'Rajdhani', sans-serif; font-size: 1rem;
+    box-sizing: border-box; transition: 0.3s;
+}
+.form-container input:focus, .form-container select:focus, .form-container textarea:focus {
+    outline: none; border-color: var(--codm-yellow); box-shadow: 0 0 10px rgba(255,193,7,0.2);
+}
+.cta-submit {
+    width: 100%; margin-top: 20px; padding: 15px; background: var(--codm-yellow); color: black;
+    font-family: 'Orbitron'; font-weight: bold; border: none; cursor: pointer;
+    clip-path: polygon(0 0, 100% 0, 100% 80%, 95% 100%, 0 100%); transition: 0.2s;
+}
+.cta-submit:hover { background: white; }
 
-.inscrits-list li {
-    padding: 6px 0;
-    border-bottom: 1px solid #444;
-    color: #ddd;
+/* =========================================
+   6. NOUVEAU : POP-UP SUCCÈS (Remplacement Alert)
+   ========================================= */
+.custom-modal-overlay {
+    display: none; /* Caché par défaut */
+    position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    align-items: center; justify-content: center;
+}
+.success-box {
+    background: #1a1a1a; border: 2px solid #4CAF50; 
+    width: 90%; max-width: 400px; padding: 25px; text-align: center;
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
+    position: relative; animation: popIn 0.3s ease-out;
+}
+@keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.success-icon { font-size: 3rem; margin-bottom: 10px; display: block; }
+.success-title { font-family: 'Orbitron'; color: #4CAF50; font-size: 1.5rem; margin: 10px 0; }
+.success-msg { font-size: 1rem; color: #ddd; line-height: 1.5; margin-bottom: 20px; }
+.btn-success-close {
+    background: #4CAF50; color: black; font-weight: bold; padding: 10px 20px;
+    border: none; cursor: pointer; font-family: 'Orbitron'; text-transform: uppercase;
+    width: 100%; transition: 0.3s;
+}
+.btn-success-close:hover { background: white; }
+
+/* =========================================
+   7. LISTE DES INSCRITS
+   ========================================= */
+#inscrits { max-width: 900px; margin: 0 auto 50px auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0 10px; }
+.mode-card { background: rgba(20,20,20,0.8); border: 1px solid #333; padding: 0; }
+.mode-header { background: #1a1a1a; padding: 15px; border-bottom: 1px solid var(--codm-yellow); display: flex; justify-content: space-between; align-items: center; }
+.mode-header h4 { margin: 0; font-family: 'Orbitron'; color: white; }
+.mode-header .count { background: var(--codm-yellow); color: black; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
+.inscrits-list { list-style: none; padding: 10px; margin: 0; max-height: 300px; overflow-y: auto; }
+.inscrits-list li { padding: 10px; margin-bottom: 5px; background: rgba(255,255,255,0.03); border-left: 2px solid #444; color: #ccc; transition: 0.2s; display: flex; align-items: center; }
+.inscrits-list li:hover { background: rgba(255,255,255,0.08); border-left-color: var(--codm-yellow); padding-left: 15px; color: white; }
+
+/* =========================================
+   8. MODALES RÈGLES (Images)
+   ========================================= */
+.rules-modal {
+    display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.95); padding-top: 20px; overflow: auto;
+}
+.modal-content-rules { position: relative; margin: 5% auto; width: 90%; max-width: 800px; border: 1px solid var(--codm-yellow); }
+.modal-content-rules img { width: 100%; display: block; }
+.rules-close { position: absolute; top: -40px; right: 0; color: white; font-size: 40px; font-weight: bold; cursor: pointer; }
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    #inscrits { grid-template-columns: 1fr; }
+    .rules-actions { flex-direction: column; }
+    .rules-btn { width: 100%; }
 }

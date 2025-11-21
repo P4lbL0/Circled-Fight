@@ -1,139 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tournoi | Circled Fight</title>
-<link rel="stylesheet" href="css/tournament.css">
-<style>
-/* --- Carrousel --- */
-.carousel { position: relative; width: 100%; max-width: 600px; margin: 20px auto; overflow: hidden; border-radius: 10px; }
-.carousel img { width: 100%; display: none; }
-.carousel img.active { display: block; }
-
-/* --- Flèches du carrousel --- */
-.carousel .prev, .carousel .next {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 2rem;
-    color: white;
-    background: rgba(0,0,0,0.4);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    line-height: 36px;
-    text-align: center;
-    cursor: pointer;
-    user-select: none;
-    z-index: 10; /* Au-dessus de l'image */
-}
-.carousel .prev { left: 10px; }
-.carousel .next { right: 10px; }
-
-/* --- Formulaire --- */
-.form-container { max-width: 600px; margin: 20px auto; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background: #1b1b1b; color: white; }
-.form-container label { display: block; margin-top: 10px; }
-.form-container input, .form-container select, .form-container textarea, .form-container button { width: 100%; margin-top: 5px; padding: 8px; border-radius: 5px; border: 1px solid #555; background: #121212; color: white; }
-.form-container button { background: #ffc107; color: black; border: none; cursor: pointer; margin-top: 15px; }
-
-/* --- Liste des inscrits --- */
-#inscrits { max-width: 600px; margin: 20px auto; }
-.mode-card { background: #111; border: 1px solid #333; border-radius: 10px; padding: 15px; margin-bottom: 20px; box-shadow: 0 0 10px rgba(255,193,7,0.1); }
-.mode-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.mode-header .icon { font-size: 1.4rem; }
-.mode-header h4 { margin: 0; font-size: 1.2rem; color: #ffc107; }
-.inscrits-list { list-style: none; padding: 0; margin-top: 10px; }
-.inscrits-list li { padding: 6px 0; border-bottom: 1px solid #444; color: #ddd; }
-
-
-/* ================================================= */
-/* --- NOUVEAUX STYLES : Bouton et Modale Règles --- */
-/* ================================================= */
-
-.rules-button {
-    display: block;
-    width: 90%;
-    max-width: 600px;
-    margin: 20px auto 30px auto;
-    padding: 12px;
-    background-color: #FF2344; /* Rouge visible */
-    color: white;
-    border: 2px solid #ffc107; /* Contour jaune */
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    text-align: center;
-    text-transform: uppercase;
-    transition: background-color 0.3s;
-}
-
-.rules-button:hover {
-    background-color: #c91c36;
-}
-
-/* MODALE DES RÈGLES */
-.rules-modal {
-    display: none; /* Masquée par défaut */
-    position: fixed;
-    z-index: 2000; /* Très haut pour être au-dessus de tout */
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.95); /* Fond très sombre */
-    padding-top: 20px;
-}
-
-.modal-content-rules {
-    position: relative;
-    margin: 5% auto; /* Centrer légèrement */
-    padding: 0;
-    width: 90%;
-    max-width: 800px; /* Taille maximale pour l'image */
-}
-
-.modal-content-rules img {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
-}
-
-.rules-close {
-    color: white;
-    position: absolute;
-    top: -30px; /* Déplacer la croix au-dessus du coin */
-    right: 0px;
-    font-size: 40px;
-    font-weight: bold;
-    transition: 0.3s;
-    cursor: pointer;
-    line-height: 1;
-}
-
-.rules-close:hover,
-.rules-close:focus {
-    color: #ffc107;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-/* Ajustement mobile pour la croix */
-@media (max-width: 600px) {
-    .rules-close {
-        top: -20px;
-        right: 10px;
-        font-size: 30px;
-    }
-    .modal-content-rules {
-        margin: 10% auto;
-    }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournoi | Circled Fight</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tournament.css">
 </head>
 <body>
 
@@ -159,85 +31,102 @@
     <div class="carousel" id="carousel">
         <span class="prev">&#10094;</span>
         <span class="next">&#10095;</span>
-        <img src="img/MJ.png" class="active" alt="Affiche Tournoi">
-        <img src="img/BR.png" alt="Affiche MJ">
-        <img src="img/HALLO.png" alt="Affiche MJ">
+        <img src="img/MJ.png" class="active" alt="Affiche MJ">
+        <img src="img/BR.png" alt="Affiche BR">
+        <img src="img/HALLO.png" alt="Event Halloween">
     </div>
 
-    <button class="rules-button" id="openRulesBtn">
-        Consulter les Règles du Tournoi MJ
-    </button>
+    <div class="rules-actions">
+        <button class="rules-btn btn-red" id="openRulesBtn">
+            📜 Règles Tournoi MJ
+        </button>
+        <button class="rules-btn btn-yellow" id="openElimRulesBtn">
+            ☠️ Règles Éliminatoires
+        </button>
+    </div>
     
     <div class="form-container">
-        <h2>S'inscrire au tournoi</h2>
-        <label for="pseudo">Pseudo In-Game :</label>
-        <input type="text" id="pseudo" placeholder="Votre pseudo" required>
+        <h2>Inscription Tournoi</h2>
+        
+        <label for="pseudo">SOLDAT (Pseudo In-Game)</label>
+        <input type="text" id="pseudo" placeholder="Ex: Angelos" required>
 
-        <label for="mode">Mode :</label>
+        <label for="mode">MISSION (Mode)</label>
         <select id="mode">
-            <option value="MJ">MJ</option>
-            <option value="BR">BR</option>
+            <option value="MJ">Multijoueur (MJ)</option>
+            <option value="BR">Battle Royale (BR)</option>
         </select>
 
-        <label for="retard">Commentaires / Retard :</label>
-        <textarea id="retard" placeholder="Ex: je serai 10min en retard..." rows="3"></textarea>
+        <label for="retard">RAPPORT (Retard / Commentaire)</label>
+        <textarea id="retard" placeholder="Ex: Présent à 21h10..." rows="2"></textarea>
 
-        <button id="submitBtn">S'inscrire</button>
+        <button id="submitBtn" class="cta-submit">CONFIRMER L'INSCRIPTION</button>
     </div>
 
     <div id="inscrits">
-        <h3>Inscriptions de la semaine</h3>
-
         <div class="mode-card">
             <div class="mode-header">
-                <span class="icon">⚔️</span>
-                <h4>MJ (<span id="countMJ">0</span>)</h4>
+                <h4>⚔️ FRONT MJ</h4>
+                <span class="count" id="countMJ">0</span>
             </div>
             <ul id="inscritsMJ" class="inscrits-list"></ul>
         </div>
 
         <div class="mode-card">
             <div class="mode-header">
-                <span class="icon">🎯</span>
-                <h4>BR (<span id="countBR">0</span>)</h4>
+                <h4>🎯 ZONE BR</h4>
+                <span class="count" id="countBR">0</span>
             </div>
             <ul id="inscritsBR" class="inscrits-list"></ul>
         </div>
     </div>
 </main>
 
+<div id="customSuccessModal" class="custom-modal-overlay">
+    <div class="success-box">
+        <span class="success-icon">✅</span>
+        <h3 class="success-title">MISSION ENREGISTRÉE</h3>
+        <p class="success-msg">
+            Merci de vous être inscrit, Soldat.<br><br>
+            Votre inscription peut prendre <strong>quelques minutes</strong> avant d'être effective dans la liste.<br>
+            Merci de patienter.
+        </p>
+        <button class="btn-success-close" onclick="closeSuccessModal()">ROMPEZ</button>
+    </div>
+</div>
+
 <div id="rulesModal" class="rules-modal">
-  <div class="modal-content-rules">
-    <span class="rules-close" id="closeRulesBtn">&times;</span>
-    <img src="img/REGLE.png" alt="Règles du Tournoi MJ - Circled Fight"> 
-  </div>
+        <div class="modal-content-rules">
+        <span class="rules-close" onclick="closeModal('rulesModal')">&times;</span>
+        <img src="img/regle.png" alt="Règles Tournoi"> 
+    </div>
+</div>
+<div id="elimModal" class="rules-modal">
+    <div class="modal-content-rules">
+        <span class="rules-close" onclick="closeModal('elimModal')">&times;</span>
+        <img src="img/elim.png" alt="Règles Éliminatoires"> 
+    </div>
 </div>
 
 <script>
-// --- Hamburger menu ---
+// --- Hamburger menu (Ton code original) ---
 (function(){
     const btn = document.getElementById('hamburgerMenu');
     const hub = document.getElementById('mobileHub');
     const backdrop = document.getElementById('mobileHubBackdrop');
-
     function openHub() {
-        hub.classList.add('open');
-        backdrop.classList.add('visible');
-        btn.setAttribute('aria-expanded','true');
-        hub.setAttribute('aria-hidden','false');
+        hub.classList.add('open'); backdrop.classList.add('visible');
+        btn.setAttribute('aria-expanded','true'); hub.setAttribute('aria-hidden','false');
     }
     function closeHub() {
-        hub.classList.remove('open');
-        backdrop.classList.remove('visible');
-        btn.setAttribute('aria-expanded','false');
-        hub.setAttribute('aria-hidden','true');
+        hub.classList.remove('open'); backdrop.classList.remove('visible');
+        btn.setAttribute('aria-expanded','false'); hub.setAttribute('aria-hidden','true');
     }
-
     btn.addEventListener('click', ()=>{ hub.classList.contains('open') ? closeHub() : openHub(); });
     backdrop.addEventListener('click', closeHub);
 })();
 
-// --- Carrousel swipe ---
+// --- Carrousel (Ton code original) ---
 const carousel = document.getElementById('carousel');
 const slides = carousel.querySelectorAll('img');
 let current = 0;
@@ -247,7 +136,6 @@ function showSlide(index){
 }
 carousel.querySelector('.prev').addEventListener('click', ()=>{ current = (current -1 + slides.length)%slides.length; showSlide(current); });
 carousel.querySelector('.next').addEventListener('click', ()=>{ current = (current +1)%slides.length; showSlide(current); });
-// Swipe touch
 let startX = 0;
 carousel.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
 carousel.addEventListener('touchend', e => {
@@ -257,29 +145,27 @@ carousel.addEventListener('touchend', e => {
     showSlide(current);
 });
 
-// --- Gestion de la Modale des Règles ---
+// --- Modales Règles ---
 const rulesModal = document.getElementById('rulesModal');
-const openRulesBtn = document.getElementById('openRulesBtn');
-const closeRulesBtn = document.getElementById('closeRulesBtn');
-
-openRulesBtn.onclick = function() {
-  rulesModal.style.display = "block";
+const elimModal = document.getElementById('elimModal');
+document.getElementById('openRulesBtn').onclick = () => rulesModal.style.display = "block";
+document.getElementById('openElimRulesBtn').onclick = () => elimModal.style.display = "block";
+window.closeModal = (id) => document.getElementById(id).style.display = "none";
+window.onclick = (e) => {
+    if (e.target == rulesModal) rulesModal.style.display = "none";
+    if (e.target == elimModal) elimModal.style.display = "none";
 }
 
-closeRulesBtn.onclick = function() {
-  rulesModal.style.display = "none";
+// --- GESTION DU SUCCÈS (Custom Pop-up) ---
+function showSuccessModal() {
+    document.getElementById('customSuccessModal').style.display = 'flex';
+}
+function closeSuccessModal() {
+    document.getElementById('customSuccessModal').style.display = 'none';
 }
 
-window.onclick = function(event) {
-  if (event.target == rulesModal) {
-    rulesModal.style.display = "none";
-  }
-}
-
-// --- Formulaire Google Forms et Chargement des inscrits (inchangé) ---
+// --- Formulaire Google Forms ---
 const submitBtn = document.getElementById('submitBtn');
-
-// Entry IDs Google Form
 const entryPseudo = 'entry.1892682717';
 const entryMode = 'entry.2094814093';
 const entryComment = 'entry.125117687';
@@ -289,7 +175,13 @@ submitBtn.onclick = ()=>{
     const pseudo = document.getElementById('pseudo').value.trim();
     const mode = document.getElementById('mode').value;
     const retard = document.getElementById('retard').value.trim();
+
     if(!pseudo){ alert("Merci de rentrer votre pseudo."); return; }
+
+    // Effet visuel sur le bouton
+    const originalText = submitBtn.innerText;
+    submitBtn.innerText = "ENVOI EN COURS...";
+    submitBtn.style.opacity = "0.7";
 
     const formData = new FormData();
     formData.append(entryPseudo, pseudo);
@@ -298,30 +190,30 @@ submitBtn.onclick = ()=>{
 
     fetch(formUrl,{method:'POST', mode:'no-cors', body:formData})
         .then(()=>{ 
-            alert("Inscription enregistrée !"); 
+            // ICI ON AFFICHE LA MODALE PERSONNALISÉE AU LIEU DE L'ALERT
+            showSuccessModal();
+
+            // Reset
             document.getElementById('pseudo').value=''; 
             document.getElementById('retard').value='';
-            loadInscrits(); 
+            submitBtn.innerText = originalText;
+            submitBtn.style.opacity = "1";
+            
+            setTimeout(loadInscrits, 2000); 
         })
-        .catch(()=>alert("Erreur lors de l'inscription"));
+        .catch(()=>{
+            alert("Erreur lors de l'inscription. Vérifiez votre connexion.");
+            submitBtn.innerText = originalText;
+            submitBtn.style.opacity = "1";
+        });
 };
 
-// --- Petit parseur CSV robuste (gère les guillemets et les doubles guillemets) ---
+// --- Parseur CSV & Load ---
 function parseCSV(text) {
-    const rows = [];
-    let cur = [];
-    let field = '';
-    let inQuotes = false;
-
+    const rows = []; let cur = []; let field = ''; let inQuotes = false;
     for (let i = 0; i < text.length; i++) {
-        const c = text[i];
-        const nc = text[i + 1];
-
-        if (c === '"') {
-            if (inQuotes && nc === '"') { field += '"'; i++; continue; }
-            inQuotes = !inQuotes;
-            continue;
-        }
+        const c = text[i]; const nc = text[i + 1];
+        if (c === '"') { if (inQuotes && nc === '"') { field += '"'; i++; continue; } inQuotes = !inQuotes; continue; }
         if (c === '\r') continue;
         if (c === '\n' && !inQuotes) { cur.push(field); rows.push(cur); cur = []; field = ''; continue; }
         if (c === ',' && !inQuotes) { cur.push(field); field = ''; continue; }
@@ -331,7 +223,6 @@ function parseCSV(text) {
     return rows;
 }
 
-// --- Charger les inscrits depuis Google Sheet (version robuste) ---
 async function loadInscrits() {
     const mj = document.getElementById('inscritsMJ');
     const br = document.getElementById('inscritsBR');
@@ -347,29 +238,22 @@ async function loadInscrits() {
         const res = await fetch(sheetUrl);
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const text = await res.text();
-        console.log('tournament: fetched CSV length=', text.length);
-
         const rows = parseCSV(text);
+        
+        mj.innerHTML = ''; br.innerHTML = '';
+
         if (!rows || rows.length <= 1) {
-            mj.innerHTML = '<li>Aucun inscrit</li>';
-            br.innerHTML = '<li>Aucun inscrit</li>';
-            countMJ.textContent = '0';
-            countBR.textContent = '0';
+            mj.innerHTML = '<li>Aucun inscrit</li>'; br.innerHTML = '<li>Aucun inscrit</li>';
             return;
         }
 
-        // Détecter les indices de colonnes (header présent en première ligne)
         const header = rows[0].map(h => (h || '').toString().trim().replace(/^"|"$/g, '').toLowerCase());
         let pseudoIdx = header.findIndex(h => /pseudo|player|name|nom/.test(h));
         let modeIdx = header.findIndex(h => /mode|type|gamemode/.test(h));
         if (pseudoIdx === -1) pseudoIdx = 0;
         if (modeIdx === -1) modeIdx = 1;
 
-        mj.innerHTML = '';
-        br.innerHTML = '';
-
-        let nbMJ = 0;
-        let nbBR = 0;
+        let nbMJ = 0; let nbBR = 0;
 
         for (let i = 1; i < rows.length; i++) {
             const row = rows[i];
@@ -379,25 +263,21 @@ async function loadInscrits() {
             if (!pseudo) continue;
 
             const li = document.createElement('li');
-            li.textContent = pseudo;
+            li.innerHTML = `<span style="color:#666; margin-right:8px;">▸</span> ${pseudo}`;
 
             if (mode === 'MJ') { mj.appendChild(li); nbMJ++; }
             else if (mode === 'BR') { br.appendChild(li); nbBR++; }
             else { mj.appendChild(li); }
         }
-
-        countMJ.textContent = nbMJ;
-        countBR.textContent = nbBR;
+        countMJ.textContent = nbMJ; countBR.textContent = nbBR;
 
     } catch (err) {
-        mj.innerHTML = '<li>Erreur de chargement</li>';
-        br.innerHTML = '<li>Erreur de chargement</li>';
-        console.error('tournament: loadInscrits error', err);
+        mj.innerHTML = '<li>Erreur chargement</li>';
+        br.innerHTML = '<li>Erreur chargement</li>';
     }
 }
-
 loadInscrits();
 </script>
 
 </body>
-</html>
+</html>	
