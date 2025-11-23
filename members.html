@@ -8,9 +8,9 @@
     <link rel="stylesheet" href="css/members.css">
     
     <style>
-        /* --- STYLES ADDITIONNELS POUR CETTE UPDATE --- */
+        /* --- STYLES ADDITIONNELS --- */
         
-        /* Barre de recherche et outils */
+        /* Barre d'outils */
         .tools-bar {
             max-width: 1200px; margin: 20px auto; padding: 0 20px;
             display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between;
@@ -27,37 +27,51 @@
         }
         .btn-tool:hover { background: #333; color: var(--codm-yellow); border-color: var(--codm-yellow); }
 
-        /* Badge clickable */
-        .badge { cursor: help; transition: transform 0.2s; }
-        .badge:hover { transform: scale(1.1); }
+        /* Badge (plus de curseur main car plus de clic) */
+        .badge { cursor: default; }
 
-        /* Admin Panel - Liste des badges existants */
-        .current-badges-list {
-            background: rgba(0,0,0,0.3); padding: 10px; margin-bottom: 15px; border-radius: 4px;
-        }
-        .edit-badge-row {
-            display: flex; gap: 5px; margin-bottom: 8px; align-items: center;
-        }
-        .edit-badge-row input, .edit-badge-row select {
-            background: #111; border: 1px solid #444; color: white; padding: 5px; border-radius: 4px; font-size: 0.8rem;
-        }
+        /* ADMIN - Liste */
+        .current-badges-list { background: rgba(0,0,0,0.3); padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+        .edit-badge-row { display: flex; gap: 5px; margin-bottom: 8px; align-items: center; }
+        .edit-badge-row input, .edit-badge-row select { background: #111; border: 1px solid #444; color: white; padding: 5px; border-radius: 4px; font-size: 0.8rem; }
         .btn-icon { cursor: pointer; padding: 5px; border: none; border-radius: 4px; font-weight: bold; }
         .btn-save-mini { background: var(--codm-yellow); color: black; }
         .btn-del-mini { background: #ff4444; color: white; }
 
-        /* Modal Encyclopédie */
+        /* ENCYCLOPÉDIE */
         .encyclopedia-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-top: 20px;
         }
         .encyclo-item {
-            background: #1a1a1a; padding: 10px; border-radius: 6px; border: 1px solid #333;
+            background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #333;
+            text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .encyclo-owner { font-size: 0.8rem; color: #888; margin-top: 5px; }
+        .encyclo-desc { font-size: 0.9rem; color: #888; margin-top: 10px; font-style: italic; }
 
-        /* Correction affichage Admin Trigger */
-        .admin-controls-wrapper {
-            max-width: 1200px; margin: 0 auto; padding: 0 20px; text-align: center;
+        /* STYLE "MON PROFIL" (Utilisateur connecté) */
+        .current-user-highlight {
+            border: 2px solid var(--codm-yellow) !important;
+            background: linear-gradient(145deg, rgba(255, 193, 7, 0.05), #111) !important;
+            position: relative;
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.1);
         }
+        .current-user-tag {
+    position: absolute;
+    top: 0;              /* Collé tout en haut */
+    right: 0;            /* Collé tout à droite */
+    background: var(--codm-yellow);
+    color: #000;         /* Texte noir pour le contraste */
+    font-size: 0.75rem;
+    font-weight: 900;    /* Bien gras */
+    padding: 4px 12px;   /* Un peu plus d'espace */
+    font-family: 'Orbitron';
+    border-bottom-left-radius: 12px; /* On arrondit juste le coin intérieur pour l'effet "Onglet" */
+    box-shadow: -2px 2px 10px rgba(255, 193, 7, 0.3); /* Petite lueur */
+    z-index: 10;         /* Pour être sûr qu'il passe au-dessus */
+    letter-spacing: 1px;
+}
+
+        .admin-controls-wrapper { max-width: 1200px; margin: 0 auto; padding: 0 20px; text-align: center; }
     </style>
 </head>
 <body>
@@ -83,7 +97,7 @@
     <div id="moduleErrorNotice" class="module-error" style="display:none;">
         <div class="module-error-inner">
             <h3>Erreur de script</h3>
-            <p>Lance un serveur local pour tester : <code>python -m http.server</code></p>
+            <p>Lance un serveur local pour tester.</p>
             <button id="moduleErrorClose">Fermer</button>
         </div>
     </div>
@@ -128,15 +142,14 @@
             <h2 style="color: var(--accent-red); font-family: 'Orbitron'; margin-top:0;">PANNEAU ADMIN</h2>
             <p style="color:#888;">Ajouter, modifier ou supprimer les badges.</p>
             <button onclick="closeAdminPanel()" style="background:transparent; border:1px solid #555; color:white; padding:5px 10px; cursor:pointer; float:right; margin-top:-40px;">FERMER</button>
-            
             <div id="adminPlayerList" style="margin-top:20px; max-height: 70vh; overflow-y: auto;"></div>
         </div>
     </div>
 
     <div id="encycloModal" class="admin-modal" style="display: none; z-index: 2000;">
         <div class="admin-panel-content" style="max-width: 800px;">
-            <h2 style="color: var(--codm-yellow); font-family: 'Orbitron'; margin-top:0;">ENCYCLOPÉDIE DES BADGES</h2>
-            <p style="color:#888;">Liste de tous les badges décernés dans le clan.</p>
+            <h2 style="color: var(--codm-yellow); font-family: 'Orbitron'; margin-top:0;">ARCHIVES BADGES</h2>
+            <p style="color:#888;">Liste unique des distinctions disponibles.</p>
             <button onclick="document.getElementById('encycloModal').style.display='none'" style="background:transparent; border:1px solid #555; color:white; padding:5px 10px; cursor:pointer; float:right; margin-top:-40px;">FERMER</button>
             
             <div id="encycloList" class="encyclopedia-grid"></div>
@@ -147,7 +160,6 @@
         import { auth, db, collection, getDocs, getDoc, doc, updateDoc, onAuthStateChanged, signOut } from './js/firebase.js';
         import { rawData } from './js/data.js';
 
-        // --- DOM ELEMENTS ---
         const authLock = document.getElementById('authLock');
         const membersContent = document.getElementById('membersContent');
         const membersGrid = document.getElementById('membersGrid');
@@ -157,29 +169,23 @@
         const adminPlayerList = document.getElementById('adminPlayerList');
         const encycloList = document.getElementById('encycloList');
 
-        let allMembersCache = []; // Stocke tous les membres pour la recherche
-        let currentUserIsAdmin = false;
+        let allMembersCache = [];
+        let currentUserUid = null;
 
-        // --- AUTHENTIFICATION ---
+        // --- AUTH ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 authLock.style.display = 'none';
                 membersContent.style.display = 'block';
                 logoutBtn.style.display = 'block';
+                currentUserUid = user.uid;
 
-                // Vérif Admin
                 const userSnap = await getDoc(doc(db, "users", user.uid));
                 const userData = userSnap.exists() ? userSnap.data() : {};
                 
-                if (userData.pseudo === "Admin") {
-                    currentUserIsAdmin = true;
-                    adminTrigger.style.display = 'block';
-                } else {
-                    currentUserIsAdmin = false;
-                    adminTrigger.style.display = 'none';
-                }
+                if (userData.pseudo === "Admin") adminTrigger.style.display = 'block';
+                else adminTrigger.style.display = 'none';
 
-                // Dans tous les cas (Admin ou Membre), on charge la grille
                 await fetchAndCacheMembers();
 
             } else {
@@ -187,39 +193,42 @@
                 membersContent.style.display = 'none';
                 logoutBtn.style.display = 'none';
                 adminTrigger.style.display = 'none';
+                currentUserUid = null;
             }
         });
 
         logoutBtn.addEventListener('click', () => { signOut(auth).then(() => location.reload()); });
 
-        // --- CHARGEMENT & AFFICHAGE ---
+        // --- FETCH & SORT ---
         async function fetchAndCacheMembers() {
             try {
                 const querySnapshot = await getDocs(collection(db, "users"));
                 let members = [];
                 querySnapshot.forEach((doc) => {
-                    let d = doc.data(); 
-                    d.uid = doc.id; 
-                    members.push(d);
+                    let d = doc.data(); d.uid = doc.id; members.push(d);
                 });
 
-                // Tri par points
+                // 1. Tri par points
                 members.sort((a, b) => (b.cfPoints || 0) - (a.cfPoints || 0));
                 
-                // Cache global pour la recherche
+                // 2. Extraire le profil de l'utilisateur connecté pour le mettre en premier
+                if (currentUserUid) {
+                    const myIndex = members.findIndex(m => m.uid === currentUserUid);
+                    if (myIndex > -1) {
+                        const myProfile = members.splice(myIndex, 1)[0];
+                        members.unshift(myProfile); // Place au début du tableau
+                    }
+                }
+
                 allMembersCache = members.filter(m => m.pseudo !== "Admin");
-                
                 renderGrid(allMembersCache);
 
-            } catch (error) { console.error("Erreur chargement:", error); }
+            } catch (error) { console.error(error); }
         }
 
-        // Fonction globale pour filtrer (appelée par l'input HTML)
         window.filterMembers = () => {
             const term = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allMembersCache.filter(m => 
-                (m.pseudo || "").toLowerCase().includes(term)
-            );
+            const filtered = allMembersCache.filter(m => (m.pseudo || "").toLowerCase().includes(term));
             renderGrid(filtered);
         };
 
@@ -236,6 +245,11 @@
                 const pseudo = m.pseudo || "Soldat";
                 const points = m.cfPoints || 0;
                 
+                // Identifier si c'est moi
+                const isMe = (m.uid === currentUserUid);
+                const cardClass = isMe ? 'member-card current-user-highlight' : 'member-card';
+                const tagHtml = isMe ? '<div class="current-user-tag">IDENTIFIÉ</div>' : '';
+
                 // Stats data.js
                 const localStats = rawData.find(d => d.name.toLowerCase() === pseudo.toLowerCase());
                 let avg = "N/A"; let games = 0; let perfBadges = "";
@@ -245,31 +259,28 @@
                     games = validScores.length;
                     if (games > 0) avg = (validScores.reduce((a, b) => a + b, 0) / games).toFixed(1);
                     
-                    if (games >= 8) perfBadges += `<span class="badge badge-gold" onclick="alert('Badge Automatique: Vétéran (8+ matchs)')">VÉTÉRAN</span>`;
-                    else if (games >= 4) perfBadges += `<span class="badge badge-silver" onclick="alert('Badge Automatique: Soldat (4+ matchs)')">SOLDAT</span>`;
-                    if (avg !== "N/A" && avg >= 60) perfBadges += `<span class="badge badge-red" onclick="alert('Badge Automatique: Élite (Moyenne > 60)')">ÉLITE</span>`;
+                    if (games >= 8) perfBadges += `<span class="badge badge-gold">VÉTÉRAN</span>`;
+                    else if (games >= 4) perfBadges += `<span class="badge badge-silver">SOLDAT</span>`;
+                    if (avg !== "N/A" && avg >= 60) perfBadges += `<span class="badge badge-red">ÉLITE</span>`;
                 }
 
-                // Badges Richesse
                 let wealthBadges = '';
-                if (points > 10000) wealthBadges += `<span class="badge badge-red" onclick="alert('Badge Richesse: Légende (>10k CF)')">LÉGENDE</span>`;
-                else if (points > 5000) wealthBadges += `<span class="badge badge-gold" onclick="alert('Badge Richesse: VIP (>5k CF)')">VIP</span>`;
+                if (points > 10000) wealthBadges += `<span class="badge badge-red">LÉGENDE</span>`;
+                else if (points > 5000) wealthBadges += `<span class="badge badge-gold">VIP</span>`;
 
-                // Badges Custom (avec description au clic)
+                // Badges Custom - SANS ONCLICK
                 let customBadgesHtml = '';
                 if (m.customBadges && Array.isArray(m.customBadges)) {
                     m.customBadges.forEach(b => {
-                        // On échappe les guillemets pour le onclick
-                        const safeDesc = (b.desc || "Pas de description").replace(/'/g, "\\'");
-                        const safeText = (b.text || "").replace(/'/g, "\\'");
-                        customBadgesHtml += `<span class="badge badge-${b.color}" onclick="alert('${safeText} : ${safeDesc}')" title="Cliquez pour voir la description">${b.text}</span>`;
+                        customBadgesHtml += `<span class="badge badge-${b.color}" title="${b.desc || ''}">${b.text}</span>`;
                     });
                 }
 
                 const initials = pseudo.substring(0, 2).toUpperCase();
 
                 html += `
-                    <div class="member-card">
+                    <div class="${cardClass}">
+                        ${tagHtml}
                         <div class="status-indicator"></div>
                         <div class="card-header">
                             <div class="avatar">${initials}</div>
@@ -301,39 +312,45 @@
             membersGrid.innerHTML = html;
         }
 
-        // --- ENCYCLOPÉDIE ---
+        // --- ENCYCLOPÉDIE (UNIQUE & ANONYME) ---
         window.openEncyclopedia = () => {
             document.getElementById('encycloModal').style.display = 'block';
-            let allBadges = [];
+            
+            // Map pour garder l'unicité basée sur le TEXTE du badge
+            let uniqueBadgesMap = new Map();
 
             allMembersCache.forEach(m => {
                 if(m.customBadges && Array.isArray(m.customBadges)) {
                     m.customBadges.forEach(b => {
-                        allBadges.push({ ...b, owner: m.pseudo });
+                        // Clé unique = le texte du badge (ex: "MVP")
+                        const key = b.text.toUpperCase();
+                        
+                        // Si le badge n'existe pas encore, ou si le nouveau a une description et pas l'ancien
+                        if (!uniqueBadgesMap.has(key) || (!uniqueBadgesMap.get(key).desc && b.desc)) {
+                            uniqueBadgesMap.set(key, { text: b.text, color: b.color, desc: b.desc });
+                        }
                     });
                 }
             });
 
-            if (allBadges.length === 0) {
+            if (uniqueBadgesMap.size === 0) {
                 encycloList.innerHTML = "<p>Aucun badge enregistré.</p>";
                 return;
             }
 
-            // On affiche tout (on pourrait regrouper par nom, mais voir qui a quoi est sympa)
             let html = '';
-            allBadges.forEach(b => {
+            uniqueBadgesMap.forEach(b => {
                 html += `
                     <div class="encyclo-item">
-                        <span class="badge badge-${b.color}">${b.text}</span>
-                        <div style="font-size:0.9rem; color:#ccc; margin-top:5px;">${b.desc || "Aucune description"}</div>
-                        <div class="encyclo-owner">Détenu par: ${b.owner}</div>
+                        <span class="badge badge-${b.color}" style="font-size:1rem; padding:5px 10px;">${b.text}</span>
+                        <div class="encyclo-desc">${b.desc || "Badge Classifié"}</div>
                     </div>
                 `;
             });
             encycloList.innerHTML = html;
         };
 
-        // --- ADMIN PANEL LOGIC ---
+        // --- ADMIN PANEL ---
         window.openAdminPanel = async () => {
             document.getElementById('adminModal').style.display = 'block';
             await loadAdminPanelData();
@@ -341,7 +358,6 @@
         window.closeAdminPanel = () => { document.getElementById('adminModal').style.display = 'none'; };
 
         async function loadAdminPanelData() {
-            // Re-fetch pour être sûr d'avoir les données fraîches pour l'édition
             const querySnapshot = await getDocs(collection(db, "users"));
             let members = [];
             querySnapshot.forEach((doc) => {
@@ -387,11 +403,10 @@
                             <strong style="color:#aaa; font-size:0.8rem;">BADGES ACTUELS :</strong>
                             ${existingBadgesHtml}
                         </div>
-
                         <div style="border-top:1px solid #444; padding-top:10px;">
                             <strong style="color:var(--codm-yellow); font-size:0.8rem;">AJOUTER UN NOUVEAU :</strong>
                             <div style="display:flex; gap:5px; margin-top:5px;">
-                                <input type="text" id="newText-${m.uid}" placeholder="NOM (ex: MVP)" style="width:80px;">
+                                <input type="text" id="newText-${m.uid}" placeholder="NOM" style="width:80px;">
                                 <select id="newColor-${m.uid}">
                                     <option value="gold">Or</option>
                                     <option value="red">Rouge</option>
@@ -400,7 +415,7 @@
                                     <option value="purple">Violet</option>
                                 </select>
                             </div>
-                            <input type="text" id="newDesc-${m.uid}" placeholder="Description (ex: Vainqueur S1)" style="width:100%; margin-top:5px;">
+                            <input type="text" id="newDesc-${m.uid}" placeholder="Description" style="width:100%; margin-top:5px;">
                             <button onclick="window.addNewBadge('${m.uid}')" style="background:var(--codm-yellow); border:none; color:black; width:100%; margin-top:5px; padding:5px;">AJOUTER</button>
                         </div>
                     </div>
@@ -415,76 +430,56 @@
         };
 
         // --- CRUD BADGES ---
-
-        // 1. AJOUTER
         window.addNewBadge = async (uid) => {
             const text = document.getElementById(`newText-${uid}`).value.trim().toUpperCase();
             const color = document.getElementById(`newColor-${uid}`).value;
             const desc = document.getElementById(`newDesc-${uid}`).value.trim();
-
-            if (!text) return alert("Le nom du badge est vide !");
-
+            if (!text) return alert("Nom vide !");
             try {
-                // On récupère le doc actuel
                 const userRef = doc(db, "users", uid);
                 const snap = await getDoc(userRef);
                 let currentBadges = snap.data().customBadges || [];
-
-                // On ajoute le nouveau
                 currentBadges.push({ text: text, color: color, desc: desc });
-
-                // On écrase le tableau
                 await updateDoc(userRef, { customBadges: currentBadges });
-                
-                alert("Badge ajouté !");
-                await loadAdminPanelData(); // Refresh panel
-                await fetchAndCacheMembers(); // Refresh grid arrière-plan
-
-            } catch (e) { console.error(e); alert("Erreur ajout"); }
+                alert("Ajouté !");
+                await loadAdminPanelData(); await fetchAndCacheMembers();
+            } catch (e) { console.error(e); }
         };
 
-        // 2. MODIFIER (UPDATE)
         window.updateBadge = async (uid, index) => {
             const newText = document.getElementById(`edit-text-${uid}-${index}`).value.trim().toUpperCase();
             const newColor = document.getElementById(`edit-color-${uid}-${index}`).value;
             const newDesc = document.getElementById(`edit-desc-${uid}-${index}`).value.trim();
-
             try {
                 const userRef = doc(db, "users", uid);
                 const snap = await getDoc(userRef);
                 let currentBadges = snap.data().customBadges || [];
-
                 if (index >= 0 && index < currentBadges.length) {
                     currentBadges[index] = { text: newText, color: newColor, desc: newDesc };
                     await updateDoc(userRef, { customBadges: currentBadges });
-                    alert("Badge modifié !");
-                    // On ne refresh pas tout le panel pour éviter de fermer le volet, juste feedback
+                    alert("Modifié !");
+                    await fetchAndCacheMembers();
                 }
-            } catch (e) { console.error(e); alert("Erreur modification"); }
+            } catch (e) { console.error(e); }
         };
 
-        // 3. SUPPRIMER
         window.deleteBadge = async (uid, index) => {
-            if(!confirm("Supprimer ce badge définitivement ?")) return;
-
+            if(!confirm("Supprimer ?")) return;
             try {
                 const userRef = doc(db, "users", uid);
                 const snap = await getDoc(userRef);
                 let currentBadges = snap.data().customBadges || [];
-
                 if (index >= 0 && index < currentBadges.length) {
-                    currentBadges.splice(index, 1); // Retire l'élément à l'index
+                    currentBadges.splice(index, 1);
                     await updateDoc(userRef, { customBadges: currentBadges });
-                    await loadAdminPanelData(); // Refresh panel pour retirer la ligne
-                    await fetchAndCacheMembers();
+                    await loadAdminPanelData(); await fetchAndCacheMembers();
                 }
-            } catch (e) { console.error(e); alert("Erreur suppression"); }
+            } catch (e) { console.error(e); }
         };
         
         window.__membersModuleLoaded = true;
     </script>
     <script>
-        // Fallback hamburger script
         (function(){
             const btn = document.getElementById('hamburgerMenu');
             const hub = document.getElementById('mobileHub');
