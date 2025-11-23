@@ -136,64 +136,57 @@
             return Math.sqrt(variance);
         }
 
-        // --- 1. CALCULS, TRENDS & AWARDS ---
+        // --- 1. CALCULS, TRENDS & AWARDS (sur toutes les semaines disponibles) ---
         rawData.forEach(player => {
-            const validScores = player.scores.filter(s => s !== null);
+            const validScores = (player.scores || []).filter(s => s !== null && s !== undefined);
             const sum = validScores.reduce((a, b) => a + b, 0);
             player.avg = validScores.length ? (sum / validScores.length).toFixed(1) : 0;
-            player.lastScore = player.scores[11] || player.scores[10] || 0; 
-            
-            // 🏅 BADGES
-            player.stdDev = calculateStdDev(player.scores);
 
-            // 💤 AFK Check (Absence sur les 2 dernières semaines de data)
-            const lastDataIndex = player.scores.length - 1;
-            player.isAFK = (player.scores[lastDataIndex] === null && player.scores[lastDataIndex - 1] === null);
+            // lastScore: last non-null within full scores (or 0)
+            let lastScore = null;
+            for (let i = (player.scores || []).length - 1; i >= 0; i--) {
+                if (player.scores[i] !== null && player.scores[i] !== undefined) { lastScore = player.scores[i]; break; }
+            }
+            player.lastScore = lastScore !== null ? lastScore : 0;
 
-            // 🚀 Progression Check (3 hausses consécutives parmi les scores enregistrés)
+            // 🏅 BADGES (stdDev calculated on full scores)
+            player.stdDev = calculateStdDev(player.scores || []);
+
+            // 💤 AFK Check based on the last two full scores
+            const lastDataIndex = (player.scores || []).length - 1;
+            player.isAFK = (lastDataIndex >= 1) ? (player.scores[lastDataIndex] === null && player.scores[lastDataIndex - 1] === null) : false;
+
+            // 🚀 Progression Check (3 hausses consécutives) within full scores
             let consecutiveIncreases = 0;
-            player.isOnFire = false; // Renommé en 'isProgression' dans le titre HTML
-            for (let i = player.scores.length - 1; i >= 1; i--) {
+            player.isProgression = false;
+            for (let i = (player.scores || []).length - 1; i >= 1; i--) {
                 const current = player.scores[i];
                 const previous = player.scores[i - 1];
-
                 if (current !== null && previous !== null) {
                     if (current > previous) {
                         consecutiveIncreases++;
-                        if (consecutiveIncreases >= 3) {
-                            player.isProgression = true; // Nouveau nom pour éviter confusion
-                            break;
-                        }
-                    } else if (current < previous) {
-                        consecutiveIncreases = 0;
-                    }
+                        if (consecutiveIncreases >= 3) { player.isProgression = true; break; }
+                    } else if (current < previous) { consecutiveIncreases = 0; }
                 }
             }
 
-            // 🔥N STREAK (Participation consécutive) - NOUVEAU
+            // 🔥N STREAK (Participation consécutive) - check within full scores
             player.streak = 0;
-            for (let i = player.scores.length - 1; i >= 0; i--) {
-                if (player.scores[i] !== null && player.scores[i] !== undefined) {
-                    player.streak++;
-                } else {
-                    break; // S'arrête à la première semaine manquée
-                }
+            for (let i = (player.scores || []).length - 1; i >= 0; i--) {
+                if (player.scores[i] !== null && player.scores[i] !== undefined) { player.streak++; }
+                else break;
             }
 
-            // 📈 TRENDS (Dernier score enregistré vs précédent)
+            // 📈 TRENDS (last vs previous) within full scores
             let lastRecordedScore = null;
             let prevRecordedScore = null;
-            for (let i = player.scores.length - 1; i >= 0; i--) {
+            for (let i = (player.scores || []).length - 1; i >= 0; i--) {
                 if (player.scores[i] !== null) {
-                    if (lastRecordedScore === null) {
-                        lastRecordedScore = player.scores[i];
-                    } else if (prevRecordedScore === null) {
-                        prevRecordedScore = player.scores[i];
-                        break; 
-                    }
+                    if (lastRecordedScore === null) lastRecordedScore = player.scores[i];
+                    else if (prevRecordedScore === null) { prevRecordedScore = player.scores[i]; break; }
                 }
             }
-            player.trend = lastRecordedScore !== null && prevRecordedScore !== null ? lastRecordedScore - prevRecordedScore : 0;
+            player.trend = (lastRecordedScore !== null && prevRecordedScore !== null) ? lastRecordedScore - prevRecordedScore : 0;
         });
 
 
@@ -367,7 +360,7 @@
 
 
                 li.innerHTML = `
-                    <span class="rank-num ${rankClass}">#${i+1}</span>
+                    <span class="rank-num ${rankClass}" style="margin-left:-10px">#${i+1}</span>
                     <div class="player-info">
                         <span class="player-name" style="color:${ds.hidden ? '#aaa' : ds.borderColor}">${ds.label}</span>
                         <span class="player-avg">Moy: ${player.avg} ${trendHTML}</span>
@@ -401,20 +394,31 @@
         // --- LOGIQUE MVP & VERSUS ---
         
         function findMVP() {
-            let lastWeekIndex = 11; 
-            let bestScore = -1;
+            // Trouver dynamiquement la dernière semaine qui contient au moins une valeur
+            let lastWeekIndex = Math.max(0, weeks.length - 1);
+            for (let w = weeks.length - 1; w >= 0; w--) {
+                if (rawData.some(p => p.scores[w] !== null && p.scores[w] !== undefined)) {
+                    lastWeekIndex = w;
+                    break;
+                }
+            }
+
+            let bestScore = -Infinity;
             let bestPlayer = "";
 
             rawData.forEach(p => {
                 const score = p.scores[lastWeekIndex];
-                if (score !== null && score > bestScore) {
+                if (score !== null && score !== undefined && score > bestScore) {
                     bestScore = score;
                     bestPlayer = p.name;
                 }
             });
 
-            if(bestPlayer) {
-                document.getElementById('mvpName').innerText = bestPlayer.toUpperCase() + " (" + bestScore + ")";
+            const mvpEl = document.getElementById('mvpName');
+            if (bestPlayer) {
+                mvpEl.innerText = bestPlayer.toUpperCase() + " (" + bestScore + ")";
+            } else {
+                mvpEl.innerText = "--";
             }
         }
 

@@ -471,7 +471,7 @@
                         <div class="player-ranking-row">
                             <span class="player-name">${playerName}</span>
                             <select id="select-${matchId}-${playerName}" data-player="${playerName}" onchange="updateBetSummary('${matchId}')">
-                                <option value="">-- Choisir Rang --</option>
+                                <option value="">-- Aucun --</option>
                                 ${rankOptions}
                             </select>
                             <div class="current-cote" id="cote-${matchId}-${playerName}">Cote: <span>x${defaultCote.toFixed(2)}</span></div>

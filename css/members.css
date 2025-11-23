@@ -1,20 +1,33 @@
 @import url('style.css');
 
-/* Page-specific overrides + header/hamburger styles copied for this page */
-.main-header {
-    background-color: #0d0d0d;
-    color: white;
-    padding: 15px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid var(--codm-yellow);
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 95%;
-    z-index: 1000;
+/* =========================================
+   1. VARIABLES & GLOBAL
+   ========================================= */
+:root {
+    --codm-yellow: #FFC107;
+    --accent-red: #FF2344;
+    --bg-dark: #0a0a0a;
+    --bg-panel: #141414;
+    --text-main: #e0e0e0;
+    --glass: rgba(20, 20, 20, 0.9);
 }
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Rajdhani', sans-serif;
+    margin: 0;
+    padding-top: 80px; /* Espace pour le header */
+    background-image: 
+        linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+        url('../img/bg-pattern.png'); /* Optionnel si tu as une image de fond */
+    background-size: cover;
+}
+
+/* =========================================
+   2. HEADER (Ton code original conservé)
+   ========================================= */
+.main-header { background-color: #0d0d0d; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--codm-yellow); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-sizing: border-box; }
 .logo-container a, .logo-container h1 { text-decoration: none; color: white; }
 .main-header h1 { margin: 0; font-family: 'Orbitron', sans-serif; font-size: 1.5rem; }
 .main-header .tag { font-size: 0.6em; color: var(--codm-yellow); vertical-align: middle; border: 1px solid var(--codm-yellow); padding: 2px 5px; border-radius: 3px; margin-left: 5px; }
@@ -28,6 +41,126 @@
 .mobile-hub a:hover { color: var(--codm-yellow); }
 .mobile-hub-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.25); opacity: 0; visibility: hidden; transition: opacity 180ms ease, visibility 180ms; z-index: 1100; }
 .mobile-hub-backdrop.visible { opacity: 1; visibility: visible; }
-.coming-soon-wrapper { display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 120px); padding-top: 60px; }
-.coming-soon { color: var(--text-main); font-size: 1.6rem; text-transform: uppercase; letter-spacing: 1px; background: rgba(255,255,255,0.02); padding: 20px 30px; border-radius: 8px; border: 1px solid #2a2a2a; }
 @media (min-width: 900px) { .hamburger-menu { font-size: 1.4rem; top: 12px; right: 22px; } .mobile-hub { top: 52px; width: 260px; } }
+
+/* =========================================
+   3. ÉCRAN DE VERROUILLAGE (Auth Required)
+   ========================================= */
+.auth-lock-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+    text-align: center;
+    color: var(--accent-red);
+}
+
+.lock-icon { font-size: 4rem; margin-bottom: 20px; text-shadow: 0 0 20px var(--accent-red); }
+.lock-title { font-family: 'Orbitron'; font-size: 2rem; margin-bottom: 10px; text-transform: uppercase; }
+.lock-msg { color: #888; max-width: 400px; margin-bottom: 30px; }
+.btn-login-redirect {
+    background: transparent; border: 1px solid var(--codm-yellow); color: var(--codm-yellow);
+    padding: 10px 20px; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s;
+    text-decoration: none; text-transform: uppercase;
+}
+.btn-login-redirect:hover { background: var(--codm-yellow); color: black; }
+
+/* =========================================
+   4. GRILLE DES MEMBRES (HUD Style)
+   ========================================= */
+.members-container {
+    display: none; /* Caché par défaut */
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section-title {
+    font-family: 'Orbitron'; color: white; border-left: 4px solid var(--codm-yellow);
+    padding-left: 15px; margin-bottom: 30px; font-size: 1.8rem;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.member-count { font-size: 0.8rem; color: #666; font-family: 'Rajdhani'; letter-spacing: 1px; }
+
+.members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+/* Carte Membre Style "Opérateur" */
+.member-card {
+    background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+    border: 1px solid #333;
+    position: relative;
+    overflow: hidden;
+    transition: 0.3s;
+    /* Coupe futuriste */
+    clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+}
+
+.member-card:hover {
+    border-color: var(--codm-yellow);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.member-card::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--codm-yellow), transparent);
+}
+
+/* Header de la carte */
+.card-header {
+    padding: 20px;
+    display: flex; align-items: center; gap: 15px;
+    background: rgba(255,255,255,0.02);
+}
+
+.avatar {
+    width: 60px; height: 60px;
+    background: #222; border: 1px solid #444;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron'; font-size: 1.5rem; color: var(--codm-yellow);
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.identity h3 { margin: 0; font-family: 'Orbitron'; font-size: 1.2rem; color: white; letter-spacing: 1px; }
+.identity .role { font-size: 0.8rem; color: #888; text-transform: uppercase; }
+
+/* Badges */
+.badges-container {
+    padding: 0 20px;
+    display: flex; flex-wrap: wrap; gap: 5px;
+    margin-bottom: 15px;
+}
+.badge {
+    font-size: 0.65rem; text-transform: uppercase; font-weight: bold;
+    padding: 2px 6px; border-radius: 2px; border: 1px solid;
+    display: inline-block;
+}
+.badge-gold { border-color: #FFD700; color: #FFD700; background: rgba(255, 215, 0, 0.1); }
+.badge-silver { border-color: #C0C0C0; color: #C0C0C0; background: rgba(192, 192, 192, 0.1); }
+.badge-red { border-color: var(--accent-red); color: var(--accent-red); background: rgba(255, 35, 68, 0.1); }
+.badge-blue { border-color: #00bcd4; color: #00bcd4; background: rgba(0, 188, 212, 0.1); }
+
+/* Stats Grid */
+.card-stats {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border-top: 1px solid #222;
+}
+.stat-box {
+    padding: 15px; text-align: center;
+    border-right: 1px solid #222;
+}
+.stat-box:last-child { border-right: none; }
+.stat-val { display: block; font-family: 'Orbitron'; font-size: 1.2rem; color: white; }
+.stat-label { font-size: 0.7rem; color: #666; text-transform: uppercase; }
+
+/* Indicateur Online/Offline (Déco) */
+.status-indicator {
+    position: absolute; top: 10px; right: 10px;
+    width: 8px; height: 8px; background: #4CAF50; border-radius: 50%;
+    box-shadow: 0 0 5px #4CAF50;
+}

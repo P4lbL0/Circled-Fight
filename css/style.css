@@ -375,3 +375,117 @@ h1, h2, h3 {
 main {
     padding-top: 105px; /* Ajustez cette valeur (75px est généralement suffisant pour un header standard) */
 }
+/* Définition des variables */
+        :root {
+            --codm-yellow: #FFC107;
+            --accent-red: #FF2344;
+            --text-muted: #888;
+        }
+
+        /* CSS Spécifique pour la Modale d'Annonce */
+        .announcement-modal {
+            display: none; /* Masquée par défaut */
+            position: fixed;
+            z-index: 1001; /* Doit être au-dessus de tout */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.85); /* Fond sombre */
+        }
+
+        .modal-content-announcement {
+            background-color: #1e1e1e;
+            margin: 10% auto; /* Marge supérieure/inférieure par défaut */
+            padding: 30px;
+            border: 3px solid var(--codm-yellow);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(255, 193, 7, 0.5);
+            position: relative;
+            text-align: center;
+            color: white;
+        }
+
+        .modal-content-announcement h2 {
+            color: var(--accent-red);
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .modal-content-announcement p, .modal-content-announcement li {
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            text-align: left;
+            list-style-type: none;
+        }
+        
+        .modal-content-announcement ul {
+            padding-left: 0;
+            margin-top: 15px;
+        }
+        
+        .modal-content-announcement li::before {
+            content: "•";
+            color: var(--codm-yellow);
+            font-weight: bold;
+            display: inline-block; 
+            width: 1em;
+            margin-left: -1em;
+        }
+
+        .modal-content-announcement .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 36px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .modal-content-announcement .cta-button {
+             background-color: var(--codm-yellow);
+             color: #1e1e1e;
+             font-weight: bold;
+             padding: 10px 20px;
+             border: none;
+             border-radius: 5px;
+             cursor: pointer;
+        }
+        .update-message {
+            margin-top: 25px;
+            border-top: 1px solid #333;
+            padding-top: 15px;
+            color: var(--codm-yellow);
+            font-style: italic;
+            text-align: center;
+        }
+        .update-message p {
+            text-align: center;
+            font-style: normal;
+        }
+
+        /* ===================================== */
+        /* SECTION RESPONSIVE (MOBILE)           */
+        /* ===================================== */
+        @media (max-width: 600px) {
+            .modal-content-announcement {
+                width: 95%; /* Utiliser presque toute la largeur */
+                margin: 5% auto; /* Réduire la marge supérieure/inférieure */
+                padding: 20px; /* Réduire le padding */
+            }
+
+            .modal-content-announcement h2 {
+                font-size: 1.5rem; /* Réduire la taille du titre */
+            }
+            
+            .modal-content-announcement p {
+                 font-size: 0.95rem; /* Taille de police légèrement plus petite */
+            }
+        }
