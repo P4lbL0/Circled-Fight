@@ -1,5 +1,3 @@
-// js/firebase.js
-
 // 1. On importe les outils Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -8,15 +6,16 @@ import {
     doc, 
     getDoc, 
     setDoc, 
-    updateDoc, // NOUVEAU
-    collection, // NOUVEAU
-    query, // NOUVEAU
-    where, // NOUVEAU
-    getDocs // NOUVEAU
+    updateDoc, 
+    collection, 
+    query, 
+    where, 
+    getDocs,
+    // AJOUTEZ arrayUnion ici :
+    arrayUnion // NOUVEAU pour les badges
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // 2. TA CONFIGURATION (Utilise ta vraie configuration ici !)
-// ↓↓↓ REMPLACE TOUT CE BLOC PAR LE TIEN ↓↓↓
 const firebaseConfig = {
   apiKey: "AIzaSyDmB93XV2HP54I5tiHfd02wDoa0F10qwKg",
   authDomain: "circled-fight-app.firebaseapp.com",
@@ -25,7 +24,6 @@ const firebaseConfig = {
   messagingSenderId: "978955769876",
   appId: "1:978955769876:web:cfa51bdb651e06756d6f01"
 };
-// ↑↑↑ FIN DU BLOC A REMPLACER ↑↑↑
 
 // 3. On lance Firebase
 const app = initializeApp(firebaseConfig);
@@ -45,5 +43,7 @@ export {
     where, 
     getDocs,
     onAuthStateChanged, 
-    signOut 
+    signOut,
+    // EXPORTE arrayUnion :
+    arrayUnion
 };

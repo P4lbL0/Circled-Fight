@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membres | Circled Fight</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/members.css">
+    </head>
+<body>
+
+    <header class="main-header">
+        <div class="logo-container">
+            <h1>Circled Fight <span class="tag">CF</span></h1>
+        </div>
+        <button id="hamburgerMenu" class="hamburger-menu" aria-label="Menu">☰</button>
+        <nav id="mobileHub" class="mobile-hub">
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="dashboard.html">Scores MJ</a></li>
+                <li><a href="br_dashboard.html">Scores BR</a></li>
+                <li><a href="tournament.html">Tournoi du Week-end</a></li>
+                <li><a href="members.html">Membres du Clan</a></li>
+                <li><a href="join.html">Nous Rejoindre</a></li>
+            </ul>
+        </nav>
+        <div id="mobileHubBackdrop" class="mobile-hub-backdrop"></div>
+    </header>
+
+    <!-- Fallback notice shown when ES module script doesn't run (e.g., opened via file://) -->
+    <div id="moduleErrorNotice" class="module-error" style="display:none;">
+        <div class="module-error-inner">
+            <h3>Problème de chargement des scripts</h3>
+            <p>Si cette page est vide, lance un serveur local dans le dossier du projet :</p>
+            <pre>python -m http.server 8000</pre>
+            <p>Puis ouvre <a href="http://localhost:8000/members.html">http://localhost:8000/members.html</a></p>
+            <button id="moduleErrorClose">Fermer</button>
+        </div>
+    </div>
+
+    <main>
+        <button id="logoutBtn" class="btn-logout-corner" style="display:none;">DÉCONNEXION ⏻</button>
+
+        <div id="authLock" class="auth-lock-screen" style="display: none;">
+            <div class="lock-icon">🔒</div>
+            <div class="lock-title">ACCÈS RESTREINT</div>
+            <p class="lock-msg">Identification requise pour accéder aux dossiers classifiés.</p>
+            
+            <div class="lock-actions">
+                <a href="login.html" class="btn-lock-login" style="text-decoration:none;">S'IDENTIFIER</a>
+                <a href="join.html" class="btn-lock-join">NOUS REJOINDRE</a>
+            </div>
+        </div>
+
+        <div id="membersContent" class="members-container" style="display: none;">
+            
+            <div id="adminTrigger" class="admin-trigger" style="display:none;">
+                <button class="btn-admin-main" onclick="openAdminPanel()">⚠️ ADMINISTRATION CLAN</button>
+            </div>
+
+            <div class="section-title">
+                UNITÉS DU CLAN
+                <span class="member-count" id="memberCount">SYNCHRONISATION...</span>
+            </div>
+            
+            <div class="members-grid" id="membersGrid"></div>
+        </div>
+    </main>
+
+    <div id="adminModal" class="admin-modal" style="display: none;">
+        <div class="admin-panel-content">
+            <h2 style="color: var(--accent-red); font-family: 'Orbitron'; margin-top:0;">PANNEAU ADMIN</h2>
+            <p style="color:#888;">Gestion des badges et distinctions.</p>
+            <button onclick="closeAdminPanel()" style="background:transparent; border:1px solid #555; color:white; padding:5px 10px; cursor:pointer; float:right; margin-top:-40px;">FERMER</button>
+            
+            <div id="adminPlayerList" style="margin-top:20px;"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // MODIFIÉ: Importe arrayUnion maintenant qu'il est exporté par firebase.js
+        // Suppression du bloc de menu mobile redondant
+        import { auth, db, collection, getDocs, getDoc, doc, updateDoc, arrayUnion, onAuthStateChanged, signOut } from './js/firebase.js';
+        import { rawData } from './js/data.js';
+
+        // --- ELEMENTS DOM ---
+        const authLock = document.getElementById('authLock');
+        const membersContent = document.getElementById('membersContent');
+        const membersGrid = document.getElementById('membersGrid');
+        const memberCount = document.getElementById('memberCount');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const adminTrigger = document.getElementById('adminTrigger');
+        const adminModal = document.getElementById('adminModal');
+        const adminPlayerList = document.getElementById('adminPlayerList');
+        
+        let allMembersCache = [];
+
+        // --- VERIFICATION CONNEXION ---
+        onAuthStateChanged(auth, async (user) => {
+
+            if (user) {
+                // --- CAS 1 : CONNECTÉ ---
+                authLock.style.display = 'none'; // Cache le cadenas
+                membersContent.style.display = 'block'; // Affiche le contenu
+                logoutBtn.style.display = 'block';
+
+                // On vérifie si c'est l'Admin
+                const userSnap = await getDoc(doc(db, "users", user.uid));
+                const userData = userSnap.exists() ? userSnap.data() : {};
+                
+                if (userData.pseudo === "Admin") {
+                    // Admin -> Affiche le bouton Admin + Cache la grille normale
+                    adminTrigger.style.display = 'block';
+                    membersGrid.innerHTML = '<p style="color:#666; text-align:center; margin-top:50px;">Mode Admin actif.<br>Utilisez le bouton ci-dessus pour gérer les badges.</p>';
+                    memberCount.innerText = "MODE SUPER-UTILISATEUR";
+                    
+                    // Pré-charge la liste pour le panneau admin
+                    await loadAdminPanelData(); 
+                    // Je retire l'appel direct à openAdminPanel() ici, pour ne pas ouvrir la modale à chaque chargement de page.
+                    // L'Admin devra cliquer sur le bouton "ADMINISTRATION CLAN".
+                } else {
+                    // Membre Normal -> Affiche la grille
+                    adminTrigger.style.display = 'none';
+                    await fetchAndDisplayMembers();
+                }
+
+            } else {
+                // --- CAS 2 : PAS CONNECTÉ ---
+                authLock.style.display = 'flex'; // Affiche le cadenas
+                membersContent.style.display = 'none'; // Cache le contenu
+                logoutBtn.style.display = 'none';
+                adminTrigger.style.display = 'none';
+            }
+        });
+
+        // --- DÉCONNEXION ---
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth).then(() => location.reload());
+        });
+
+        // --- CHARGEMENT DES MEMBRES (GRILLE) ---
+        async function fetchAndDisplayMembers() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "users"));
+                let members = [];
+                querySnapshot.forEach((doc) => {
+                    let d = doc.data(); d.uid = doc.id; members.push(d);
+                });
+
+                // Tri et Filtre
+                members.sort((a, b) => (b.cfPoints || 0) - (a.cfPoints || 0));
+                const visibleMembers = members.filter(m => m.pseudo !== "Admin");
+
+                memberCount.innerText = `${visibleMembers.length} DOSSIERS TROUVÉS`;
+                let html = '';
+
+                visibleMembers.forEach(m => {
+                    const pseudo = m.pseudo || "Soldat";
+                    const points = m.cfPoints || 0;
+                    
+                    // Pont Data.js
+                    const localStats = rawData.find(d => d.name.toLowerCase() === pseudo.toLowerCase());
+                    let avg = "N/A"; let games = 0; let perfBadges = "";
+
+                    if (localStats) {
+                        const validScores = localStats.scores.filter(s => typeof s === 'number' && s !== null);
+                        games = validScores.length;
+                        if (games > 0) avg = (validScores.reduce((a, b) => a + b, 0) / games).toFixed(1);
+                        
+                        if (games >= 8) perfBadges += `<span class="badge badge-gold">VÉTÉRAN</span>`;
+                        else if (games >= 4) perfBadges += `<span class="badge badge-silver">SOLDAT</span>`;
+                        if (avg !== "N/A" && avg >= 60) perfBadges += `<span class="badge badge-red">ÉLITE</span>`;
+                    }
+
+                    // Badges Richesse
+                    let wealthBadges = '';
+                    if (points > 10000) wealthBadges += `<span class="badge badge-red">LÉGENDE</span>`;
+                    else if (points > 5000) wealthBadges += `<span class="badge badge-gold">VIP</span>`;
+
+                    // Badges Custom
+                    let customBadgesHtml = '';
+                    if (m.customBadges && Array.isArray(m.customBadges)) {
+                        m.customBadges.forEach(b => {
+                            customBadgesHtml += `<span class="badge badge-${b.color}">${b.text}</span>`;
+                        });
+                    }
+
+                    const initials = pseudo.substring(0, 2).toUpperCase();
+
+                    html += `
+                        <div class="member-card">
+                            <div class="status-indicator"></div>
+                            <div class="card-header">
+                                <div class="avatar">${initials}</div>
+                                <div class="identity">
+                                    <h3>${pseudo}</h3>
+                                    <div class="role">Opérateur</div>
+                                </div>
+                            </div>
+                            <div class="badges-container">
+                                ${wealthBadges} ${perfBadges} ${customBadgesHtml}
+                            </div>
+                            <div class="card-stats" style="display:grid; grid-template-columns: 1fr 1fr 1fr; border-top:1px solid #333;">
+                                <div class="stat-box" style="border-right:1px solid #333;">
+                                    <span class="stat-val" style="color:var(--codm-yellow)">${points}</span>
+                                    <span class="stat-label">CF Points</span>
+                                </div>
+                                <div class="stat-box" style="border-right:1px solid #333;">
+                                    <span class="stat-val">${avg}</span>
+                                    <span class="stat-label">Moyenne</span>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-val">${games}</span>
+                                    <span class="stat-label">Missions</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                membersGrid.innerHTML = html;
+            } catch (error) { console.error(error); }
+        }
+
+        // --- FONCTIONS ADMIN ---
+        window.openAdminPanel = () => {
+            document.getElementById('adminModal').style.display = 'block';
+            // On peut relancer le chargement pour s'assurer que les données sont fraîches
+            loadAdminPanelData();
+        };
+        window.closeAdminPanel = () => { document.getElementById('adminModal').style.display = 'none'; };
+
+        async function loadAdminPanelData() {
+            const querySnapshot = await getDocs(collection(db, "users"));
+            let members = [];
+            querySnapshot.forEach((doc) => {
+                let d = doc.data(); d.uid = doc.id; members.push(d);
+            });
+            members.sort((a, b) => (a.pseudo || "").localeCompare(b.pseudo || ""));
+
+            let html = '';
+            members.forEach(m => {
+                if (m.pseudo === "Admin") return;
+                html += `
+                    <div class="admin-player-row">
+                        <span style="color:white; font-weight:bold;">${m.pseudo}</span>
+                        <button class="btn-add-badge" onclick="window.toggleBadgeForm('${m.uid}')">+ BADGE</button>
+                    </div>
+                    <div id="form-${m.uid}" class="badge-form">
+                        <input type="text" id="badgeText-${m.uid}" placeholder="NOM (Ex: MVP)">
+                        <select id="badgeColor-${m.uid}">
+                            <option value="gold">Or</option>
+                            <option value="red">Rouge</option>
+                            <option value="blue">Bleu</option>
+                            <option value="green">Vert</option>
+                            <option value="purple">Violet</option>
+                            <option value="pink">Rose</option>
+                        </select>
+                        <button onclick="window.saveBadge('${m.uid}')" style="background:var(--codm-yellow); border:none; color:black;">OK</button>
+                    </div>
+                `;
+            });
+            adminPlayerList.innerHTML = html;
+        }
+
+        window.toggleBadgeForm = (uid) => {
+            const f = document.getElementById(`form-${uid}`);
+            // Fixe un bug potentiel: si l'élément n'existe pas, cela ne doit pas crasher.
+            if (f) f.style.display = f.style.display === 'block' ? 'none' : 'block';
+        };
+
+        window.saveBadge = async (uid) => {
+            const textInput = document.getElementById(`badgeText-${uid}`);
+            const colorSelect = document.getElementById(`badgeColor-${uid}`);
+            const badgeText = textInput.value.toUpperCase().trim();
+            if(!badgeText) return;
+
+            try {
+                await updateDoc(doc(db, "users", uid), {
+                    customBadges: arrayUnion({ text: badgeText, color: colorSelect.value })
+                });
+                // Remplacer alert() par un log pour le moment
+                console.log("Badge ajouté !");
+                textInput.value = "";
+            } catch (e) { 
+                console.error("Erreur lors de l'ajout du badge :", e); 
+                // Remplacer alert() par un log pour le moment
+                console.log("Erreur ajout"); 
+            }
+        };
+
+        // Indicateur que le module s'est bien chargé (fallback script checks this)
+        window.__membersModuleLoaded = true;
+
+    </script>
+    <script>
+        // Fallback non-module: initialise the hamburger immediately and show guidance if module fails
+        (function(){
+            const btn = document.getElementById('hamburgerMenu');
+            const hub = document.getElementById('mobileHub');
+            const backdrop = document.getElementById('mobileHubBackdrop');
+            if (btn && hub && backdrop) {
+                function openHub(){ hub.classList.add('open'); backdrop.classList.add('visible'); btn.setAttribute('aria-expanded','true'); hub.setAttribute('aria-hidden','false'); }
+                function closeHub(){ hub.classList.remove('open'); backdrop.classList.remove('visible'); btn.setAttribute('aria-expanded','false'); hub.setAttribute('aria-hidden','true'); }
+                btn.addEventListener('click', ()=>{ const opened = btn.getAttribute('aria-expanded')==='true'; if(opened) closeHub(); else openHub(); });
+                backdrop.addEventListener('click', closeHub);
+            }
+
+            // If the module didn't run, show the guidance notice after short timeout
+            setTimeout(() => {
+                if (!window.__membersModuleLoaded) {
+                    const notice = document.getElementById('moduleErrorNotice');
+                    if (notice) notice.style.display = 'block';
+                }
+            }, 600);
+
+            const closeBtn = document.getElementById('moduleErrorClose');
+            if (closeBtn) closeBtn.addEventListener('click', () => { document.getElementById('moduleErrorNotice').style.display='none'; });
+        })();
+    </script>
+</body>
+</html>
