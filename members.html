@@ -290,7 +290,15 @@
                 let wealthBadges = '';
                 if (points > 10000) wealthBadges += `<span class="badge badge-red">LÉGENDE</span>`;
                 else if (points > 5000) wealthBadges += `<span class="badge badge-gold">VIP</span>`;
-
+if (localStats) {
+                    const validScores = localStats.scores.filter(s => typeof s === 'number' && s !== null);
+                    games = validScores.length;
+                    if (games > 0) avg = (validScores.reduce((a, b) => a + b, 0) / games).toFixed(1);
+                    
+                    if (games >= 8) perfBadges += `<span></span>`;
+                    else if (games >= 4) perfBadges += `<span ></span>`;
+                    if (avg !== "N/A" && avg >= 60) perfBadges += `<span ></span>`;
+                }
                 let customBadgesHtml = '';
                 if (m.customBadges && Array.isArray(m.customBadges)) {
                     m.customBadges.forEach(b => {
