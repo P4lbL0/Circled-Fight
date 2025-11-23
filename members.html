@@ -8,12 +8,12 @@
     <link rel="stylesheet" href="css/members.css">
     
     <style>
-        /* --- MOTEUR GRAPHIQUE BADGES V2.5 (FINAL) --- */
+        /* --- MOTEUR GRAPHIQUE BADGES V4 (ULTIMATE) --- */
         
         /* Base Badge */
         .badge {
             position: relative;
-            overflow: hidden; 
+             overflow: hidden; /* Désactivé pour permettre aux cadres de dépasser */
             border: 1px solid rgba(255,255,255,0.1);
             cursor: default;
             transition: all 0.3s ease;
@@ -23,103 +23,104 @@
             font-size: 0.75rem;
             font-weight: bold;
             text-transform: uppercase;
-            margin: 2px;
+            margin: 4px; /* Un peu plus d'espace pour les cadres */
+            z-index: 1;
         }
 
-        /* --- COULEURS & MATIÈRES --- */
-        .badge-gold    { background: #ffc107; color: #000; border-color: #ffd700; }
-        .badge-red     { background: #b71c1c; color: #fff; }
-        .badge-blue    { background: #0d47a1; color: #fff; }
-        .badge-green   { background: #1b5e20; color: #fff; }
-        .badge-purple  { background: #4a148c; color: #fff; }
+        /* --- 1. COULEURS & MATIÈRES (Backgrounds) --- */
+        /* Basiques étandus */
+        .badge-gold    { background: #ffc107; color: #000; }
+        .badge-red     { background: #d32f2f; color: #fff; }
+        .badge-blue    { background: #1976d2; color: #fff; }
+        .badge-green   { background: #388e3c; color: #fff; }
+        .badge-purple  { background: #7b1fa2; color: #fff; }
+        .badge-cyan    { background: #00bcd4; color: #000; }
+        .badge-pink    { background: #e91e63; color: #fff; }
+        .badge-orange  { background: #f57c00; color: #fff; }
+        .badge-lime    { background: #cddc39; color: #000; }
+        .badge-black   { background: #111; color: #fff; border-color: #444; }
         
-        /* Spéciaux */
-        .badge-obsidian { 
-            background: #000; color: #ccc; border: 1px solid #7c4dff; 
-            box-shadow: 0 0 5px rgba(124, 77, 255, 0.2);
-        }
-        .badge-diamond { 
-            background: #e3f2fd; color: #0d47a1; border: 1px solid #fff; 
-            text-shadow: 0 0 5px rgba(255,255,255,0.8);
-        }
-        .badge-magma {
-            background: linear-gradient(45deg, #b71c1c, #f57f17);
-            color: #fff;
-        }
-        
-        /* LE VRAI OR (REAL GOLD) */
+        /* Matières Précieuses "Real" */
         .badge-realgold {
-            background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-            background-size: 200% 200%;
-            color: #222;
-            font-weight: 900;
-            border: 1px solid #fff;
-            text-shadow: 0px 1px 0px rgba(255,255,255,0.4);
-            animation: gradientMove 5s ease infinite;
+            background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7);
+            background-size: 200% 200%; color: #222; font-weight: 900; border: 1px solid #fff;
+            text-shadow: 0px 1px 0px rgba(255,255,255,0.4); animation: gradientMove 5s ease infinite;
         }
+        .badge-realsilver {
+            background: linear-gradient(135deg, #e0e0e0, #ffffff, #a0a0a0, #e6e6e6);
+            background-size: 200% 200%; color: #333; font-weight: 900; border: 1px solid #fff;
+            text-shadow: 0px 1px 0px rgba(255,255,255,0.4); animation: gradientMove 6s ease infinite alternate;
+        }
+        .badge-realdiamond {
+             background: linear-gradient(135deg, #e1f5fe, #b3e5fc, #ffffff, #e1f5fe);
+             color: #01579b; font-weight: 900; border: 1px solid #81d4fa;
+             text-shadow: 0 0 10px rgba(255,255,255,0.9);
+             box-shadow: inset 0 0 10px rgba(255,255,255,0.8);
+             animation: diamondSparkle 4s infinite linear;
+        }
+        .badge-magma { background: linear-gradient(45deg, #b71c1c, #f57f17); color: #fff; }
+        .badge-obsidian { background: #000; color: #ccc; border: 1px solid #7c4dff; box-shadow: 0 0 5px rgba(124, 77, 255, 0.2); }
 
-        /* --- EFFETS (ANIMATIONS) --- */
+        /* --- 2. EFFETS (Animations internes/externes) --- */
+        /* Demande spécifique : Contour Rouge Éclair */
+        .effect-lightning-red {
+            border-color: #ff0000 !important;
+            box-shadow: 0 0 5px #f00, inset 0 0 5px #f00;
+            animation: redShock 1.2s infinite alternate ease-in-out;
+        }
+        @keyframes redShock {
+            0% { box-shadow: 0 0 2px #d32f2f, inset 0 0 2px #d32f2f; opacity: 0.8; }
+            100% { box-shadow: 0 0 15px #ff1744, inset 0 0 10px #ff1744; border-color: #ff5252 !important; opacity: 1; }
+        }
         
-        /* 1. PULSE (Respiration) */
+        /* Autres effets */
         .effect-pulse { animation: pulseAnim 2s infinite; }
-        @keyframes pulseAnim {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
-            50% { transform: scale(1.05); box-shadow: 0 0 0 4px rgba(255, 255, 255, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
-        }
-
-        /* 2. ÉLECTRIQUE (Vibration + Flash) */
         .effect-electric { animation: electricAnim 0.8s infinite; }
-        @keyframes electricAnim {
-            0% { transform: translate(0,0); opacity: 1; }
-            20% { transform: translate(-1px, 1px); border-color: #fff; }
-            40% { transform: translate(1px, -1px); opacity: 0.9; }
-            60% { transform: translate(-1px, 0); border-color: transparent; }
-            80% { transform: translate(1px, 1px); opacity: 1; }
-            100% { transform: translate(0, 0); }
-        }
-
-        /* 3. SHINE (Reflet qui passe) */
-        .effect-shine::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 50%; height: 100%;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
-            transform: skewX(-25deg);
-            animation: shineAnim 3s infinite;
-        }
-        @keyframes shineAnim {
-            0% { left: -100%; }
-            20% { left: 200%; }
-            100% { left: 200%; }
-        }
-
-        /* 4. GLITCH (Bug visuel) */
         .effect-glitch { animation: glitchAnim 2s infinite; }
-        @keyframes glitchAnim {
-            0% { clip-path: inset(0 0 0 0); transform: translate(0); }
-            5% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, 0); }
-            10% { clip-path: inset(80% 0 10% 0); transform: translate(2px, 0); filter: hue-rotate(90deg); }
-            15% { clip-path: inset(0 0 0 0); transform: translate(0); filter: none; }
-            100% { clip-path: inset(0 0 0 0); }
+        .effect-burn { box-shadow: 0 0 10px currentColor; animation: burnAnim 1.5s alternate infinite; }
+        /* Shine nécessite overflow hidden, on l'applique spécifiquement */
+        .badge[class*="effect-shine"] { overflow: hidden; }
+        .effect-shine::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg); animation: shineAnim 3s infinite;
         }
 
-        /* 5. BURN (Lueur intense permanente) */
-        .effect-burn {
-            box-shadow: 0 0 10px currentColor;
-            animation: burnAnim 1.5s alternate infinite;
+        /* --- 3. CADRES (Structures externes) --- */
+        /* Cadre Élite (Orné Doré) */
+        .frame-elite {
+            border: none;
+            box-shadow: 0 0 0 2px #111, 0 0 0 4px var(--codm-yellow);
+            margin: 6px; /* Plus d'espace pour le double contour */
         }
-        @keyframes burnAnim {
-            from { box-shadow: 0 0 5px currentColor; }
-            to { box-shadow: 0 0 15px currentColor, 0 0 5px #fff; }
+        /* Cadre Cyber (Tech Bleu) */
+        .frame-cyber {
+            border: 1px solid #00e5ff;
+            box-shadow: 0 0 5px #00e5ff, inset 0 0 5px #00e5ff;
+            border-radius: 0; /* Carré pour le look tech */
+            clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10% );
+        }
+        /* Cadre Hazard (Avertissement) */
+        .frame-hazard {
+             border: 2px dashed #ffeb3b;
+             background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.2), rgba(0,0,0,0.2) 5px, transparent 5px, transparent 10px);
+        }
+        /* Cadre Spectral (Aura fantôme) */
+        .frame-spectral {
+            border: none;
+            box-shadow: 0 0 10px 2px rgba(124, 77, 255, 0.6);
+            animation: pulseAnim 3s infinite reverse;
         }
 
-        @keyframes gradientMove { 
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+
+        /* Animations Utilitaires */
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+        @keyframes diamondSparkle { 0% { filter: brightness(1); } 50% { filter: brightness(1.3) hue-rotate(10deg); } 100% { filter: brightness(1); } }
+        @keyframes pulseAnim { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes electricAnim { 0% { transform: translate(0,0); } 20% { transform: translate(-1px, 1px); } 40% { transform: translate(1px, -1px); } 60% { transform: translate(-1px, 0); } 80% { transform: translate(1px, 1px); } 100% { transform: translate(0, 0); } }
+        @keyframes shineAnim { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+        @keyframes glitchAnim { 0% { clip-path: inset(0 0 0 0); } 5% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, 0); } 10% { clip-path: inset(80% 0 10% 0); transform: translate(2px, 0); filter: invert(1); } 15% { clip-path: inset(0 0 0 0); transform: translate(0); filter: none; } 100% { clip-path: inset(0 0 0 0); } }
+        @keyframes burnAnim { from { box-shadow: 0 0 5px currentColor; } to { box-shadow: 0 0 15px currentColor, 0 0 5px #fff; } }
 
         /* --- LAYOUT UTILS --- */
         .tools-bar { max-width: 1200px; margin: 20px auto; padding: 0 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; }
@@ -127,33 +128,22 @@
         .btn-tool { background: #222; color: #ccc; border: 1px solid #444; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-family: 'Rajdhani'; transition: 0.3s; }
         .btn-tool:hover { background: #333; color: var(--codm-yellow); border-color: var(--codm-yellow); }
         
-        /* ADMIN PANEL STYLES */
+        /* ADMIN PANEL STYLES (Élargi pour les nouveaux selects) */
         .current-badges-list { background: rgba(0,0,0,0.3); padding: 10px; margin-bottom: 15px; border-radius: 4px; }
-        .edit-badge-row { display: flex; gap: 5px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; }
-        .edit-badge-row input, .edit-badge-row select { background: #111; border: 1px solid #444; color: white; padding: 5px; border-radius: 4px; font-size: 0.8rem; }
+        .edit-badge-row { display: flex; gap: 5px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 4px; }
+        .edit-badge-row input, .edit-badge-row select { background: #111; border: 1px solid #444; color: white; padding: 5px; border-radius: 4px; font-size: 0.8rem; margin-right: 2px; }
         .btn-icon { cursor: pointer; padding: 5px; border: none; border-radius: 4px; font-weight: bold; width: 30px; }
         .btn-save-mini { background: var(--codm-yellow); color: black; }
         .btn-del-mini { background: #ff4444; color: white; }
         
         /* ENCYCLO */
         .encyclopedia-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
-        .encyclo-item { background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #333; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .encyclo-desc { font-size: 0.9rem; color: #888; margin-top: 10px; font-style: italic; }
+        .encyclo-item { background: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid #333; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 120px; }
+        .encyclo-desc { font-size: 0.9rem; color: #888; margin-top: 15px; font-style: italic; }
 
         /* USER HIGHLIGHT */
-        .current-user-highlight {
-            border: 2px solid var(--codm-yellow) !important;
-            background: linear-gradient(145deg, rgba(255, 193, 7, 0.05), #111) !important;
-            position: relative; box-shadow: 0 0 15px rgba(255, 193, 7, 0.1);
-        }
-        /* CORRECTION ÉTIQUETTE */
-        .current-user-tag {
-            position: absolute; top: 0; right: 0;
-            background: var(--codm-yellow); color: #000;
-            font-size: 0.75rem; font-weight: 900; padding: 4px 12px;
-            font-family: 'Orbitron'; border-bottom-left-radius: 12px;
-            box-shadow: -2px 2px 10px rgba(255, 193, 7, 0.3); z-index: 10; letter-spacing: 1px;
-        }
+        .current-user-highlight { border: 2px solid var(--codm-yellow) !important; background: linear-gradient(145deg, rgba(255, 193, 7, 0.05), #111) !important; position: relative; box-shadow: 0 0 15px rgba(255, 193, 7, 0.1); }
+        .current-user-tag { position: absolute; top: 0; right: 0; background: var(--codm-yellow); color: #000; font-size: 0.75rem; font-weight: 900; padding: 4px 12px; font-family: 'Orbitron'; border-bottom-left-radius: 12px; box-shadow: -2px 2px 10px rgba(255, 193, 7, 0.3); z-index: 10; letter-spacing: 1px; }
         .current-user-highlight .status-indicator { top: 35px; right: 10px; }
         .admin-controls-wrapper { max-width: 1200px; margin: 0 auto; padding: 0 20px; text-align: center; }
     </style>
@@ -179,56 +169,33 @@
     </header>
 
     <div id="moduleErrorNotice" class="module-error" style="display:none;">
-        <div class="module-error-inner">
-            <h3>Erreur de script</h3>
-            <p>Lance un serveur local.</p>
-            <button id="moduleErrorClose">Fermer</button>
-        </div>
+        <div class="module-error-inner"><h3>Erreur de script</h3><p>Lance un serveur local.</p><button id="moduleErrorClose">Fermer</button></div>
     </div>
 
     <main>
-        <div style="display:flex; justify-content:flex-end; padding:10px 20px;">
-            <button id="logoutBtn" class="btn-logout-corner" style="display:none;">DÉCONNEXION ⏻</button>
-        </div>
-
+        <div style="display:flex; justify-content:flex-end; padding:10px 20px;"><button id="logoutBtn" class="btn-logout-corner" style="display:none;">DÉCONNEXION ⏻</button></div>
         <div id="authLock" class="auth-lock-screen" style="display: none;">
-            <div class="lock-icon">🔒</div>
-            <div class="lock-title">ACCÈS RESTREINT</div>
-            <p class="lock-msg">Identifie-toi pour accéder aux dossiers des agents.</p>
-            <div class="lock-actions">
-                <a href="login.html" class="btn-lock-login" style="text-decoration:none;">S'IDENTIFIER</a>
-                <a href="join.html" class="btn-lock-join">NOUS REJOINDRE</a>
-            </div>
+            <div class="lock-icon">🔒</div><div class="lock-title">ACCÈS RESTREINT</div><p class="lock-msg">Identifie-toi pour accéder aux dossiers des agents.</p>
+            <div class="lock-actions"><a href="login.html" class="btn-lock-login" style="text-decoration:none;">S'IDENTIFIER</a><a href="join.html" class="btn-lock-join">NOUS REJOINDRE</a></div>
         </div>
 
         <div id="membersContent" class="members-container" style="display: none;">
-            <div id="adminTrigger" class="admin-controls-wrapper" style="display:none;">
-                <button class="btn-admin-main" onclick="openAdminPanel()">⚠️ GÉRER LES BADGES (ADMIN)</button>
-            </div>
-            
+            <div id="adminTrigger" class="admin-controls-wrapper" style="display:none;"><button class="btn-admin-main" onclick="openAdminPanel()">⚠️ GÉRER LES BADGES (ADMIN)</button></div>
             <div class="tools-bar">
                 <input type="text" id="searchInput" class="search-box" placeholder="Rechercher un soldat..." onkeyup="window.filterMembers()">
                 <button class="btn-tool" onclick="openEncyclopedia()">📚 Encyclopédie des Badges</button>
             </div>
-
-            <div class="section-title">
-                UNITÉS DU CLAN
-                <span class="member-count" id="memberCount">CHARGEMENT...</span>
-            </div>
-            
+            <div class="section-title">UNITÉS DU CLAN <span class="member-count" id="memberCount">CHARGEMENT...</span></div>
             <div class="members-grid" id="membersGrid"></div>
         </div>
     </main>
 
     <div id="adminModal" class="admin-modal" style="display: none;">
-        <div class="admin-panel-content">
-            <h2 style="color: var(--accent-red); font-family: 'Orbitron'; margin-top:0;">PANNEAU ADMIN</h2>
-            <p style="color:#888;">Forge de Badges v3.0</p>
+        <div class="admin-panel-content" style="max-width: 900px;">
+            <h2 style="color: var(--accent-red); font-family: 'Orbitron'; margin-top:0;">FORGE V4 (ADMIN)</h2>
+            <p style="color:#888;">Système de badges : Matière + Effet + Cadre.</p>
             <button onclick="closeAdminPanel()" style="background:transparent; border:1px solid #555; color:white; padding:5px 10px; cursor:pointer; float:right; margin-top:-40px;">FERMER</button>
-            
-            <input type="text" id="adminSearchInput" placeholder="Chercher un membre pour modifier..." onkeyup="window.filterAdminList()" 
-                   style="width:100%; padding:10px; margin-bottom:15px; background:#111; border:1px solid #444; color:white; border-radius:4px; font-family:'Rajdhani';">
-            
+            <input type="text" id="adminSearchInput" placeholder="Chercher un membre..." onkeyup="window.filterAdminList()" style="width:100%; padding:10px; margin-bottom:15px; background:#111; border:1px solid #444; color:white; border-radius:4px; font-family:'Rajdhani';">
             <div id="adminPlayerList" style="margin-top:20px; max-height: 70vh; overflow-y: auto;"></div>
         </div>
     </div>
@@ -236,7 +203,6 @@
     <div id="encycloModal" class="admin-modal" style="display: none; z-index: 2000;">
         <div class="admin-panel-content" style="max-width: 800px;">
             <h2 style="color: var(--codm-yellow); font-family: 'Orbitron'; margin-top:0;">ARCHIVES BADGES</h2>
-            <p style="color:#888;">Répertoire des distinctions et effets.</p>
             <button onclick="document.getElementById('encycloModal').style.display='none'" style="background:transparent; border:1px solid #555; color:white; padding:5px 10px; cursor:pointer; float:right; margin-top:-40px;">FERMER</button>
             <div id="encycloList" class="encyclopedia-grid"></div>
         </div>
@@ -259,43 +225,31 @@
         let adminUsersCache = [];
         let currentUserUid = null;
 
-        // --- AUTH ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                authLock.style.display = 'none';
-                membersContent.style.display = 'block';
-                logoutBtn.style.display = 'block';
+                authLock.style.display = 'none'; membersContent.style.display = 'block'; logoutBtn.style.display = 'block';
                 currentUserUid = user.uid;
                 const userSnap = await getDoc(doc(db, "users", user.uid));
                 const userData = userSnap.exists() ? userSnap.data() : {};
-                if (userData.pseudo === "Admin") adminTrigger.style.display = 'block';
-                else adminTrigger.style.display = 'none';
+                adminTrigger.style.display = (userData.pseudo === "Admin") ? 'block' : 'none';
                 await fetchAndCacheMembers();
             } else {
-                authLock.style.display = 'flex';
-                membersContent.style.display = 'none';
-                logoutBtn.style.display = 'none';
-                adminTrigger.style.display = 'none';
+                authLock.style.display = 'flex'; membersContent.style.display = 'none'; logoutBtn.style.display = 'none'; adminTrigger.style.display = 'none';
                 currentUserUid = null;
             }
         });
 
         logoutBtn.addEventListener('click', () => { signOut(auth).then(() => location.reload()); });
 
-        // --- FETCH MEMBERS (GRID) ---
         async function fetchAndCacheMembers() {
             try {
                 const querySnapshot = await getDocs(collection(db, "users"));
                 let members = [];
                 querySnapshot.forEach((doc) => { let d = doc.data(); d.uid = doc.id; members.push(d); });
                 members.sort((a, b) => (b.cfPoints || 0) - (a.cfPoints || 0));
-                
                 if (currentUserUid) {
                     const myIndex = members.findIndex(m => m.uid === currentUserUid);
-                    if (myIndex > -1) {
-                        const myProfile = members.splice(myIndex, 1)[0];
-                        members.unshift(myProfile);
-                    }
+                    if (myIndex > -1) members.unshift(members.splice(myIndex, 1)[0]);
                 }
                 allMembersCache = members.filter(m => m.pseudo !== "Admin");
                 renderGrid(allMembersCache);
@@ -304,18 +258,13 @@
 
         window.filterMembers = () => {
             const term = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allMembersCache.filter(m => (m.pseudo || "").toLowerCase().includes(term));
-            renderGrid(filtered);
+            renderGrid(allMembersCache.filter(m => (m.pseudo || "").toLowerCase().includes(term)));
         };
 
         function renderGrid(membersList) {
             memberCount.innerText = `${membersList.length} DOSSIERS`;
             let html = '';
-
-            if(membersList.length === 0) {
-                membersGrid.innerHTML = '<p style="text-align:center; color:#666; width:100%;">Aucun soldat trouvé.</p>';
-                return;
-            }
+            if(membersList.length === 0) { membersGrid.innerHTML = '<p style="text-align:center; color:#666;">Aucun soldat.</p>'; return; }
 
             membersList.forEach(m => {
                 const pseudo = m.pseudo || "Soldat";
@@ -326,7 +275,6 @@
 
                 const localStats = rawData.find(d => d.name.toLowerCase() === pseudo.toLowerCase());
                 let avg = "N/A"; let games = 0; let perfBadges = "";
-
                 if (localStats) {
                     const validScores = localStats.scores.filter(s => typeof s === 'number' && s !== null);
                     games = validScores.length;
@@ -343,40 +291,23 @@
                 let customBadgesHtml = '';
                 if (m.customBadges && Array.isArray(m.customBadges)) {
                     m.customBadges.forEach(b => {
+                        // V4 : Ajout de la classe de Frame (Cadre)
                         const effectClass = b.effect ? `effect-${b.effect}` : '';
-                        customBadgesHtml += `<span class="badge badge-${b.color} ${effectClass}" title="${b.desc || ''}">${b.text}</span>`;
+                        const frameClass = b.frame ? `frame-${b.frame}` : '';
+                        customBadgesHtml += `<span class="badge badge-${b.color} ${effectClass} ${frameClass}" title="${b.desc || ''}">${b.text}</span>`;
                     });
                 }
 
                 const initials = pseudo.substring(0, 2).toUpperCase();
-
                 html += `
                     <div class="${cardClass}">
-                        ${tagHtml}
-                        <div class="status-indicator"></div>
-                        <div class="card-header">
-                            <div class="avatar">${initials}</div>
-                            <div class="identity">
-                                <h3>${pseudo}</h3>
-                                <div class="role">Opérateur</div>
-                            </div>
-                        </div>
-                        <div class="badges-container">
-                            ${wealthBadges} ${perfBadges} ${customBadgesHtml}
-                        </div>
+                        ${tagHtml}<div class="status-indicator"></div>
+                        <div class="card-header"><div class="avatar">${initials}</div><div class="identity"><h3>${pseudo}</h3><div class="role">Opérateur</div></div></div>
+                        <div class="badges-container">${wealthBadges} ${perfBadges} ${customBadgesHtml}</div>
                         <div class="card-stats" style="display:grid; grid-template-columns: 1fr 1fr 1fr; border-top:1px solid #333;">
-                            <div class="stat-box" style="border-right:1px solid #333;">
-                                <span class="stat-val" style="color:var(--codm-yellow)">${points}</span>
-                                <span class="stat-label">CF Points</span>
-                            </div>
-                            <div class="stat-box" style="border-right:1px solid #333;">
-                                <span class="stat-val">${avg}</span>
-                                <span class="stat-label">Moyenne</span>
-                            </div>
-                            <div class="stat-box">
-                                <span class="stat-val">${games}</span>
-                                <span class="stat-label">Missions</span>
-                            </div>
+                            <div class="stat-box" style="border-right:1px solid #333;"><span class="stat-val" style="color:var(--codm-yellow)">${points}</span><span class="stat-label">CF Points</span></div>
+                            <div class="stat-box" style="border-right:1px solid #333;"><span class="stat-val">${avg}</span><span class="stat-label">Moyenne</span></div>
+                            <div class="stat-box"><span class="stat-val">${games}</span><span class="stat-label">Missions</span></div>
                         </div>
                     </div>
                 `;
@@ -384,155 +315,116 @@
             membersGrid.innerHTML = html;
         }
 
-        // --- ENCYCLOPEDIA ---
         window.openEncyclopedia = () => {
             document.getElementById('encycloModal').style.display = 'block';
             let uniqueBadgesMap = new Map();
             allMembersCache.forEach(m => {
                 if(m.customBadges && Array.isArray(m.customBadges)) {
                     m.customBadges.forEach(b => {
-                        const key = b.text.toUpperCase();
+                        const key = b.text.toUpperCase() + (b.color||'') + (b.effect||'') + (b.frame||''); // Clé unique plus précise
                         if (!uniqueBadgesMap.has(key) || (!uniqueBadgesMap.get(key).desc && b.desc)) {
                             uniqueBadgesMap.set(key, b);
                         }
                     });
                 }
             });
-
-            if (uniqueBadgesMap.size === 0) {
-                encycloList.innerHTML = "<p>Aucun badge enregistré.</p>";
-                return;
-            }
-
+            if (uniqueBadgesMap.size === 0) { encycloList.innerHTML = "<p>Aucun badge enregistré.</p>"; return; }
             let html = '';
             uniqueBadgesMap.forEach(b => {
                 const effectClass = b.effect ? `effect-${b.effect}` : '';
-                html += `
-                    <div class="encyclo-item">
-                        <span class="badge badge-${b.color} ${effectClass}" style="font-size:1rem; padding:5px 10px;">${b.text}</span>
+                const frameClass = b.frame ? `frame-${b.frame}` : '';
+                html += `<div class="encyclo-item">
+                        <span class="badge badge-${b.color} ${effectClass} ${frameClass}" style="font-size:1rem; padding:6px 12px;">${b.text}</span>
                         <div class="encyclo-desc">${b.desc || "Classifié"}</div>
-                    </div>
-                `;
+                    </div>`;
             });
             encycloList.innerHTML = html;
         };
 
-        // --- ADMIN PANEL & SEARCH ---
-        window.openAdminPanel = async () => {
-            document.getElementById('adminModal').style.display = 'block';
-            await loadAdminPanelData();
-        };
+        window.openAdminPanel = async () => { document.getElementById('adminModal').style.display = 'block'; await loadAdminPanelData(); };
         window.closeAdminPanel = () => { document.getElementById('adminModal').style.display = 'none'; };
 
         async function loadAdminPanelData() {
             const querySnapshot = await getDocs(collection(db, "users"));
             adminUsersCache = [];
-            querySnapshot.forEach((doc) => { 
-                let d = doc.data(); d.uid = doc.id; adminUsersCache.push(d); 
-            });
+            querySnapshot.forEach((doc) => { let d = doc.data(); d.uid = doc.id; adminUsersCache.push(d); });
             adminUsersCache.sort((a, b) => (a.pseudo || "").localeCompare(b.pseudo || ""));
             renderAdminList(adminUsersCache);
         }
-
         window.filterAdminList = () => {
             const term = document.getElementById('adminSearchInput').value.toLowerCase();
-            const filtered = adminUsersCache.filter(m => (m.pseudo || "").toLowerCase().includes(term));
-            renderAdminList(filtered);
+            renderAdminList(adminUsersCache.filter(m => (m.pseudo || "").toLowerCase().includes(term)));
         };
 
-        function renderAdminList(list) {
-            let html = '';
-            if(list.length === 0) {
-                adminPlayerList.innerHTML = '<p style="color:#666; text-align:center;">Aucun membre trouvé.</p>';
-                return;
-            }
+        // --- FONCTIONS SELECTS ADMIN V4 ---
+        function getColorsOptions(selected) {
+            const opts = [
+                {g:'MATIÈRES PRÉCIEUSES', om:[{v:'realgold',l:'⚠️ Vrai Or'},{v:'realsilver',l:'⚪ Vrai Argent'},{v:'realdiamond',l:'💎 Vrai Diamant'},{v:'magma',l:'🔥 Magma'},{v:'obsidian',l:'🌑 Obsidian'}]},
+                {g:'COULEURS BASIQUES', om:[{v:'gold',l:'Or (Simple)'},{v:'red',l:'Rouge'},{v:'blue',l:'Bleu'},{v:'green',l:'Vert'},{v:'purple',l:'Violet'},{v:'cyan',l:'Cyan'},{v:'pink',l:'Rose'},{v:'orange',l:'Orange'},{v:'lime',l:'Lime'},{v:'black',l:'Noir'}]}
+            ];
+            return opts.map(group => `<optgroup label="${group.g}">${group.om.map(o => `<option value="${o.v}" ${selected===o.v?'selected':''}>${o.l}</option>`).join('')}</optgroup>`).join('');
+        }
+        function getEffectsOptions(selected) {
+            const opts = [{v:'',l:'(Aucun Effet)'},{v:'lightning-red',l:'⚡ Contour Éclair Rouge (NEW)'},{v:'shine',l:'✨ Shine (Brillance)'},{v:'electric',l:'⚡ Électrique (Vibration)'},{v:'pulse',l:'💓 Pulse (Respiration)'},{v:'glitch',l:'👾 Glitch (Bug)'},{v:'burn',l:'🔥 Burn (Lueur)'}];
+            return opts.map(o => `<option value="${o.v}" ${selected===o.v?'selected':''}>${o.l}</option>`).join('');
+        }
+        // NOUVEAU SELECT : CADRES
+        function getFramesOptions(selected) {
+            const opts = [{v:'',l:'(Aucun Cadre)'},{v:'elite',l:'🛡️ Élite (Orné Doré)'},{v:'cyber',l:'🤖 Cyber (Tech Bleu)'},{v:'hazard',l:'⚠️ Hazard (Danger Jaune)'},{v:'spectral',l:'👻 Spectral (Aura Violette)'}];
+            return opts.map(o => `<option value="${o.v}" ${selected===o.v?'selected':''}>${o.l}</option>`).join('');
+        }
 
+        function renderAdminList(list) {
+            let html = ''; if(list.length === 0) { adminPlayerList.innerHTML = '<p style="color:#666; text-align:center;">Aucun membre.</p>'; return; }
             list.forEach(m => {
                 if (m.pseudo === "Admin") return;
-
                 let existingBadgesHtml = '';
                 if (m.customBadges && Array.isArray(m.customBadges) && m.customBadges.length > 0) {
                     m.customBadges.forEach((b, index) => {
-                        existingBadgesHtml += `
-                            <div class="edit-badge-row">
-                                <input type="text" id="edit-text-${m.uid}-${index}" value="${b.text}" style="width:50px;" placeholder="TXT">
-                                <select id="edit-color-${m.uid}-${index}">${getColorsOptions(b.color)}</select>
-                                <select id="edit-effect-${m.uid}-${index}">${getEffectsOptions(b.effect)}</select>
-                                <input type="text" id="edit-desc-${m.uid}-${index}" value="${b.desc || ''}" placeholder="Desc..." style="width:80px;">
-                                <button class="btn-icon btn-save-mini" onclick="window.updateBadge('${m.uid}', ${index})" title="Sauvegarder">💾</button>
-                                <button class="btn-icon btn-del-mini" onclick="window.deleteBadge('${m.uid}', ${index})" title="Supprimer">✕</button>
-                            </div>
-                        `;
+                        // V4 : Ajout du select Frame dans l'édition
+                        existingBadgesHtml += `<div class="edit-badge-row">
+                            <input type="text" id="edit-text-${m.uid}-${index}" value="${b.text}" style="width:50px;" placeholder="TXT">
+                            <select id="edit-color-${m.uid}-${index}">${getColorsOptions(b.color)}</select>
+                            <select id="edit-effect-${m.uid}-${index}">${getEffectsOptions(b.effect)}</select>
+                            <select id="edit-frame-${m.uid}-${index}">${getFramesOptions(b.frame)}</select>
+                            <input type="text" id="edit-desc-${m.uid}-${index}" value="${b.desc || ''}" placeholder="Desc..." style="width:100px; flex-grow:1;">
+                            <button class="btn-icon btn-save-mini" onclick="window.updateBadge('${m.uid}', ${index})" title="Sauvegarder">💾</button>
+                            <button class="btn-icon btn-del-mini" onclick="window.deleteBadge('${m.uid}', ${index})" title="Supprimer">✕</button>
+                        </div>`;
                     });
-                } else {
-                    existingBadgesHtml = '<div style="font-size:0.8rem; color:#666; margin-bottom:10px;">Aucun badge.</div>';
-                }
+                } else { existingBadgesHtml = '<div style="font-size:0.8rem; color:#666; margin-bottom:10px;">Aucun badge.</div>'; }
 
-                html += `
-                    <div class="admin-player-row">
-                        <span style="color:white; font-weight:bold;">${m.pseudo}</span>
-                        <button class="btn-add-badge" onclick="window.toggleBadgeForm('${m.uid}')">GÉRER</button>
-                    </div>
-                    <div id="form-${m.uid}" class="badge-form">
-                        <div class="current-badges-list">
-                            ${existingBadgesHtml}
-                        </div>
+                html += `<div class="admin-player-row"><span style="color:white; font-weight:bold;">${m.pseudo}</span><button class="btn-add-badge" onclick="window.toggleBadgeForm('${m.uid}')">GÉRER</button></div>
+                    <div id="form-${m.uid}" class="badge-form"><div class="current-badges-list">${existingBadgesHtml}</div>
                         <div style="border-top:1px solid #444; padding-top:10px;">
-                            <strong style="color:var(--codm-yellow); font-size:0.8rem;">CRÉER UN BADGE :</strong>
+                            <strong style="color:var(--codm-yellow); font-size:0.8rem;">CRÉER UN BADGE (V4) :</strong>
                             <div style="display:flex; gap:5px; margin-top:5px; flex-wrap:wrap;">
-                                <input type="text" id="newText-${m.uid}" placeholder="NOM" style="width:60px;">
+                                <input type="text" id="newText-${m.uid}" placeholder="NOM" style="width:70px;">
                                 <select id="newColor-${m.uid}">${getColorsOptions('gold')}</select>
                                 <select id="newEffect-${m.uid}">${getEffectsOptions('')}</select>
+                                <select id="newFrame-${m.uid}">${getFramesOptions('')}</select>
                             </div>
                             <input type="text" id="newDesc-${m.uid}" placeholder="Description" style="width:100%; margin-top:5px;">
                             <button onclick="window.addNewBadge('${m.uid}')" style="background:var(--codm-yellow); border:none; color:black; width:100%; margin-top:5px; padding:5px;">AJOUTER</button>
-                        </div>
-                    </div>
-                `;
+                        </div></div>`;
             });
             adminPlayerList.innerHTML = html;
         }
 
-        // --- UTILS SELECTS ---
-        function getColorsOptions(selected) {
-            const colors = [
-                {v:'gold', l:'Or'}, {v:'realgold', l:'⚠️ VRAI OR'}, 
-                {v:'red', l:'Rouge'}, {v:'blue', l:'Bleu'}, 
-                {v:'green', l:'Vert'}, {v:'purple', l:'Violet'},
-                {v:'obsidian', l:'Obsidian (Noir)'}, {v:'diamond', l:'Diamant'}, {v:'magma', l:'Magma'}
-            ];
-            return colors.map(c => `<option value="${c.v}" ${selected===c.v?'selected':''}>${c.l}</option>`).join('');
-        }
+        window.toggleBadgeForm = (uid) => { const f = document.getElementById(`form-${uid}`); if (f) f.style.display = f.style.display === 'block' ? 'none' : 'block'; };
 
-        function getEffectsOptions(selected) {
-            const effects = [
-                {v:'', l:'Aucun effet'},
-                {v:'shine', l:'✨ Shine'},
-                {v:'electric', l:'⚡ Électrique'},
-                {v:'pulse', l:'💓 Pulse'},
-                {v:'glitch', l:'👾 Glitch'},
-                {v:'burn', l:'🔥 Burn'}
-            ];
-            return effects.map(e => `<option value="${e.v}" ${selected===e.v?'selected':''}>${e.l}</option>`).join('');
-        }
-
-        window.toggleBadgeForm = (uid) => {
-            const f = document.getElementById(`form-${uid}`);
-            if (f) f.style.display = f.style.display === 'block' ? 'none' : 'block';
-        };
-
-        // --- CRUD OPERATIONS ---
+        // --- CRUD V4 (Inclut Frame) ---
         window.addNewBadge = async (uid) => {
             const text = document.getElementById(`newText-${uid}`).value.trim().toUpperCase();
             const color = document.getElementById(`newColor-${uid}`).value;
             const effect = document.getElementById(`newEffect-${uid}`).value;
+            const frame = document.getElementById(`newFrame-${uid}`).value; // NOUVEAU
             const desc = document.getElementById(`newDesc-${uid}`).value.trim();
             if (!text) return alert("Nom vide !");
             try {
-                const userRef = doc(db, "users", uid);
-                const snap = await getDoc(userRef);
+                const userRef = doc(db, "users", uid); const snap = await getDoc(userRef);
                 let currentBadges = snap.data().customBadges || [];
-                currentBadges.push({ text, color, effect, desc });
+                currentBadges.push({ text, color, effect, frame, desc }); // Sauvegarde Frame
                 await updateDoc(userRef, { customBadges: currentBadges });
                 await loadAdminPanelData(); await fetchAndCacheMembers();
             } catch (e) { console.error(e); }
@@ -542,16 +434,15 @@
             const newText = document.getElementById(`edit-text-${uid}-${index}`).value.trim().toUpperCase();
             const newColor = document.getElementById(`edit-color-${uid}-${index}`).value;
             const newEffect = document.getElementById(`edit-effect-${uid}-${index}`).value;
+            const newFrame = document.getElementById(`edit-frame-${uid}-${index}`).value; // NOUVEAU
             const newDesc = document.getElementById(`edit-desc-${uid}-${index}`).value.trim();
             try {
-                const userRef = doc(db, "users", uid);
-                const snap = await getDoc(userRef);
+                const userRef = doc(db, "users", uid); const snap = await getDoc(userRef);
                 let currentBadges = snap.data().customBadges || [];
                 if (index >= 0 && index < currentBadges.length) {
-                    currentBadges[index] = { text: newText, color: newColor, effect: newEffect, desc: newDesc };
+                    currentBadges[index] = { text: newText, color: newColor, effect: newEffect, frame: newFrame, desc: newDesc };
                     await updateDoc(userRef, { customBadges: currentBadges });
-                    alert("Modifié !");
-                    await fetchAndCacheMembers();
+                    alert("Modifié !"); await fetchAndCacheMembers();
                 }
             } catch (e) { console.error(e); }
         };
@@ -559,30 +450,22 @@
         window.deleteBadge = async (uid, index) => {
             if(!confirm("Supprimer ?")) return;
             try {
-                const userRef = doc(db, "users", uid);
-                const snap = await getDoc(userRef);
+                const userRef = doc(db, "users", uid); const snap = await getDoc(userRef);
                 let currentBadges = snap.data().customBadges || [];
                 if (index >= 0 && index < currentBadges.length) {
-                    currentBadges.splice(index, 1);
-                    await updateDoc(userRef, { customBadges: currentBadges });
+                    currentBadges.splice(index, 1); await updateDoc(userRef, { customBadges: currentBadges });
                     await loadAdminPanelData(); await fetchAndCacheMembers();
                 }
             } catch (e) { console.error(e); }
         };
-        
         window.__membersModuleLoaded = true;
     </script>
     <script>
         (function(){
-            const btn = document.getElementById('hamburgerMenu');
-            const hub = document.getElementById('mobileHub');
-            const backdrop = document.getElementById('mobileHubBackdrop');
+            const btn = document.getElementById('hamburgerMenu'); const hub = document.getElementById('mobileHub'); const backdrop = document.getElementById('mobileHubBackdrop');
             if (btn && hub && backdrop) {
                 const close = () => { hub.classList.remove('open'); backdrop.classList.remove('visible'); btn.setAttribute('aria-expanded','false'); };
-                btn.addEventListener('click', () => { 
-                    if(hub.classList.contains('open')) close(); 
-                    else { hub.classList.add('open'); backdrop.classList.add('visible'); btn.setAttribute('aria-expanded','true'); }
-                });
+                btn.addEventListener('click', () => { if(hub.classList.contains('open')) close(); else { hub.classList.add('open'); backdrop.classList.add('visible'); btn.setAttribute('aria-expanded','true'); } });
                 backdrop.addEventListener('click', close);
             }
             setTimeout(() => { if (!window.__membersModuleLoaded) document.getElementById('moduleErrorNotice').style.display = 'block'; }, 1000);
