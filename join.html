@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Accueil | Circled Fight</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ========================================
+           CSS MODERNISÉ & RESPONSIVE
+           ======================================== */
+        :root {
+            --codm-yellow: #ffc107;
+            --codm-yellow-glow: rgba(255, 193, 7, 0.4);
+            --bg-dark: #0b0b0b;
+            --bg-card: #141414;
+            --bg-card-hover: #1f1f1f;
+            --text-main: #e6e6e6;
+            --text-muted: #a0a0a0;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * { box-sizing: border-box; }
+        
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text-main); 
+            font-family: 'Rajdhani', sans-serif; 
+            margin: 0; 
+            padding-top: 70px; /* Espace pour le header fixe */
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4 { font-family: 'Orbitron', sans-serif; margin-top: 0; text-transform: uppercase; letter-spacing: 1px; }
+        a { text-decoration: none; color: inherit; transition: var(--transition); }
+        ul { list-style: none; padding: 0; }
+        img { max-width: 100%; display: block; }
+
+        /* HEADER FIXE */
+        .main-header {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            background: rgba(11, 11, 11, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 20px; height: 70px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .logo-container h1 { font-size: 1.2rem; color: #fff; margin: 0; font-weight: 900; }
+        .logo-container .tag { color: var(--codm-yellow); font-size: 0.8em; vertical-align: super; }
+
+        /* HAMBURGER MENU */
+        .hamburger-menu { background: none; border: none; font-size: 2rem; color: #fff; cursor: pointer; padding: 5px; }
+        
+        /* Mobile Navigation Overlay */
+        .mobile-hub {
+            position: fixed; top: 0; right: -100%; width: 280px; height: 100vh;
+            background: #1a1a1a; border-left: 2px solid var(--codm-yellow);
+            padding: 80px 20px 20px; z-index: 999;
+            transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+        }
+        .mobile-hub.open { right: 0; }
+        
+        .mobile-hub ul li { margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
+        .mobile-hub ul li a { font-family: 'Orbitron'; font-size: 1.1rem; color: #fff; display: block; }
+        .mobile-hub ul li a:hover { color: var(--codm-yellow); padding-left: 10px; }
+
+        .mobile-hub-backdrop {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 998;
+            opacity: 0; visibility: hidden; transition: 0.3s;
+        }
+        .mobile-hub-backdrop.visible { opacity: 1; visibility: visible; }
+
+        /* HERO SECTION */
+        .hero-section {
+            position: relative;
+            padding: 60px 20px;
+            text-align: center;
+            background: linear-gradient(to bottom, rgba(11,11,11,0.3), var(--bg-dark)), url('img/hero-bg.jpg'); /* Ajoute une image de fond ici */
+            background-size: cover; background-position: center;
+            border-bottom: 2px solid var(--codm-yellow);
+        }
+        
+        .hero-content {
+            max-width: 800px; margin: 0 auto;
+            position: relative; z-index: 2;
+        }
+        
+        .hero-section h2 { 
+            font-size: 2.2rem; color: #fff; 
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
+            margin-bottom: 15px;
+        }
+        .text-neon { color: var(--codm-yellow); text-shadow: 0 0 15px var(--codm-yellow-glow); }
+        .hero-section p { color: #ddd; font-size: 1rem; margin-bottom: 30px; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+        /* BOUTON PRINCIPAL */
+        .btn-main-action {
+            display: inline-block;
+            background: var(--codm-yellow); color: #000;
+            padding: 14px 28px; font-weight: 700; font-family: 'Orbitron';
+            text-transform: uppercase; border-radius: 4px;
+            box-shadow: 0 0 15px var(--codm-yellow-glow);
+            transition: var(--transition);
+        }
+        .btn-main-action:hover {
+            transform: translateY(-3px); box-shadow: 0 0 25px var(--codm-yellow);
+        }
+        .btn-main-action.cta-invert { background: #fff; color: #000; box-shadow: none; }
+
+        /* SECTIONS GÉNÉRALES */
+        .main-content-home section { margin-bottom: 40px; padding: 0 20px; max-width: 1200px; margin-left: auto; margin-right: auto; }
+        
+        .section-title { 
+            border-left: 4px solid var(--codm-yellow); 
+            padding-left: 15px; margin-bottom: 20px; 
+            color: #fff; font-size: 1.5rem;
+        }
+
+        /* POURQUOI NOUS REJOINDRE */
+        .join-why .lead { font-size: 1.1rem; color: var(--text-main); margin-bottom: 20px; }
+        .benefits-list li {
+            position: relative; padding-left: 20px; margin-bottom: 12px; color: var(--text-muted);
+        }
+        .benefits-list li::before {
+            content: '>'; color: var(--codm-yellow); font-weight: bold;
+            position: absolute; left: 0;
+        }
+        .benefits-list strong { color: #fff; }
+
+        /* GRILLES (Posters & Features) */
+        .posters-grid, .features-extended-grid {
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 20px;
+        }
+
+        /* CARTE AFFICHE */
+        .poster-card {
+            background: var(--bg-card); padding: 10px; border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        .poster-card:hover { border-color: var(--codm-yellow); transform: translateY(-5px); }
+        .poster-img { 
+            width: 100%; height: 350px; object-fit: cover; 
+            border-radius: 6px; cursor: zoom-in; opacity: 0.9;
+        }
+        .poster-card figcaption { text-align: center; padding-top: 10px; font-size: 0.9rem; color: #ccc; }
+
+        /* CARTE FEATURE */
+        .feature-block {
+            background: linear-gradient(145deg, #1a1a1a, #141414);
+            padding: 20px; border-radius: 12px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .feature-block h4 { color: var(--codm-yellow); margin-bottom: 10px; font-size: 1.1rem; }
+        .feature-block p { font-size: 0.95rem; margin: 0; color: var(--text-muted); }
+
+        /* CALL TO ACTION */
+        .join-callout {
+            background: linear-gradient(45deg, #222, #111);
+            padding: 40px 20px; text-align: center; border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* STATS */
+        .season-stats {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 20px;
+            max-width: 400px; width: 100%; margin: 40px auto;
+            text-align: center;
+        }
+        .stat-card { display: flex; justify-content: space-around; align-items: center; margin-bottom: 15px; }
+        .stat-number { font-size: 2.5rem; font-family: 'Orbitron'; color: var(--codm-yellow); font-weight: 700; line-height: 1; }
+        .stat-label { font-size: 0.8rem; text-transform: uppercase; margin-top: 5px; color: #888; }
+        .stat-divider { width: 1px; height: 50px; background: rgba(255,255,255,0.1); }
+        .thanks { font-size: 0.8rem; color: #666; font-style: italic; }
+
+        /* FOOTER */
+        .main-footer {
+            background: #050505; padding: 30px 20px;
+            text-align: center; font-size: 0.9rem; color: #666;
+            border-top: 1px solid var(--border-color);
+            margin-top: 50px;
+        }
+        .main-footer a { color: #888; margin-left: 10px; }
+
+        /* MODAL IMAGES */
+        .image-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000;
+            display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .image-modal[aria-hidden="false"] { display: flex; opacity: 1; }
+        .image-modal-inner { position: relative; max-width: 95%; max-height: 95%; }
+        .image-modal img { max-height: 85vh; border: 2px solid var(--codm-yellow); border-radius: 8px; }
+        .close-image-modal {
+            position: absolute; top: -40px; right: 0; color: #fff; font-size: 2rem; background: none; border: none; cursor: pointer;
+        }
+
+        /* WELCOME MODAL */
+        .announcement-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2100;
+            display: none; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .modal-content-announcement {
+            background: #1a1a1a; padding: 30px; border-radius: 12px;
+            max-width: 500px; width: 100%; text-align: center;
+            border: 1px solid var(--codm-yellow);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+        .cta-button { background: var(--codm-yellow); border: none; padding: 10px 20px; font-weight: bold; margin-top: 15px; cursor: pointer; border-radius: 4px; }
+
+        /* RESPONSIVE TWEAKS */
+        @media (max-width: 768px) {
+            .hero-section h2 { font-size: 1.8rem; }
+            .posters-grid { grid-template-columns: 1fr; } /* 1 colonne sur mobile */
+            .poster-img { height: auto; max-height: 450px; }
+            .stat-number { font-size: 2rem; }
+            .features-extended-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="logo-container">
+            <h1>CIRCLED FIGHT <span class="tag">CF</span></h1>
+        </div>
+        <button id="hamburgerMenu" class="hamburger-menu" aria-label="Ouvrir le menu">☰</button>
+        
+        <nav id="mobileHub" class="mobile-hub" aria-hidden="true">
+            <ul>
+                <li><a href="index.html">ACCUEIL</a></li>
+                <li><a href="dashboard.html">SCORES MJ</a></li>
+                <li><a href="br_dashboard.html">SCORES BR</a></li>
+                <li><a href="tournament.html">TOURNOI HEBDO</a></li>
+                <li><a href="members.html">MEMBRES</a></li>
+                <li><a href="join.html" style="color: var(--codm-yellow);">NOUS REJOINDRE</a></li>
+            </ul>
+        </nav>
+        <div id="mobileHubBackdrop" class="mobile-hub-backdrop"></div>
+    </header>
+
+    <main class="main-content-home">
+        <section class="hero-section">
+            <div class="hero-content">
+                <h2>L'ANALYSE DE PERFORMANCE <br><span class="text-neon">DU CLAN</span></h2>
+                <p>Circled Fight est l'élite. Suivez en temps réel les moyennes, ratios et tendances. Rejoins-nous pour les tournois, les badges uniques et le défi.</p>
+                <a href="dashboard.html" class="btn-main-action">VOIR LE CLASSEMENT</a>
+            </div>
+        </section>
+
+        <section class="join-why">
+            <h3 class="section-title">Pourquoi nous rejoindre ?</h3>
+            <p class="lead">Accède à un écosystème compétitif complet :</p>
+            <ul class="benefits-list">
+                <li><strong>Tournois hebdomadaires (MJ & BR)</strong> — Events chaque semaine.</li>
+                <li><strong>Statistiques avancées</strong> — Analyse tes courbes de progression.</li>
+                <li><strong>Badges & XP</strong> — Débloque des trophées uniques (Tryhard, Streak...).</li>
+                <li><strong>Paris (CF Points)</strong> — Parie en fictif et grimpe le ladder parieur.</li>
+                <li><strong>Boutique</strong> — Skins de profil et avantages exclusifs.</li>
+            </ul>
+        </section>
+
+        <section class="posters-section">
+            <h3 class="section-title">Événements à venir</h3>
+            <div class="posters-grid">
+                <figure class="poster-card">
+                    <img src="img/MJ.png" alt="Affiche Tournoi MJ" class="poster-img" data-title="Tournoi MJ - Week-end" />
+                    <figcaption>Tournoi MJ - Hebdomadaire</figcaption>
+                </figure>
+
+                <figure class="poster-card">
+                    <img src="img/BR.png" alt="Affiche Battle Royale" class="poster-img" data-title="BR - Rumble Week-end" />
+                    <figcaption>Battle Royale - Spécial</figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section class="features-extended">
+            <h3 class="section-title">Ton espace membre</h3>
+            <div class="features-extended-grid">
+                <article class="feature-block">
+                    <h4>💎 Compte & XP</h4>
+                    <p>Historique des matchs, XP gagnée par participation, débloque les badges "Elite".</p>
+                </article>
+                <article class="feature-block">
+                    <h4>🎲 Paris & CF Points</h4>
+                    <p>Mise tes points sur les vainqueurs des tournois. Risque rien, gagne la gloire.</p>
+                </article>
+                <article class="feature-block">
+                    <h4>🛒 Boutique Clan</h4>
+                    <p>Achète des avatars, des cadres et des tickets de tournois avec tes gains.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="join-callout">
+            <h3>Prêt à en découdre ?</h3>
+            <p style="color: #aaa; margin-bottom: 20px;">Crée ton compte maintenant et reçois 100 CF Points de bienvenue.</p>
+            <a href="join.html" class="btn-main-action cta-invert">REJOINDRE LE CLAN</a>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2025 Circled Fight Clan V4.3.8<br>Designed for the Elite.</p>
+        <p><a href="#top">Haut de page</a></p>
+    </footer>
+
+    <div id="imageModal" class="image-modal" aria-hidden="true">
+        <div class="image-modal-inner">
+            <button id="closeImageModal" class="close-image-modal" aria-label="Fermer">✕</button>
+            <img id="modalImage" src="" alt="" />
+        </div>
+    </div>
+
+    <div id="welcomeModal" class="announcement-modal" aria-hidden="true">
+        <div class="modal-content-announcement">
+            <button class="close-btn" id="closeModal">×</button>
+            <h2 style="color: var(--codm-yellow); font-size: 1.5rem;">BIENVENUE SOLDAT</h2>
+            <p>Le QG Circled Fight a fait peau neuve.</p>
+            <ul style="text-align: left; margin: 20px 0; color: #ccc;">
+                <li>📊 Stats et graphiques live</li>
+                <li>🏆 Inscriptions Tournois simplifiées</li>
+                <li>🛍️ Nouvelle boutique de clan</li>
+            </ul>
+            <button class="cta-button" id="okModal">ACCÉDER AU SITE</button>
+        </div>
+    </div>
+
+    <script>
+        // MENU MOBILE
+        const btn = document.getElementById('hamburgerMenu');
+        const hub = document.getElementById('mobileHub');
+        const backdrop = document.getElementById('mobileHubBackdrop');
+        
+        function toggleMenu() {
+            hub.classList.toggle('open');
+            backdrop.classList.toggle('visible');
+        }
+        
+        if(btn) btn.addEventListener('click', toggleMenu);
+        if(backdrop) backdrop.addEventListener('click', toggleMenu);
+
+        // COMPTEURS ANIMÉS
+        const counters = document.querySelectorAll('.stat-number');
+        counters.forEach(counter => {
+            const target = +counter.getAttribute('data-target');
+            const inc = target / 100;
+            const updateCount = () => {
+                const count = +counter.innerText;
+                if (count < target) {
+                    counter.innerText = Math.ceil(count + inc);
+                    setTimeout(updateCount, 20);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+            updateCount();
+        });
+
+        // MODAL IMAGE (ZOOM)
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        const closeImgBtn = document.getElementById('closeImageModal');
+        const imgs = document.querySelectorAll('.poster-img');
+
+        imgs.forEach(img => {
+            img.addEventListener('click', () => {
+                modal.setAttribute('aria-hidden', 'false');
+                modalImg.src = img.src;
+            });
+        });
+
+        function closeZoom() { modal.setAttribute('aria-hidden', 'true'); }
+        if(closeImgBtn) closeImgBtn.addEventListener('click', closeZoom);
+        modal.addEventListener('click', (e) => { if(e.target === modal) closeZoom(); });
+
+        // WELCOME MODAL
+        const welcomeModal = document.getElementById('welcomeModal');
+        const closeWelcome = document.getElementById('closeModal');
+        const okWelcome = document.getElementById('okModal');
+        
+        // Change la clé de version pour réafficher le modal si besoin (ex: 'cf_v2')
+        if(!localStorage.getItem('cf_welcome_v4')) {
+            welcomeModal.style.display = 'flex';
+        }
+
+        function hideWelcome() {
+            welcomeModal.style.display = 'none';
+            localStorage.setItem('cf_welcome_v4', 'true');
+        }
+
+        if(closeWelcome) closeWelcome.addEventListener('click', hideWelcome);
+        if(okWelcome) okWelcome.addEventListener('click', hideWelcome);
+    </script>
+</body>
+</html>

@@ -78,9 +78,9 @@
     </div>
 
     <script type="module">
-        // MODIFIÉ: Importe arrayUnion maintenant qu'il est exporté par firebase.js
+        // MODIFIÉ: Importe arrayUnion/arrayRemove maintenant qu'ils sont exportés par firebase.js
         // Suppression du bloc de menu mobile redondant
-        import { auth, db, collection, getDocs, getDoc, doc, updateDoc, arrayUnion, onAuthStateChanged, signOut } from './js/firebase.js';
+        import { auth, db, collection, getDocs, getDoc, doc, updateDoc, arrayUnion, arrayRemove, onAuthStateChanged, signOut } from './js/firebase.js';
         import { rawData } from './js/data.js';
 
         // --- ELEMENTS DOM ---
@@ -240,13 +240,34 @@
             let html = '';
             members.forEach(m => {
                 if (m.pseudo === "Admin") return;
+                // Existing badges display
+                html += `<div class="admin-player-row">`;
+                html += `<span style="color:white; font-weight:bold;">${m.pseudo}</span>`;
+                html += `<button class="btn-add-badge" onclick="window.toggleBadgeForm('${m.uid}')">+ BADGE</button>`;
+                html += `</div>`;
+
+                // Show existing badges (if any)
+                if (m.customBadges && Array.isArray(m.customBadges) && m.customBadges.length) {
+                    html += `<div class="existing-badges" style="padding:8px 12px; display:flex; gap:8px; flex-wrap:wrap;">`;
+                    m.customBadges.forEach(b => {
+                        const encText = encodeURIComponent(b.text || '');
+                        const encDesc = encodeURIComponent(b.description || '');
+                        html += `
+                            <div class="badge admin-badge" style="display:flex; align-items:center; gap:8px; padding:6px 8px; border:1px solid #333; background:rgba(0,0,0,0.3);">
+                                <span style="font-weight:bold; color:var(--codm-yellow);">${b.text}</span>
+                                <small style="color:#aaa; max-width:200px;">${b.description || ''}</small>
+                                <button class="btn" style="background:transparent; border:1px solid #622; color:#f88; padding:4px 6px; cursor:pointer;" onclick="window.deleteBadge('${m.uid}','${encText}','${b.color}','${encDesc}')">Suppr</button>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+
+                // Badge form (requires description)
                 html += `
-                    <div class="admin-player-row">
-                        <span style="color:white; font-weight:bold;">${m.pseudo}</span>
-                        <button class="btn-add-badge" onclick="window.toggleBadgeForm('${m.uid}')">+ BADGE</button>
-                    </div>
                     <div id="form-${m.uid}" class="badge-form">
                         <input type="text" id="badgeText-${m.uid}" placeholder="NOM (Ex: MVP)">
+                        <input type="text" id="badgeDesc-${m.uid}" placeholder="DESCRIPTION (Ex: "Meilleur score MJ")">
                         <select id="badgeColor-${m.uid}">
                             <option value="gold">Or</option>
                             <option value="red">Rouge</option>
@@ -270,21 +291,38 @@
 
         window.saveBadge = async (uid) => {
             const textInput = document.getElementById(`badgeText-${uid}`);
+            const descInput = document.getElementById(`badgeDesc-${uid}`);
             const colorSelect = document.getElementById(`badgeColor-${uid}`);
-            const badgeText = textInput.value.toUpperCase().trim();
-            if(!badgeText) return;
+            const badgeText = textInput ? textInput.value.toUpperCase().trim() : '';
+            const badgeDesc = descInput ? descInput.value.trim() : '';
+            if (!badgeText) { alert('Le nom du badge est requis.'); return; }
+            if (!badgeDesc) { alert('La description du badge est requise.'); return; }
 
+            const badgeObj = { text: badgeText, color: colorSelect.value, description: badgeDesc };
             try {
                 await updateDoc(doc(db, "users", uid), {
-                    customBadges: arrayUnion({ text: badgeText, color: colorSelect.value })
+                    customBadges: arrayUnion(badgeObj)
                 });
-                // Remplacer alert() par un log pour le moment
                 console.log("Badge ajouté !");
-                textInput.value = "";
+                if (textInput) textInput.value = "";
+                if (descInput) descInput.value = "";
+                // Refresh admin panel to show new badge
+                await loadAdminPanelData();
             } catch (e) { 
                 console.error("Erreur lors de l'ajout du badge :", e); 
-                // Remplacer alert() par un log pour le moment
-                console.log("Erreur ajout"); 
+                alert('Erreur ajout badge');
+            }
+        };
+
+        window.deleteBadge = async (uid, encText, color, encDesc) => {
+            try {
+                const badge = { text: decodeURIComponent(encText), color: color, description: decodeURIComponent(encDesc) };
+                await updateDoc(doc(db, "users", uid), { customBadges: arrayRemove(badge) });
+                console.log('Badge supprimé', badge);
+                await loadAdminPanelData();
+            } catch (e) {
+                console.error('Erreur suppression badge', e);
+                alert('Erreur suppression badge');
             }
         };
 
