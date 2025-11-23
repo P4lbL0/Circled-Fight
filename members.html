@@ -111,6 +111,17 @@
             box-shadow: 0 0 10px 2px rgba(124, 77, 255, 0.6);
             animation: pulseAnim 3s infinite reverse;
         }
+        .frame-blood {
+            border: 3px solid #6d0000;
+            box-shadow: 0 0 15px #b71c1c, 0 0 5px #ff5252 inset;
+            border-radius: 8px; /* Un peu arrondi */
+            animation: pulseBlood 2s infinite alternate;
+        }
+
+        @keyframes pulseBlood {
+            from { border-color: #6d0000; box-shadow: 0 0 10px #b71c1c; }
+            to { border-color: #ff5252; box-shadow: 0 0 20px #ff1744; }
+        }
 
 
         /* Animations Utilitaires */
@@ -275,14 +286,6 @@
 
                 const localStats = rawData.find(d => d.name.toLowerCase() === pseudo.toLowerCase());
                 let avg = "N/A"; let games = 0; let perfBadges = "";
-                if (localStats) {
-                    const validScores = localStats.scores.filter(s => typeof s === 'number' && s !== null);
-                    games = validScores.length;
-                    if (games > 0) avg = (validScores.reduce((a, b) => a + b, 0) / games).toFixed(1);
-                    if (games >= 8) perfBadges += `<span class="badge badge-gold">VÉTÉRAN</span>`;
-                    else if (games >= 4) perfBadges += `<span class="badge badge-silver">SOLDAT</span>`;
-                    if (avg !== "N/A" && avg >= 60) perfBadges += `<span class="badge badge-red">ÉLITE</span>`;
-                }
 
                 let wealthBadges = '';
                 if (points > 10000) wealthBadges += `<span class="badge badge-red">LÉGENDE</span>`;
@@ -370,7 +373,7 @@
         }
         // NOUVEAU SELECT : CADRES
         function getFramesOptions(selected) {
-            const opts = [{v:'',l:'(Aucun Cadre)'},{v:'elite',l:'🛡️ Élite (Orné Doré)'},{v:'cyber',l:'🤖 Cyber (Tech Bleu)'},{v:'hazard',l:'⚠️ Hazard (Danger Jaune)'},{v:'spectral',l:'👻 Spectral (Aura Violette)'}];
+            const opts = [{v:'',l:'(Aucun Cadre)'},{v:'elite',l:'🛡️ Élite (Orné Doré)'},{v:'blood',l:'🩸 Blood (Rouge Sang) (NEW)'},{v:'cyber',l:'🤖 Cyber (Tech Bleu)'},{v:'hazard',l:'⚠️ Hazard (Danger Jaune)'},{v:'spectral',l:'👻 Spectral (Aura Violette)'}];
             return opts.map(o => `<option value="${o.v}" ${selected===o.v?'selected':''}>${o.l}</option>`).join('');
         }
 
