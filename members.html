@@ -8,12 +8,11 @@
     <link rel="stylesheet" href="css/members.css">
     
     <style>
-        /* --- MOTEUR GRAPHIQUE BADGES V4 (ULTIMATE) --- */
+        /* --- MOTEUR GRAPHIQUE BADGES V4.5 --- */
         
-        /* Base Badge */
         .badge {
             position: relative;
-             overflow: hidden; /* Désactivé pour permettre aux cadres de dépasser */
+            /* overflow: hidden; Désactivé pour les cadres */
             border: 1px solid rgba(255,255,255,0.1);
             cursor: default;
             transition: all 0.3s ease;
@@ -23,12 +22,12 @@
             font-size: 0.75rem;
             font-weight: bold;
             text-transform: uppercase;
-            margin: 4px; /* Un peu plus d'espace pour les cadres */
+            margin: 4px;
             z-index: 1;
+            vertical-align: middle;
         }
 
-        /* --- 1. COULEURS & MATIÈRES (Backgrounds) --- */
-        /* Basiques étandus */
+        /* --- COULEURS --- */
         .badge-gold    { background: #ffc107; color: #000; }
         .badge-red     { background: #d32f2f; color: #fff; }
         .badge-blue    { background: #1976d2; color: #fff; }
@@ -40,7 +39,7 @@
         .badge-lime    { background: #cddc39; color: #000; }
         .badge-black   { background: #111; color: #fff; border-color: #444; }
         
-        /* Matières Précieuses "Real" */
+        /* Matières Précieuses */
         .badge-realgold {
             background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7);
             background-size: 200% 200%; color: #222; font-weight: 900; border: 1px solid #fff;
@@ -61,70 +60,25 @@
         .badge-magma { background: linear-gradient(45deg, #b71c1c, #f57f17); color: #fff; }
         .badge-obsidian { background: #000; color: #ccc; border: 1px solid #7c4dff; box-shadow: 0 0 5px rgba(124, 77, 255, 0.2); }
 
-        /* --- 2. EFFETS (Animations internes/externes) --- */
-        /* Demande spécifique : Contour Rouge Éclair */
-        .effect-lightning-red {
-            border-color: #ff0000 !important;
-            box-shadow: 0 0 5px #f00, inset 0 0 5px #f00;
-            animation: redShock 1.2s infinite alternate ease-in-out;
-        }
-        @keyframes redShock {
-            0% { box-shadow: 0 0 2px #d32f2f, inset 0 0 2px #d32f2f; opacity: 0.8; }
-            100% { box-shadow: 0 0 15px #ff1744, inset 0 0 10px #ff1744; border-color: #ff5252 !important; opacity: 1; }
-        }
+        /* --- EFFETS --- */
+        .effect-lightning-red { border-color: #ff0000 !important; box-shadow: 0 0 5px #f00, inset 0 0 5px #f00; animation: redShock 1.2s infinite alternate ease-in-out; }
+        @keyframes redShock { 0% { box-shadow: 0 0 2px #d32f2f, inset 0 0 2px #d32f2f; opacity: 0.8; } 100% { box-shadow: 0 0 15px #ff1744, inset 0 0 10px #ff1744; border-color: #ff5252 !important; opacity: 1; } }
         
-        /* Autres effets */
         .effect-pulse { animation: pulseAnim 2s infinite; }
         .effect-electric { animation: electricAnim 0.8s infinite; }
-        .effect-glitch { animation: glitchAnim 2s infinite; }
+        .effect-glitch { animation: glitchAnim 4s infinite; }
         .effect-burn { box-shadow: 0 0 10px currentColor; animation: burnAnim 1.5s alternate infinite; }
-        /* Shine nécessite overflow hidden, on l'applique spécifiquement */
         .badge[class*="effect-shine"] { overflow: hidden; }
-        .effect-shine::after {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
-            transform: skewX(-25deg); animation: shineAnim 3s infinite;
-        }
+        .effect-shine::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shineAnim 3s infinite; }
 
-        /* --- 3. CADRES (Structures externes) --- */
-        /* Cadre Élite (Orné Doré) */
-        .frame-elite {
-            border: none;
-            box-shadow: 0 0 0 2px #111, 0 0 0 4px var(--codm-yellow);
-            margin: 6px; /* Plus d'espace pour le double contour */
-        }
-        /* Cadre Cyber (Tech Bleu) */
-        .frame-cyber {
-            border: 1px solid #00e5ff;
-            box-shadow: 0 0 5px #00e5ff, inset 0 0 5px #00e5ff;
-            border-radius: 0; /* Carré pour le look tech */
-            clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10% );
-        }
-        /* Cadre Hazard (Avertissement) */
-        .frame-hazard {
-             border: 2px dashed #ffeb3b;
-             background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.2), rgba(0,0,0,0.2) 5px, transparent 5px, transparent 10px);
-        }
-        /* Cadre Spectral (Aura fantôme) */
-        .frame-spectral {
-            border: none;
-            box-shadow: 0 0 10px 2px rgba(124, 77, 255, 0.6);
-            animation: pulseAnim 3s infinite reverse;
-        }
-        .frame-blood {
-            border: 3px solid #6d0000;
-            box-shadow: 0 0 15px #b71c1c, 0 0 5px #ff5252 inset;
-            border-radius: 8px; /* Un peu arrondi */
-            animation: pulseBlood 2s infinite alternate;
-        }
+        /* --- CADRES --- */
+        .frame-elite { border: none; box-shadow: 0 0 0 2px #111, 0 0 0 4px var(--codm-yellow); margin: 6px; }
+        .frame-cyber { border: 1px solid #00e5ff; box-shadow: 0 0 5px #00e5ff, inset 0 0 5px #00e5ff; border-radius: 0; clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10% ); }
+        .frame-hazard { border: 2px dashed #ffeb3b; background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.2), rgba(0,0,0,0.2) 5px, transparent 5px, transparent 10px); }
+        .frame-spectral { border: none; box-shadow: 0 0 10px 2px rgba(124, 77, 255, 0.6); animation: pulseAnim 3s infinite reverse; }
+        .frame-blood { border: 3px solid #6d0000; box-shadow: 0 0 15px #b71c1c, 0 0 5px #ff5252 inset; border-radius: 8px; animation: pulseBlood 2s infinite alternate; }
 
-        @keyframes pulseBlood {
-            from { border-color: #6d0000; box-shadow: 0 0 10px #b71c1c; }
-            to { border-color: #ff5252; box-shadow: 0 0 20px #ff1744; }
-        }
-
-
-        /* Animations Utilitaires */
+        @keyframes pulseBlood { from { border-color: #6d0000; box-shadow: 0 0 10px #b71c1c; } to { border-color: #ff5252; box-shadow: 0 0 20px #ff1744; } }
         @keyframes gradientMove { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
         @keyframes diamondSparkle { 0% { filter: brightness(1); } 50% { filter: brightness(1.3) hue-rotate(10deg); } 100% { filter: brightness(1); } }
         @keyframes pulseAnim { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
@@ -139,7 +93,7 @@
         .btn-tool { background: #222; color: #ccc; border: 1px solid #444; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-family: 'Rajdhani'; transition: 0.3s; }
         .btn-tool:hover { background: #333; color: var(--codm-yellow); border-color: var(--codm-yellow); }
         
-        /* ADMIN PANEL STYLES (Élargi pour les nouveaux selects) */
+        /* ADMIN & EDIT STYLES */
         .current-badges-list { background: rgba(0,0,0,0.3); padding: 10px; margin-bottom: 15px; border-radius: 4px; }
         .edit-badge-row { display: flex; gap: 5px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 4px; }
         .edit-badge-row input, .edit-badge-row select { background: #111; border: 1px solid #444; color: white; padding: 5px; border-radius: 4px; font-size: 0.8rem; margin-right: 2px; }
@@ -147,14 +101,49 @@
         .btn-save-mini { background: var(--codm-yellow); color: black; }
         .btn-del-mini { background: #ff4444; color: white; }
         
-        /* ENCYCLO */
-        .encyclopedia-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
-        .encyclo-item { background: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid #333; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 120px; }
-        .encyclo-desc { font-size: 0.9rem; color: #888; margin-top: 15px; font-style: italic; }
+        /* ENCYCLOPÉDIE V2 */
+        .encyclo-category-title { color: var(--codm-yellow); font-family: 'Orbitron'; font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 5px; margin: 30px 0 15px 0; text-transform: uppercase; }
+        .encyclopedia-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .encyclo-item { background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #333; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: start; min-height: 140px; }
+        .encyclo-desc { font-size: 0.85rem; color: #888; margin-top: 10px; font-style: italic; }
+        .encyclo-owners { margin-top: auto; padding-top: 10px; font-size: 0.75rem; color: #555; width: 100%; border-top: 1px solid rgba(255,255,255,0.05); }
+        .encyclo-owners strong { color: #888; display: block; margin-bottom: 2px; }
+
+        /* REORDER MODAL */
+        .reorder-list { display: flex; flex-direction: column; gap: 8px; max-height: 60vh; overflow-y: auto; }
+        .reorder-item { display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 12px; border-radius: 4px; border: 1px solid #333; }
+        .reorder-btn { background: #333; color: white; border: 1px solid #555; padding: 5px 10px; cursor: pointer; border-radius: 4px; font-size: 1rem; }
+        .reorder-btn:hover { background: var(--codm-yellow); color: black; }
 
         /* USER HIGHLIGHT */
         .current-user-highlight { border: 2px solid var(--codm-yellow) !important; background: linear-gradient(145deg, rgba(255, 193, 7, 0.05), #111) !important; position: relative; box-shadow: 0 0 15px rgba(255, 193, 7, 0.1); }
         .current-user-tag { position: absolute; top: 0; right: 0; background: var(--codm-yellow); color: #000; font-size: 0.75rem; font-weight: 900; padding: 4px 12px; font-family: 'Orbitron'; border-bottom-left-radius: 12px; box-shadow: -2px 2px 10px rgba(255, 193, 7, 0.3); z-index: 10; letter-spacing: 1px; }
+        /* BOUTON RÉORGANISER (Design corrigé) */
+        .reorder-trigger {
+            position: absolute;
+            top: 5px; 
+            right: 95px; /* On le décale bien à gauche de l'étiquette IDENTIFIÉ */
+            background: rgba(0,0,0,0.4); /* Fond sombre semi-transparent */
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #aaa;
+            border-radius: 4px;
+            font-size: 1.2rem; /* Icone un peu plus grosse */
+            cursor: pointer;
+            padding: 2px 8px;
+            z-index: 15;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 26px;
+        }
+        .reorder-trigger:hover {
+            background: var(--codm-yellow);
+            color: #000;
+            border-color: var(--codm-yellow);
+            box-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
+            transform: scale(1.05);
+        }
         .current-user-highlight .status-indicator { top: 35px; right: 10px; }
         .admin-controls-wrapper { max-width: 1200px; margin: 0 auto; padding: 0 20px; text-align: center; }
     </style>
@@ -194,28 +183,37 @@
             <div id="adminTrigger" class="admin-controls-wrapper" style="display:none;"><button class="btn-admin-main" onclick="openAdminPanel()">⚠️ GÉRER LES BADGES (ADMIN)</button></div>
             <div class="tools-bar">
                 <input type="text" id="searchInput" class="search-box" placeholder="Rechercher un soldat..." onkeyup="window.filterMembers()">
-                <button class="btn-tool" onclick="openEncyclopedia()">📚 Encyclopédie des Badges</button>
+                <button class="btn-tool" onclick="openEncyclopedia()">📚 Encyclopédie & Rangs</button>
             </div>
             <div class="section-title">UNITÉS DU CLAN <span class="member-count" id="memberCount">CHARGEMENT...</span></div>
             <div class="members-grid" id="membersGrid"></div>
         </div>
     </main>
 
+    <div id="reorderModal" class="admin-modal" style="display: none;">
+        <div class="admin-panel-content" style="max-width: 500px;">
+            <h2 style="color: var(--codm-yellow); font-family: 'Orbitron'; margin-top:0;">RÉORGANISER</h2>
+            <p style="color:#888;">Change l'ordre d'affichage de tes badges.</p>
+            <button onclick="document.getElementById('reorderModal').style.display='none'" style="float:right; margin-top:-40px; background:none; border:1px solid #555; color:white;">✕</button>
+            <div id="reorderListContainer" class="reorder-list"></div>
+            <button onclick="location.reload()" style="width:100%; margin-top:15px; background:var(--codm-yellow); border:none; padding:10px; color:black; font-weight:bold;">VALIDER & RECHARGER</button>
+        </div>
+    </div>
+
     <div id="adminModal" class="admin-modal" style="display: none;">
         <div class="admin-panel-content" style="max-width: 900px;">
             <h2 style="color: var(--accent-red); font-family: 'Orbitron'; margin-top:0;">FORGE V4 (ADMIN)</h2>
-            <p style="color:#888;">Système de badges : Matière + Effet + Cadre.</p>
             <button onclick="closeAdminPanel()" style="background:transparent; border:1px solid #555; color:white; padding:5px 10px; cursor:pointer; float:right; margin-top:-40px;">FERMER</button>
-            <input type="text" id="adminSearchInput" placeholder="Chercher un membre..." onkeyup="window.filterAdminList()" style="width:100%; padding:10px; margin-bottom:15px; background:#111; border:1px solid #444; color:white; border-radius:4px; font-family:'Rajdhani';">
+            <input type="text" id="adminSearchInput" placeholder="Chercher un membre..." onkeyup="window.filterAdminList()" style="width:100%; padding:10px; margin-bottom:15px; background:#111; border:1px solid #444; color:white; border-radius:4px;">
             <div id="adminPlayerList" style="margin-top:20px; max-height: 70vh; overflow-y: auto;"></div>
         </div>
     </div>
 
     <div id="encycloModal" class="admin-modal" style="display: none; z-index: 2000;">
-        <div class="admin-panel-content" style="max-width: 800px;">
-            <h2 style="color: var(--codm-yellow); font-family: 'Orbitron'; margin-top:0;">ARCHIVES BADGES</h2>
+        <div class="admin-panel-content" style="max-width: 1000px; max-height: 90vh; overflow-y:auto;">
+            <h2 style="color: var(--codm-yellow); font-family: 'Orbitron'; margin-top:0;">ARCHIVES & DÉTENTEURS</h2>
             <button onclick="document.getElementById('encycloModal').style.display='none'" style="background:transparent; border:1px solid #555; color:white; padding:5px 10px; cursor:pointer; float:right; margin-top:-40px;">FERMER</button>
-            <div id="encycloList" class="encyclopedia-grid"></div>
+            <div id="encycloList"></div>
         </div>
     </div>
 
@@ -231,10 +229,12 @@
         const adminTrigger = document.getElementById('adminTrigger');
         const adminPlayerList = document.getElementById('adminPlayerList');
         const encycloList = document.getElementById('encycloList');
+        const reorderListContainer = document.getElementById('reorderListContainer');
 
         let allMembersCache = [];
         let adminUsersCache = [];
         let currentUserUid = null;
+        let currentUserBadgesCache = [];
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -257,7 +257,19 @@
                 const querySnapshot = await getDocs(collection(db, "users"));
                 let members = [];
                 querySnapshot.forEach((doc) => { let d = doc.data(); d.uid = doc.id; members.push(d); });
-                members.sort((a, b) => (b.cfPoints || 0) - (a.cfPoints || 0));
+                members.sort((a, b) => {
+                    // On compte les badges custom (ceux ajoutés par l'admin)
+                    const badgesA = (a.customBadges || []).length;
+                    const badgesB = (b.customBadges || []).length;
+
+                    // Si le nombre de badges est différent, celui qui en a le plus passe devant
+                    if (badgesB !== badgesA) {
+                        return badgesB - badgesA;
+                    }
+                    
+                    // Si même nombre de badges, on départage par les CF Points
+                    return (b.cfPoints || 0) - (a.cfPoints || 0);
+                });
                 if (currentUserUid) {
                     const myIndex = members.findIndex(m => m.uid === currentUserUid);
                     if (myIndex > -1) members.unshift(members.splice(myIndex, 1)[0]);
@@ -282,27 +294,29 @@
                 const points = m.cfPoints || 0;
                 const isMe = (m.uid === currentUserUid);
                 const cardClass = isMe ? 'member-card current-user-highlight' : 'member-card';
-                const tagHtml = isMe ? '<div class="current-user-tag">IDENTIFIÉ</div>' : '';
+                // Ajout du bouton de réorganisation pour l'utilisateur connecté
+                const tagHtml = isMe ? `<div class="current-user-tag">IDENTIFIÉ</div><button class="reorder-trigger" onclick="window.openReorderModal()" title="Changer l'ordre des badges">⇄</button>` : '';
+
+                if(isMe) currentUserBadgesCache = m.customBadges || [];
 
                 const localStats = rawData.find(d => d.name.toLowerCase() === pseudo.toLowerCase());
                 let avg = "N/A"; let games = 0; let perfBadges = "";
+                if (localStats) {
+                    const validScores = localStats.scores.filter(s => typeof s === 'number' && s !== null);
+                    games = validScores.length;
+                    if (games > 0) avg = (validScores.reduce((a, b) => a + b, 0) / games).toFixed(1);
+                    if (games >= 8) perfBadges += `<span></span>`;
+                    else if (games >= 4) perfBadges += `<span></span>`;
+                    if (avg !== "N/A" && avg >= 60) perfBadges += `<span></span>`;
+                }
 
                 let wealthBadges = '';
                 if (points > 10000) wealthBadges += `<span class="badge badge-red">LÉGENDE</span>`;
                 else if (points > 5000) wealthBadges += `<span class="badge badge-gold">VIP</span>`;
-if (localStats) {
-                    const validScores = localStats.scores.filter(s => typeof s === 'number' && s !== null);
-                    games = validScores.length;
-                    if (games > 0) avg = (validScores.reduce((a, b) => a + b, 0) / games).toFixed(1);
-                    
-                    if (games >= 8) perfBadges += `<span></span>`;
-                    else if (games >= 4) perfBadges += `<span ></span>`;
-                    if (avg !== "N/A" && avg >= 60) perfBadges += `<span ></span>`;
-                }
+
                 let customBadgesHtml = '';
                 if (m.customBadges && Array.isArray(m.customBadges)) {
                     m.customBadges.forEach(b => {
-                        // V4 : Ajout de la classe de Frame (Cadre)
                         const effectClass = b.effect ? `effect-${b.effect}` : '';
                         const frameClass = b.frame ? `frame-${b.frame}` : '';
                         customBadgesHtml += `<span class="badge badge-${b.color} ${effectClass} ${frameClass}" title="${b.desc || ''}">${b.text}</span>`;
@@ -326,31 +340,129 @@ if (localStats) {
             membersGrid.innerHTML = html;
         }
 
-        window.openEncyclopedia = () => {
+        // --- REORDER LOGIC (USER) ---
+        window.openReorderModal = () => {
+            if(!currentUserBadgesCache || currentUserBadgesCache.length === 0) return alert("Tu n'as pas encore de badges à organiser.");
+            document.getElementById('reorderModal').style.display = 'block';
+            renderReorderList();
+        };
+
+        function renderReorderList() {
+            let html = '';
+            currentUserBadgesCache.forEach((b, i) => {
+                const effectClass = b.effect ? `effect-${b.effect}` : '';
+                const frameClass = b.frame ? `frame-${b.frame}` : '';
+                html += `
+                    <div class="reorder-item">
+                        <span class="badge badge-${b.color} ${effectClass} ${frameClass}">${b.text}</span>
+                        <div>
+                            <button class="reorder-btn" onclick="window.moveBadge(${i}, -1)">▲</button>
+                            <button class="reorder-btn" onclick="window.moveBadge(${i}, 1)">▼</button>
+                        </div>
+                    </div>
+                `;
+            });
+            reorderListContainer.innerHTML = html;
+        }
+
+        window.moveBadge = async (index, direction) => {
+            const newIndex = index + direction;
+            if(newIndex < 0 || newIndex >= currentUserBadgesCache.length) return; // Hors limites
+
+            // Swap
+            const temp = currentUserBadgesCache[index];
+            currentUserBadgesCache[index] = currentUserBadgesCache[newIndex];
+            currentUserBadgesCache[newIndex] = temp;
+
+            renderReorderList(); // Update visuel immédiat
+
+            // Save Firebase
+            try {
+                const userRef = doc(db, "users", currentUserUid);
+                await updateDoc(userRef, { customBadges: currentUserBadgesCache });
+            } catch(e) { console.error("Erreur save ordre", e); }
+        };
+
+        // --- ENCYCLOPEDIA V2 (CATEGORIES & OWNERS) ---
+       window.openEncyclopedia = () => {
             document.getElementById('encycloModal').style.display = 'block';
-            let uniqueBadgesMap = new Map();
+            
+            // 1. Définition des catégories dans l'ordre d'affichage
+            const categories = {
+                // La nouvelle catégorie tout en haut
+                top10Arme: { title: "🏆 TOP 10 MONDE ARMES", items: new Map() },
+                
+                topMonde: { title: "🌍 TOP MONDE", items: new Map() },
+                topServeur: { title: "🇪🇺 TOP SERVEUR", items: new Map() },
+                autr: { title: "AUTRES DISTINCTIONS", items: new Map() }
+            };
+
+            // 2. Tri des badges
             allMembersCache.forEach(m => {
                 if(m.customBadges && Array.isArray(m.customBadges)) {
                     m.customBadges.forEach(b => {
-                        const key = b.text.toUpperCase() + (b.color||'') + (b.effect||'') + (b.frame||''); // Clé unique plus précise
-                        if (!uniqueBadgesMap.has(key) || (!uniqueBadgesMap.get(key).desc && b.desc)) {
-                            uniqueBadgesMap.set(key, b);
+                        const key = b.text.toUpperCase() + (b.color||'') + (b.effect||'') + (b.frame||'');
+                        
+                        let targetCat = categories.autr; // Par défaut
+
+                        // LOGIQUE DE TRI :
+                        if (b.frame === 'elite') {
+                            // Si le cadre est "Élite", ça part direct en haut, peu importe le texte
+                            targetCat = categories.top10Arme;
+                        } 
+                        else if (b.color === 'realgold') {
+                            targetCat = categories.topMonde;
+                        } 
+                        else if (b.color === 'realsilver') {
+                            targetCat = categories.topServeur;
                         }
+
+                        if (!targetCat.items.has(key)) {
+                            targetCat.items.set(key, { badge: b, owners: [] });
+                        }
+                        targetCat.items.get(key).owners.push(m.pseudo || "Inconnu");
                     });
                 }
             });
-            if (uniqueBadgesMap.size === 0) { encycloList.innerHTML = "<p>Aucun badge enregistré.</p>"; return; }
-            let html = '';
-            uniqueBadgesMap.forEach(b => {
-                const effectClass = b.effect ? `effect-${b.effect}` : '';
-                const frameClass = b.frame ? `frame-${b.frame}` : '';
-                html += `<div class="encyclo-item">
-                        <span class="badge badge-${b.color} ${effectClass} ${frameClass}" style="font-size:1rem; padding:6px 12px;">${b.text}</span>
-                        <div class="encyclo-desc">${b.desc || "Classifié"}</div>
-                    </div>`;
-            });
-            encycloList.innerHTML = html;
+
+            // 3. Génération HTML
+            let fullHtml = '';
+            
+            const renderSection = (catKey) => {
+                const cat = categories[catKey];
+                if (cat.items.size === 0) return ''; 
+
+                let gridHtml = '';
+                cat.items.forEach(val => {
+                    const b = val.badge;
+                    const ownersStr = val.owners.join(', ');
+                    const effectClass = b.effect ? `effect-${b.effect}` : '';
+                    const frameClass = b.frame ? `frame-${b.frame}` : '';
+                    
+                    gridHtml += `
+                        <div class="encyclo-item">
+                            <span class="badge badge-${b.color} ${effectClass} ${frameClass}" style="font-size:1rem; padding:6px 12px; margin-bottom:10px;">${b.text}</span>
+                            <div class="encyclo-desc">${b.desc || "Classifié"}</div>
+                            <div class="encyclo-owners"><strong>DÉTENU PAR :</strong>${ownersStr}</div>
+                        </div>
+                    `;
+                });
+
+                return `<div class="encyclo-category-title">${cat.title}</div>
+                        <div class="encyclopedia-grid">${gridHtml}</div>`;
+            };
+
+            // Ordre d'appel des sections
+            fullHtml += renderSection('top10Arme');
+            fullHtml += renderSection('topMonde');
+            fullHtml += renderSection('topServeur');
+            fullHtml += renderSection('autr');
+
+            if(fullHtml === '') fullHtml = "<p style='text-align:center; color:#888;'>Aucun badge n'a encore été décerné.</p>";
+            
+            encycloList.innerHTML = fullHtml;
         };
+
 
         window.openAdminPanel = async () => { document.getElementById('adminModal').style.display = 'block'; await loadAdminPanelData(); };
         window.closeAdminPanel = () => { document.getElementById('adminModal').style.display = 'none'; };
@@ -367,7 +479,6 @@ if (localStats) {
             renderAdminList(adminUsersCache.filter(m => (m.pseudo || "").toLowerCase().includes(term)));
         };
 
-        // --- FONCTIONS SELECTS ADMIN V4 ---
         function getColorsOptions(selected) {
             const opts = [
                 {g:'MATIÈRES PRÉCIEUSES', om:[{v:'realgold',l:'⚠️ Vrai Or'},{v:'realsilver',l:'⚪ Vrai Argent'},{v:'realdiamond',l:'💎 Vrai Diamant'},{v:'magma',l:'🔥 Magma'},{v:'obsidian',l:'🌑 Obsidian'}]},
@@ -376,12 +487,11 @@ if (localStats) {
             return opts.map(group => `<optgroup label="${group.g}">${group.om.map(o => `<option value="${o.v}" ${selected===o.v?'selected':''}>${o.l}</option>`).join('')}</optgroup>`).join('');
         }
         function getEffectsOptions(selected) {
-            const opts = [{v:'',l:'(Aucun Effet)'},{v:'lightning-red',l:'⚡ Contour Éclair Rouge (NEW)'},{v:'shine',l:'✨ Shine (Brillance)'},{v:'electric',l:'⚡ Électrique (Vibration)'},{v:'pulse',l:'💓 Pulse (Respiration)'},{v:'glitch',l:'👾 Glitch (Bug)'},{v:'burn',l:'🔥 Burn (Lueur)'}];
+            const opts = [{v:'',l:'(Aucun Effet)'},{v:'lightning-red',l:'⚡ Contour Éclair Rouge'},{v:'shine',l:'✨ Shine'},{v:'electric',l:'⚡ Électrique'},{v:'pulse',l:'💓 Pulse'},{v:'glitch',l:'👾 Glitch'},{v:'burn',l:'🔥 Burn'}];
             return opts.map(o => `<option value="${o.v}" ${selected===o.v?'selected':''}>${o.l}</option>`).join('');
         }
-        // NOUVEAU SELECT : CADRES
         function getFramesOptions(selected) {
-            const opts = [{v:'',l:'(Aucun Cadre)'},{v:'elite',l:'🛡️ Élite (Orné Doré)'},{v:'blood',l:'🩸 Blood (Rouge Sang) (NEW)'},{v:'cyber',l:'🤖 Cyber (Tech Bleu)'},{v:'hazard',l:'⚠️ Hazard (Danger Jaune)'},{v:'spectral',l:'👻 Spectral (Aura Violette)'}];
+            const opts = [{v:'',l:'(Aucun Cadre)'},{v:'elite',l:'🛡️ Élite'},{v:'blood',l:'🩸 Blood (Rouge Sang)'},{v:'cyber',l:'🤖 Cyber'},{v:'hazard',l:'⚠️ Hazard'},{v:'spectral',l:'👻 Spectral'}];
             return opts.map(o => `<option value="${o.v}" ${selected===o.v?'selected':''}>${o.l}</option>`).join('');
         }
 
@@ -392,7 +502,6 @@ if (localStats) {
                 let existingBadgesHtml = '';
                 if (m.customBadges && Array.isArray(m.customBadges) && m.customBadges.length > 0) {
                     m.customBadges.forEach((b, index) => {
-                        // V4 : Ajout du select Frame dans l'édition
                         existingBadgesHtml += `<div class="edit-badge-row">
                             <input type="text" id="edit-text-${m.uid}-${index}" value="${b.text}" style="width:50px;" placeholder="TXT">
                             <select id="edit-color-${m.uid}-${index}">${getColorsOptions(b.color)}</select>
@@ -424,18 +533,17 @@ if (localStats) {
 
         window.toggleBadgeForm = (uid) => { const f = document.getElementById(`form-${uid}`); if (f) f.style.display = f.style.display === 'block' ? 'none' : 'block'; };
 
-        // --- CRUD V4 (Inclut Frame) ---
         window.addNewBadge = async (uid) => {
             const text = document.getElementById(`newText-${uid}`).value.trim().toUpperCase();
             const color = document.getElementById(`newColor-${uid}`).value;
             const effect = document.getElementById(`newEffect-${uid}`).value;
-            const frame = document.getElementById(`newFrame-${uid}`).value; // NOUVEAU
+            const frame = document.getElementById(`newFrame-${uid}`).value;
             const desc = document.getElementById(`newDesc-${uid}`).value.trim();
             if (!text) return alert("Nom vide !");
             try {
                 const userRef = doc(db, "users", uid); const snap = await getDoc(userRef);
                 let currentBadges = snap.data().customBadges || [];
-                currentBadges.push({ text, color, effect, frame, desc }); // Sauvegarde Frame
+                currentBadges.push({ text, color, effect, frame, desc });
                 await updateDoc(userRef, { customBadges: currentBadges });
                 await loadAdminPanelData(); await fetchAndCacheMembers();
             } catch (e) { console.error(e); }
@@ -445,7 +553,7 @@ if (localStats) {
             const newText = document.getElementById(`edit-text-${uid}-${index}`).value.trim().toUpperCase();
             const newColor = document.getElementById(`edit-color-${uid}-${index}`).value;
             const newEffect = document.getElementById(`edit-effect-${uid}-${index}`).value;
-            const newFrame = document.getElementById(`edit-frame-${uid}-${index}`).value; // NOUVEAU
+            const newFrame = document.getElementById(`edit-frame-${uid}-${index}`).value;
             const newDesc = document.getElementById(`edit-desc-${uid}-${index}`).value.trim();
             try {
                 const userRef = doc(db, "users", uid); const snap = await getDoc(userRef);
