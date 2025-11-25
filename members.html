@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/members.css">
     
     <style>
-        /* --- MOTEUR GRAPHIQUE BADGES V4.5 --- */
+        /* --- MOTEUR GRAPHIQUE BADGES V5 (ULTIMATE) --- */
         
         .badge {
             position: relative;
@@ -60,6 +60,24 @@
         .badge-magma { background: linear-gradient(45deg, #b71c1c, #f57f17); color: #fff; }
         .badge-obsidian { background: #000; color: #ccc; border: 1px solid #7c4dff; box-shadow: 0 0 5px rgba(124, 77, 255, 0.2); }
 
+        /* NOUVEAUTÉS FUN/MYTHIC */
+        .badge-pigeon { 
+            background: linear-gradient(180deg, #e0e0e0, #9e9e9e); 
+            color: #222; border: 1px solid #fff; 
+        }
+        .badge-clown {
+            background-image: radial-gradient(#ff0000 15%, transparent 16%), radial-gradient(#ffff00 15%, transparent 16%);
+            background-color: #fff;
+            background-position: 0 0, 8px 8px;
+            background-size: 16px 16px;
+            color: #000; font-weight: 900; text-shadow: 1px 1px 0 #fff;
+            border: 1px solid #ff0000;
+        }
+        .badge-galaxy {
+            background: linear-gradient(45deg, #673ab7, #3f51b5, #e91e63);
+            color: #fff;
+        }
+
         /* --- EFFETS --- */
         .effect-lightning-red { border-color: #ff0000 !important; box-shadow: 0 0 5px #f00, inset 0 0 5px #f00; animation: redShock 1.2s infinite alternate ease-in-out; }
         @keyframes redShock { 0% { box-shadow: 0 0 2px #d32f2f, inset 0 0 2px #d32f2f; opacity: 0.8; } 100% { box-shadow: 0 0 15px #ff1744, inset 0 0 10px #ff1744; border-color: #ff5252 !important; opacity: 1; } }
@@ -68,15 +86,31 @@
         .effect-electric { animation: electricAnim 0.8s infinite; }
         .effect-glitch { animation: glitchAnim 4s infinite; }
         .effect-burn { box-shadow: 0 0 10px currentColor; animation: burnAnim 1.5s alternate infinite; }
+        .effect-holo {
+            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.4) 100%);
+            background-size: 200% 200%; animation: holoAnim 2s infinite linear; mix-blend-mode: hard-light;
+        }
+        @keyframes holoAnim { 0% { background-position: 0% 0%; } 100% { background-position: 200% 200%; } }
+
         .badge[class*="effect-shine"] { overflow: hidden; }
         .effect-shine::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shineAnim 3s infinite; }
 
         /* --- CADRES --- */
-        .frame-elite { border: none; box-shadow: 0 0 0 2px #111, 0 0 0 4px var(--codm-yellow); margin: 6px; }
+        .frame-elite { border: none; box-shadow: 0 0 0 2px #fd2424, 0 0 0 4px #6d0000; margin: 6px; }
         .frame-cyber { border: 1px solid #00e5ff; box-shadow: 0 0 5px #00e5ff, inset 0 0 5px #00e5ff; border-radius: 0; clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10% ); }
         .frame-hazard { border: 2px dashed #ffeb3b; background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.2), rgba(0,0,0,0.2) 5px, transparent 5px, transparent 10px); }
         .frame-spectral { border: none; box-shadow: 0 0 10px 2px rgba(124, 77, 255, 0.6); animation: pulseAnim 3s infinite reverse; }
         .frame-blood { border: 3px solid #6d0000; box-shadow: 0 0 15px #b71c1c, 0 0 5px #ff5252 inset; border-radius: 8px; animation: pulseBlood 2s infinite alternate; }
+        
+        /* Cadres Fun/Mythic */
+        .frame-wings { border: none; box-shadow: 0 0 0 2px #fff; margin: 0 12px; }
+        .frame-wings::before, .frame-wings::after { content: '🪶'; position: absolute; top: 50%; transform: translateY(-50%); font-size: 14px; }
+        .frame-wings::before { left: -14px; transform: translateY(-50%) scaleX(-1); }
+        .frame-wings::after { right: -14px; }
+        
+        .frame-circus { border: 2px dashed #ffeb3b; box-shadow: 0 0 5px #e91e63; animation: spinBorder 10s linear infinite; }
+        .frame-mythic { border: 2px double #ffd700; box-shadow: 0 0 10px #9c27b0, inset 0 0 10px #9c27b0; animation: pulseMythic 3s infinite alternate; }
+        @keyframes pulseMythic { from { box-shadow: 0 0 5px #9c27b0; } to { box-shadow: 0 0 20px #e040fb, 0 0 40px #9c27b0; } }
 
         @keyframes pulseBlood { from { border-color: #6d0000; box-shadow: 0 0 10px #b71c1c; } to { border-color: #ff5252; box-shadow: 0 0 20px #ff1744; } }
         @keyframes gradientMove { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
@@ -101,8 +135,14 @@
         .btn-save-mini { background: var(--codm-yellow); color: black; }
         .btn-del-mini { background: #ff4444; color: white; }
         
-        /* ENCYCLOPÉDIE V2 */
-        .encyclo-category-title { color: var(--codm-yellow); font-family: 'Orbitron'; font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 5px; margin: 30px 0 15px 0; text-transform: uppercase; }
+        /* ENCYCLOPÉDIE V2 (ACCORDÉON) */
+        .encyclo-category-header { background: linear-gradient(90deg, rgba(255,193,7,0.1), transparent); border-left: 4px solid var(--codm-yellow); padding: 15px; margin-top: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Orbitron'; color: white; transition: 0.3s; }
+        .encyclo-category-header:hover { background: rgba(255,193,7,0.2); }
+        .encyclo-arrow { transition: transform 0.3s; }
+        .encyclo-category-header.active .encyclo-arrow { transform: rotate(180deg); }
+        .encyclo-content { display: none; padding: 15px 0; animation: slideDown 0.3s ease-out; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
         .encyclopedia-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
         .encyclo-item { background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #333; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: start; min-height: 140px; }
         .encyclo-desc { font-size: 0.85rem; color: #888; margin-top: 10px; font-style: italic; }
@@ -118,32 +158,28 @@
         /* USER HIGHLIGHT */
         .current-user-highlight { border: 2px solid var(--codm-yellow) !important; background: linear-gradient(145deg, rgba(255, 193, 7, 0.05), #111) !important; position: relative; box-shadow: 0 0 15px rgba(255, 193, 7, 0.1); }
         .current-user-tag { position: absolute; top: 0; right: 0; background: var(--codm-yellow); color: #000; font-size: 0.75rem; font-weight: 900; padding: 4px 12px; font-family: 'Orbitron'; border-bottom-left-radius: 12px; box-shadow: -2px 2px 10px rgba(255, 193, 7, 0.3); z-index: 10; letter-spacing: 1px; }
-        /* BOUTON RÉORGANISER (Design corrigé) */
+        
+        /* BOUTON RÉORGANISER (Position corrigée) */
         .reorder-trigger {
             position: absolute;
             top: 5px; 
-            right: 95px; /* On le décale bien à gauche de l'étiquette IDENTIFIÉ */
-            background: rgba(0,0,0,0.4); /* Fond sombre semi-transparent */
+            right: 100px; /* Décalé à gauche de l'étiquette */
+            background: rgba(0,0,0,0.6); 
             border: 1px solid rgba(255,255,255,0.2);
             color: #aaa;
             border-radius: 4px;
-            font-size: 1.2rem; /* Icone un peu plus grosse */
+            font-size: 1.2rem;
             cursor: pointer;
-            padding: 2px 8px;
+            padding: 2px 10px;
             z-index: 15;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 26px;
+            display: flex; align-items: center; justify-content: center; height: 26px;
         }
         .reorder-trigger:hover {
-            background: var(--codm-yellow);
-            color: #000;
-            border-color: var(--codm-yellow);
+            background: var(--codm-yellow); color: #000; border-color: var(--codm-yellow);
             box-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
-            transform: scale(1.05);
         }
+
         .current-user-highlight .status-indicator { top: 35px; right: 10px; }
         .admin-controls-wrapper { max-width: 1200px; margin: 0 auto; padding: 0 20px; text-align: center; }
     </style>
@@ -257,19 +293,15 @@
                 const querySnapshot = await getDocs(collection(db, "users"));
                 let members = [];
                 querySnapshot.forEach((doc) => { let d = doc.data(); d.uid = doc.id; members.push(d); });
+                
+                // 1. Tri par NOMBRE DE BADGES, puis par POINTS
                 members.sort((a, b) => {
-                    // On compte les badges custom (ceux ajoutés par l'admin)
                     const badgesA = (a.customBadges || []).length;
                     const badgesB = (b.customBadges || []).length;
-
-                    // Si le nombre de badges est différent, celui qui en a le plus passe devant
-                    if (badgesB !== badgesA) {
-                        return badgesB - badgesA;
-                    }
-                    
-                    // Si même nombre de badges, on départage par les CF Points
+                    if (badgesB !== badgesA) return badgesB - badgesA;
                     return (b.cfPoints || 0) - (a.cfPoints || 0);
                 });
+
                 if (currentUserUid) {
                     const myIndex = members.findIndex(m => m.uid === currentUserUid);
                     if (myIndex > -1) members.unshift(members.splice(myIndex, 1)[0]);
@@ -294,8 +326,7 @@
                 const points = m.cfPoints || 0;
                 const isMe = (m.uid === currentUserUid);
                 const cardClass = isMe ? 'member-card current-user-highlight' : 'member-card';
-                // Ajout du bouton de réorganisation pour l'utilisateur connecté
-                const tagHtml = isMe ? `<div class="current-user-tag">IDENTIFIÉ</div><button class="reorder-trigger" onclick="window.openReorderModal()" title="Changer l'ordre des badges">⇄</button>` : '';
+                const tagHtml = isMe ? `<div class="current-user-tag">IDENTIFIÉ</div><button class="reorder-trigger" onclick="window.openReorderModal()" title="Réorganiser">⇄</button>` : '';
 
                 if(isMe) currentUserBadgesCache = m.customBadges || [];
 
@@ -305,9 +336,9 @@
                     const validScores = localStats.scores.filter(s => typeof s === 'number' && s !== null);
                     games = validScores.length;
                     if (games > 0) avg = (validScores.reduce((a, b) => a + b, 0) / games).toFixed(1);
-                    if (games >= 8) perfBadges += `<span></span>`;
-                    else if (games >= 4) perfBadges += `<span></span>`;
-                    if (avg !== "N/A" && avg >= 60) perfBadges += `<span></span>`;
+                    if (games >= 8) perfBadges += `<span ></span>`;
+                    else if (games >= 4) perfBadges += `<span ></span>`;
+                    if (avg !== "N/A" && avg >= 60) perfBadges += `<span ></span>`;
                 }
 
                 let wealthBadges = '';
@@ -340,7 +371,7 @@
             membersGrid.innerHTML = html;
         }
 
-        // --- REORDER LOGIC (USER) ---
+        // --- REORDER LOGIC ---
         window.openReorderModal = () => {
             if(!currentUserBadgesCache || currentUserBadgesCache.length === 0) return alert("Tu n'as pas encore de badges à organiser.");
             document.getElementById('reorderModal').style.display = 'block';
@@ -367,65 +398,50 @@
 
         window.moveBadge = async (index, direction) => {
             const newIndex = index + direction;
-            if(newIndex < 0 || newIndex >= currentUserBadgesCache.length) return; // Hors limites
+            if(newIndex < 0 || newIndex >= currentUserBadgesCache.length) return; 
 
-            // Swap
             const temp = currentUserBadgesCache[index];
             currentUserBadgesCache[index] = currentUserBadgesCache[newIndex];
             currentUserBadgesCache[newIndex] = temp;
 
-            renderReorderList(); // Update visuel immédiat
-
-            // Save Firebase
+            renderReorderList();
             try {
                 const userRef = doc(db, "users", currentUserUid);
                 await updateDoc(userRef, { customBadges: currentUserBadgesCache });
             } catch(e) { console.error("Erreur save ordre", e); }
         };
 
-        // --- ENCYCLOPEDIA V2 (CATEGORIES & OWNERS) ---
-       window.openEncyclopedia = () => {
+        // --- ENCYCLOPEDIA V5 (ACCORDÉON + LOGIQUE TRI) ---
+        window.openEncyclopedia = () => {
             document.getElementById('encycloModal').style.display = 'block';
             
-            // 1. Définition des catégories dans l'ordre d'affichage
             const categories = {
-                // La nouvelle catégorie tout en haut
-                top10Arme: { title: "🏆 TOP 10 MONDE ARMES", items: new Map() },
-                
-                topMonde: { title: "🌍 TOP MONDE", items: new Map() },
-                topServeur: { title: "🇪🇺 TOP SERVEUR", items: new Map() },
-                autr: { title: "AUTRES DISTINCTIONS", items: new Map() }
+                top10Arme: { id:'cat1', title: "🏆 TOP 10 MONDE ARMES ", items: new Map() },
+                topMonde: { id:'cat2', title: "🌍 TOP MONDE", items: new Map() },
+                topServeur: { id:'cat3', title: "🇪🇺 TOP SERVEUR", items: new Map() },
+                mythic: { id:'cat4', title: "🔮 MYTHIQUES & RARES", items: new Map() }, 
+                fun: { id:'cat5', title: "🤡 BADGE TROLL", items: new Map() }, 
+                autr: { id:'cat6', title: "AUTRES DISTINCTIONS", items: new Map() }
             };
 
-            // 2. Tri des badges
             allMembersCache.forEach(m => {
                 if(m.customBadges && Array.isArray(m.customBadges)) {
                     m.customBadges.forEach(b => {
                         const key = b.text.toUpperCase() + (b.color||'') + (b.effect||'') + (b.frame||'');
-                        
-                        let targetCat = categories.autr; // Par défaut
+                        let targetCat = categories.autr;
 
-                        // LOGIQUE DE TRI :
-                        if (b.frame === 'elite') {
-                            // Si le cadre est "Élite", ça part direct en haut, peu importe le texte
-                            targetCat = categories.top10Arme;
-                        } 
-                        else if (b.color === 'realgold') {
-                            targetCat = categories.topMonde;
-                        } 
-                        else if (b.color === 'realsilver') {
-                            targetCat = categories.topServeur;
-                        }
+                        if (b.frame === 'elite') targetCat = categories.top10Arme;
+                        else if (b.color === 'realgold') targetCat = categories.topMonde;
+                        else if (b.color === 'realsilver') targetCat = categories.topServeur;
+                        else if (b.frame === 'mythic' || b.color === 'galaxy') targetCat = categories.mythic;
+                        else if (b.color === 'pigeon' || b.color === 'clown') targetCat = categories.fun;
 
-                        if (!targetCat.items.has(key)) {
-                            targetCat.items.set(key, { badge: b, owners: [] });
-                        }
+                        if (!targetCat.items.has(key)) targetCat.items.set(key, { badge: b, owners: [] });
                         targetCat.items.get(key).owners.push(m.pseudo || "Inconnu");
                     });
                 }
             });
 
-            // 3. Génération HTML
             let fullHtml = '';
             
             const renderSection = (catKey) => {
@@ -438,31 +454,45 @@
                     const ownersStr = val.owners.join(', ');
                     const effectClass = b.effect ? `effect-${b.effect}` : '';
                     const frameClass = b.frame ? `frame-${b.frame}` : '';
-                    
                     gridHtml += `
                         <div class="encyclo-item">
                             <span class="badge badge-${b.color} ${effectClass} ${frameClass}" style="font-size:1rem; padding:6px 12px; margin-bottom:10px;">${b.text}</span>
                             <div class="encyclo-desc">${b.desc || "Classifié"}</div>
                             <div class="encyclo-owners"><strong>DÉTENU PAR :</strong>${ownersStr}</div>
-                        </div>
-                    `;
+                        </div>`;
                 });
 
-                return `<div class="encyclo-category-title">${cat.title}</div>
-                        <div class="encyclopedia-grid">${gridHtml}</div>`;
+                return `
+                    <div class="encyclo-category-header" onclick="window.toggleSection('${cat.id}')">
+                        ${cat.title} <span id="arrow-${cat.id}" class="encyclo-arrow">▼</span>
+                    </div>
+                    <div id="${cat.id}" class="encyclo-content">
+                        <div class="encyclopedia-grid">${gridHtml}</div>
+                    </div>
+                `;
             };
 
-            // Ordre d'appel des sections
             fullHtml += renderSection('top10Arme');
             fullHtml += renderSection('topMonde');
             fullHtml += renderSection('topServeur');
+            fullHtml += renderSection('mythic');
+            fullHtml += renderSection('fun');
             fullHtml += renderSection('autr');
 
             if(fullHtml === '') fullHtml = "<p style='text-align:center; color:#888;'>Aucun badge n'a encore été décerné.</p>";
-            
             encycloList.innerHTML = fullHtml;
         };
 
+        window.toggleSection = (id) => {
+            const content = document.getElementById(id);
+            const arrow = document.getElementById(`arrow-${id}`);
+            const header = arrow.parentElement;
+            if (content.style.display === "block") {
+                content.style.display = "none"; header.classList.remove('active');
+            } else {
+                content.style.display = "block"; header.classList.add('active');
+            }
+        };
 
         window.openAdminPanel = async () => { document.getElementById('adminModal').style.display = 'block'; await loadAdminPanelData(); };
         window.closeAdminPanel = () => { document.getElementById('adminModal').style.display = 'none'; };
@@ -479,19 +509,23 @@
             renderAdminList(adminUsersCache.filter(m => (m.pseudo || "").toLowerCase().includes(term)));
         };
 
+        // ADMIN OPTIONS UPDATED (INCLUT FUN/MYTHIC)
         function getColorsOptions(selected) {
             const opts = [
-                {g:'MATIÈRES PRÉCIEUSES', om:[{v:'realgold',l:'⚠️ Vrai Or'},{v:'realsilver',l:'⚪ Vrai Argent'},{v:'realdiamond',l:'💎 Vrai Diamant'},{v:'magma',l:'🔥 Magma'},{v:'obsidian',l:'🌑 Obsidian'}]},
-                {g:'COULEURS BASIQUES', om:[{v:'gold',l:'Or (Simple)'},{v:'red',l:'Rouge'},{v:'blue',l:'Bleu'},{v:'green',l:'Vert'},{v:'purple',l:'Violet'},{v:'cyan',l:'Cyan'},{v:'pink',l:'Rose'},{v:'orange',l:'Orange'},{v:'lime',l:'Lime'},{v:'black',l:'Noir'}]}
+                {g:'SPÉCIAL', om:[{v:'realgold',l:'⚠️ Vrai Or'},{v:'realsilver',l:'⚪ Vrai Argent'},{v:'realdiamond',l:'💎 Vrai Diamant'},{v:'galaxy',l:'🌌 Galaxy'},{v:'magma',l:'🔥 Magma'},{v:'obsidian',l:'🌑 Obsidian'}]},
+                {g:'FUN', om:[{v:'pigeon',l:'🐦 Pigeon (Argent)'},{v:'clown',l:'🤡 Clown (Pois)'}]},
+                {g:'BASIQUE', om:[{v:'gold',l:'Or'},{v:'red',l:'Rouge'},{v:'blue',l:'Bleu'},{v:'green',l:'Vert'},{v:'purple',l:'Violet'},{v:'cyan',l:'Cyan'},{v:'pink',l:'Rose'},{v:'orange',l:'Orange'},{v:'lime',l:'Lime'},{v:'black',l:'Noir'}]}
             ];
             return opts.map(group => `<optgroup label="${group.g}">${group.om.map(o => `<option value="${o.v}" ${selected===o.v?'selected':''}>${o.l}</option>`).join('')}</optgroup>`).join('');
         }
+
         function getEffectsOptions(selected) {
-            const opts = [{v:'',l:'(Aucun Effet)'},{v:'lightning-red',l:'⚡ Contour Éclair Rouge'},{v:'shine',l:'✨ Shine'},{v:'electric',l:'⚡ Électrique'},{v:'pulse',l:'💓 Pulse'},{v:'glitch',l:'👾 Glitch'},{v:'burn',l:'🔥 Burn'}];
+            const opts = [{v:'',l:'(Aucun Effet)'},{v:'holo',l:'🌈 Holographique'},{v:'lightning-red',l:'⚡ Contour Éclair Rouge'},{v:'shine',l:'✨ Shine'},{v:'electric',l:'⚡ Électrique'},{v:'pulse',l:'💓 Pulse'},{v:'glitch',l:'👾 Glitch'},{v:'burn',l:'🔥 Burn'}];
             return opts.map(o => `<option value="${o.v}" ${selected===o.v?'selected':''}>${o.l}</option>`).join('');
         }
+
         function getFramesOptions(selected) {
-            const opts = [{v:'',l:'(Aucun Cadre)'},{v:'elite',l:'🛡️ Élite'},{v:'blood',l:'🩸 Blood (Rouge Sang)'},{v:'cyber',l:'🤖 Cyber'},{v:'hazard',l:'⚠️ Hazard'},{v:'spectral',l:'👻 Spectral'}];
+            const opts = [{v:'',l:'(Aucun Cadre)'},{v:'elite',l:'🛡️ Élite'},{v:'mythic',l:'🔮 Mythique'},{v:'wings',l:'🪶 Ailes (Pigeon)'},{v:'circus',l:'🎪 Cirque (Clown)'},{v:'blood',l:'🩸 Blood'},{v:'cyber',l:'🤖 Cyber'},{v:'hazard',l:'⚠️ Hazard'},{v:'spectral',l:'👻 Spectral'}];
             return opts.map(o => `<option value="${o.v}" ${selected===o.v?'selected':''}>${o.l}</option>`).join('');
         }
 
@@ -517,7 +551,7 @@
                 html += `<div class="admin-player-row"><span style="color:white; font-weight:bold;">${m.pseudo}</span><button class="btn-add-badge" onclick="window.toggleBadgeForm('${m.uid}')">GÉRER</button></div>
                     <div id="form-${m.uid}" class="badge-form"><div class="current-badges-list">${existingBadgesHtml}</div>
                         <div style="border-top:1px solid #444; padding-top:10px;">
-                            <strong style="color:var(--codm-yellow); font-size:0.8rem;">CRÉER UN BADGE (V4) :</strong>
+                            <strong style="color:var(--codm-yellow); font-size:0.8rem;">CRÉER UN BADGE :</strong>
                             <div style="display:flex; gap:5px; margin-top:5px; flex-wrap:wrap;">
                                 <input type="text" id="newText-${m.uid}" placeholder="NOM" style="width:70px;">
                                 <select id="newColor-${m.uid}">${getColorsOptions('gold')}</select>
