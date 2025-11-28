@@ -2,13 +2,148 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Accueil | Circled Fight</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/home.css"> 
     
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+
     <style>
+        /* --- NOUVEAU DESIGN ACCUEIL (HUB V2) --- */
         
+        :root {
+            --codm-yellow: #ffc107;
+            --accent-red: #d32f2f;
+            --bg-dark: #050505;
+            --card-bg: #141414;
+        }
+
+        body { background-color: var(--bg-dark); color: white; overflow-x: hidden; }
+
+        /* HERO */
+        .hero-section {
+            padding: 50px 20px;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(255, 193, 7, 0.08) 0%, transparent 80%);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .hero-content h2 {
+            font-family: 'Orbitron'; font-size: 2.2rem; letter-spacing: 1px;
+            margin-bottom: 10px; text-transform: uppercase; line-height: 1.2;
+        }
+        .text-neon { color: var(--codm-yellow); text-shadow: 0 0 15px rgba(255, 193, 7, 0.4); }
+        .hero-content p {
+            font-family: 'Rajdhani'; font-size: 1.1rem; color: #aaa; max-width: 600px; margin: 0 auto 25px;
+        }
+
+        /* LE HUB (GRILLE) */
+        .hub-section {
+            max-width: 1200px; margin: 0 auto; padding: 30px 20px;
+        }
+        .section-title {
+            text-align: center; font-family: 'Orbitron'; font-size: 1.4rem; margin-bottom: 25px;
+            color: white; border-left: 4px solid var(--codm-yellow); padding-left: 15px; display: inline-block;
+        }
+        
+        .hub-grid {
+            display: grid;
+            /* Par défaut (PC) : colonnes automatiques */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .hub-card {
+            background: linear-gradient(145deg, #161616, #0b0b0b);
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, border-color 0.3s;
+            display: flex; flex-direction: column; justify-content: space-between;
+            min-height: 200px;
+        }
+        
+        .hub-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--codm-yellow);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        .hub-card h3 {
+            font-family: 'Orbitron'; color: white; margin: 0 0 10px 0; font-size: 1.3rem;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .hub-card p { font-family: 'Rajdhani'; color: #999; font-size: 1rem; line-height: 1.4; margin-bottom: 20px; }
+        
+        .card-icon { font-size: 1.4rem; }
+        
+        .btn-card {
+            background: #1a1a1a; border: 1px solid #444; color: white;
+            padding: 12px 15px; text-decoration: none; text-align: center;
+            font-family: 'Orbitron'; font-size: 0.9rem; transition: 0.3s;
+            margin-top: auto; display: block; border-radius: 4px;
+        }
+        .btn-card:hover { background: var(--codm-yellow); color: black; border-color: var(--codm-yellow); }
+
+        /* TAGS */
+        .new-tag, .pop-tag {
+            position: absolute; top: 10px; right: 10px;
+            font-size: 0.6rem; padding: 3px 8px; font-family: 'Orbitron'; border-radius: 2px;
+            font-weight: bold; letter-spacing: 1px;
+        }
+        .new-tag { background: var(--accent-red); color: white; animation: pulseTag 2s infinite; }
+        .pop-tag { background: var(--codm-yellow); color: black; box-shadow: 0 0 10px rgba(255,193,7,0.3); }
+        
+        @keyframes pulseTag { 0% { opacity: 0.8; } 50% { opacity: 1; box-shadow: 0 0 8px var(--accent-red); } 100% { opacity: 0.8; } }
+
+        /* STATS */
+        .season-stats {
+            background: #0f0f0f; border: 1px solid #222; border-radius: 12px;
+            padding: 20px; margin: 30px auto; max-width: 500px; text-align: center;
+        }
+        .stat-card { display: flex; justify-content: space-around; align-items: center; }
+        .stat-number { font-family: 'Orbitron'; font-size: 2.5rem; color: var(--codm-yellow); font-weight: bold; }
+        .stat-label { font-family: 'Rajdhani'; font-size: 0.8rem; color: #666; text-transform: uppercase; }
+        .stat-divider { width: 1px; height: 40px; background: #333; }
+        .thanks { margin-top: 15px; font-style: italic; color: #444; font-size: 0.8rem; }
+
+        /* JOIN CALLOUT */
+        .join-callout {
+            background: linear-gradient(to bottom, #050505, #111);
+            border-top: 1px solid #333;
+            padding: 40px 20px; text-align: center; margin-top: 20px;
+        }
+        .btn-main-action {
+            background: var(--codm-yellow); color: black; padding: 14px 25px;
+            font-family: 'Orbitron'; font-weight: bold; text-decoration: none;
+            display: inline-block; margin-top: 15px; border-radius: 4px;
+            box-shadow: 0 0 15px rgba(255,193,7,0.2); transition: 0.3s;
+        }
+
+        /* --- MOBILE OPTIMIZATION (LE VRAI FIX) --- */
+        @media (max-width: 768px) {
+            .hero-section { padding: 40px 15px; }
+            .hero-content h2 { font-size: 1.8rem; }
+            
+            /* Force une seule colonne sur mobile pour que ce soit lisible */
+            .hub-grid { 
+                grid-template-columns: 1fr; 
+                gap: 15px;
+            }
+            
+            .hub-card {
+                padding: 20px;
+                min-height: auto; /* Hauteur adaptative */
+            }
+            
+            .hub-card h3 { font-size: 1.2rem; }
+            .section-title { font-size: 1.3rem; margin-bottom: 20px; }
+            
+            /* Boutons plus faciles à cliquer */
+            .btn-card, .btn-main-action { padding: 15px; } 
+        }
     </style>
 </head>
 <body>
@@ -26,221 +161,145 @@
                 <li><a href="br_dashboard.html">Scores BR</a></li>
                 <li><a href="paris.html">Espace Paris</a></li>
                 <li><a href="tournament.html">Tournoi du Week-end</a></li>
-                <li><a href="1v1.html">1v1</a></li>                
+                <li><a href="1v1.html">1v1</a></li>
                 <li><a href="join.html">Nous Rejoindre</a></li>
             </ul>
         </nav>
         <div id="mobileHubBackdrop" class="mobile-hub-backdrop" tabindex="-1" aria-hidden="true"></div>
     </header>
-    <main class="main-content-home">
+
+    <main>
 
         <section class="hero-section">
             <div class="hero-content">
-                <h2>L'ANALYSE DE PERFORMANCE <span class="text-neon">DU CLAN</span></h2>
-                <p>Circled Fight est l'élite. Suivez en temps réel les moyennes, les ratios, et les tendances de progression de nos meilleurs joueurs.</p>
-                <a href="dashboard.html" class="btn-main-action">VOIR LE CLASSEMENT ACTUEL</a>
-            </div>
-        </section>
-
-        <section class="features-section">
-            <h3>CE QUE NOTRE SYSTÈME MESURE</h3>
-            <div class="features-container">
-                <div class="feature-card">
-                    <span class="icon">🔥</span>
-                    <h4>La Série de Victoires</h4>
-                    <p>Compte le nombre de semaines consécutives de participation active au tournoi.</p>
-                </div> 
-                <div class="feature-card">
-                    <span class="icon">🚀</span>
-                    <h4>La Progression</h4>
-                    <p>Badges des joueurs en nette amélioration sur leurs trois dernières semaines de jeu.</p>
-                </div>
-                <div class="feature-card">
-                    <span class="icon">💤</span>
-                    <h4>La Régularité</h4>
-                    <p>Attribué aux joueurs n’ayant pas participé au tournoi depuis un certain temps</p>
+                <h2>LE QG DE L'<span class="text-neon">ÉLITE</span></h2>
+                <p>Bienvenue soldat. Analyse, parie, combats. Explore l'écosystème complet du clan Circled Fight.</p>
+                <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <a href="dashboard.html" class="btn-card" style="border-color: var(--codm-yellow); color: var(--codm-yellow); min-width: 140px;">DATA CENTER</a>
+                    <a href="join.html" class="btn-card" style="min-width: 140px;">RECRUTEMENT</a>
                 </div>
             </div>
         </section>
 
-        <section class="join-callout">
-            <h3>VOUS VOULEZ FAIRE PARTIE DE L'ÉLITE ?</h3>
-            <p>Nous sommes toujours à la recherche de joueurs motivés. Notre force réside dans la détermination de chaque membre.</p>
-            <a href="join.html" class="btn-main-action cta-invert" role="button" aria-label="Rejoindre le clan">REJOINDRE LE CLAN</a>
+        <section class="hub-section">
+            <div style="text-align: center;"><div class="section-title">CENTRE D'OPÉRATIONS</div></div>
+            
+            <div class="hub-grid">
+                
+                <div class="hub-card" style="border-color: rgba(255,193,7,0.3);">
+                    <span class="pop-tag">POPULAIRE</span>
+                    <h3><span class="card-icon">🏆</span> TOURNOI HEBDO</h3>
+                    <p>L'événement principal. Consulte le tableau des scores, les règles et les prochains affrontements du week-end.</p>
+                    <a href="tournament.html" class="btn-card">VOIR LE TABLEAU</a>
+                </div>
+
+                <div class="hub-card">
+                    <span class="pop-tag">POPULAIRE</span>
+                    <h3><span class="card-icon">👥</span> CASERNE</h3>
+                    <p>L'effectif complet. Analyse les stats de tes alliés, compare les badges et consulte l'encyclopédie.</p>
+                    <a href="members.html" class="btn-card">CONSULTER L'EFFECTIF</a>
+                </div>
+
+                <div class="hub-card">
+                    <span class="new-tag">NOUVEAU</span>
+                    <h3><span class="card-icon">🥊</span> ARÈNE 1V1</h3>
+                    <p>Défie les autres membres. Grimpe le classement Win Rate et prouve ta valeur en duel.</p>
+                    <a href="1v1.html" class="btn-card">ENTRER DANS L'ARÈNE</a>
+                </div>
+
+                <div class="hub-card">
+                    <span class="new-tag">NOUVEAU</span>
+                    <h3><span class="card-icon">💰</span> PARIS SPORTIFS</h3>
+                    <p>Mise tes CF Points sur les tournois. Analyse les cotes et deviens le magnat du clan.</p>
+                    <a href="paris.html" class="btn-card">PLACER UN PARI</a>
+                </div>
+
+                <div class="hub-card">
+                    <h3><span class="card-icon">🛒</span> ARMURERIE</h3>
+                    <p>Dépense tes gains pour acheter des skins et avantages (Bientôt disponible).</p>
+                    <a href="boutique.html" class="btn-card">ACCÉDER AU SHOP</a>
+                </div>
+
+            </div>
         </section>
 
-        <div id="seasonStats" class="season-stats" aria-hidden="false">
+        <div id="seasonStats" class="season-stats">
+            <h4 style="margin: 0 0 15px 0; color: #888; font-family:'Orbitron'; font-size: 0.9rem;">STATISTIQUES GLOBALES</h4>
             <div class="stat-card">
                 <div class="stat-item">
                     <div class="stat-number" data-target="30">0</div>
-                    <div class="stat-label">membres actifs cette saison</div>
+                    <div class="stat-label">Soldats</div>
                 </div>
-                <div class="stat-divider" aria-hidden="true"></div>
+                <div class="stat-divider"></div>
                 <div class="stat-item">
                     <div class="stat-number" data-target="18">0</div>
-                    <div class="stat-label">participants au dernier tournoi</div>
+                    <div class="stat-label">Actifs</div>
                 </div>
             </div>
-            <div class="thanks">Merci à : Silence de nous avoir rejoint</div>
+            <div class="thanks">Dernière recrue : <span style="color:white;">Silence</span></div>
         </div>
+
+        <section class="join-callout">
+            <h3 style="font-family:'Orbitron'; color:white; font-size:1.5rem; margin-bottom:10px;">PRÊT À COMBATTRE ?</h3>
+            <p style="color:#aaa; max-width:600px; margin:0 auto; font-size: 0.9rem;">Si tu penses avoir le niveau et la mentalité pour évoluer parmi l'élite.</p>
+            <a href="join.html" class="btn-main-action" role="button">POSTULER</a>
+        </section>
 
     </main>
     
     <footer class="main-footer">
-        <p>&copy; 2025 Circled Fight Clan V6.2.1 Tous droits réservés. | Designed for the Elite.</p>
+        <p>&copy; 2025 Circled Fight Clan V6.4.0 Tous droits réservés.</p>
         <div class="footer-links">
-            Recrutement |
-            <a href="#top">Haut de page</a>
+            <a href="join.html">Recrutement</a> | <a href="#top">Haut</a>
         </div>
     </footer>
-    
     
     <div id="welcomeModal" class="announcement-modal">
         <div class="modal-content-announcement">
             <span class="close-btn" id="closeModal">&times;</span>
-            <h2 style="color: var(--codm-yellow);">BIENVENUE CLAN CIRCLED FIGHT</h2>
-            
-            <p style="text-align: center; margin-bottom: 25px;">
-                Nous sommes ravis de vous accueillir sur l'espace officiel du clan !
-            </p>
-            <ul>
-                <li>📊 Suivre les résultats et statistiques des joueurs.</li>
-                <li>📰 Consulter les affiches des prochains évènements.</li>
-                <li>🏆 T'inscrire aux tournois internes.</li>
-                <li>🤝 Postuler pour rejoindre la grande famille que le clan représente.</li>
+            <h2 style="color: var(--codm-yellow); font-size: 1.4rem;">BIENVENUE SOLDAT</h2>
+            <p style="text-align: center; margin-bottom: 20px; font-size: 0.95rem; color:#ccc;">Le QG Circled Fight est opérationnel.</p>
+            <ul style="text-align: left; padding-left: 20px; font-size: 0.9rem;">
+                <li>🔥 <strong>Nouveau :</strong> Arène 1v1 Classée</li>
+                <li>💰 <strong>Nouveau :</strong> Paris Sportifs</li>
+                <li>📊 Stats et graphiques live</li>
             </ul>
-            
-            <div class="update-message">
-                <h3>🛠️ Notes de Patch</h3>
-                <p>Attention : une nouvelle fonctionnalité est en cours de déploiement ! Restez connectés...</p>
-                <p style="font-size: 0.9em; margin-top: 10px; color: #ff9999; font-style: italic;">
-                    ⚠️ Si vous rencontrez le moindre bug ou anomalie, veuillez en informer le support technique (Angelos).
-                </p>
-            </div>
-
-            <button class="cta-button" id="okModal" style="margin-top: 25px;">C'est parti !</button>
+            <button class="cta-button" id="okModal" style="margin-top: 20px;">ACCÉDER AU HUB</button>
         </div>
     </div>
     
-    
     <script>
-        // Small counter animation for the homepage stats card
+        // COMPTEURS
         (function(){
             const counters = document.querySelectorAll('.stat-number');
             counters.forEach(el => {
                 const target = parseInt(el.getAttribute('data-target') || '0', 10);
-                let start = 0;
-                const duration = 900; // ms
-                const stepTime = Math.max(Math.floor(duration / Math.max(target,1)), 12);
-                const startTime = Date.now();
-
+                const duration = 1500; const startTime = Date.now();
                 function tick(){
                     const elapsed = Date.now() - startTime;
                     const progress = Math.min(elapsed / duration, 1);
-                    const value = Math.floor(progress * target);
-                    el.textContent = value;
-                    if(progress < 1) requestAnimationFrame(tick);
-                    else el.textContent = target;
+                    const ease = 1 - Math.pow(1 - progress, 3);
+                    el.textContent = Math.floor(ease * target);
+                    if(progress < 1) requestAnimationFrame(tick); else el.textContent = target;
                 }
-
-                // Small delay so it doesn't start before layout
-                setTimeout(() => requestAnimationFrame(tick), 120);
+                setTimeout(() => requestAnimationFrame(tick), 300);
             });
         })();
 
-        // Small counter animation for the homepage stats card + hamburger init
+        // HAMBURGER
         (function(){
-            // Counters
-            const counters = document.querySelectorAll('.stat-number');
-            counters.forEach(el => {
-                const target = parseInt(el.getAttribute('data-target') || '0', 10);
-                const duration = 900; // ms
-                const startTime = Date.now();
-
-                function tick(){
-                    const elapsed = Date.now() - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    const value = Math.floor(progress * target);
-                    el.textContent = value;
-                    if(progress < 1) requestAnimationFrame(tick);
-                    else el.textContent = target;
-                }
-                setTimeout(() => requestAnimationFrame(tick), 120);
+            const btn = document.getElementById('hamburgerMenu');
+            const hub = document.getElementById('mobileHub');
+            const backdrop = document.getElementById('mobileHubBackdrop');
+            if(!btn || !hub || !backdrop) return;
+            const close = () => { hub.classList.remove('open'); backdrop.classList.remove('visible'); btn.setAttribute('aria-expanded','false'); };
+            btn.addEventListener('click', () => { 
+                if(hub.classList.contains('open')) close(); 
+                else { hub.classList.add('open'); backdrop.classList.add('visible'); btn.setAttribute('aria-expanded','true'); }
             });
-
-            // Hamburger menu toggle (index.html only)
-            (function(){
-                const btn = document.getElementById('hamburgerMenu');
-                const hub = document.getElementById('mobileHub');
-                const backdrop = document.getElementById('mobileHubBackdrop');
-
-                if(!btn || !hub || !backdrop) return;
-
-                function openHub() {
-                    hub.classList.add('open');
-                    backdrop.classList.add('visible');
-                    btn.setAttribute('aria-expanded', 'true');
-                    hub.setAttribute('aria-hidden', 'false');
-                    const firstLink = hub.querySelector('a');
-                    if(firstLink) firstLink.focus();
-                }
-
-                function closeHub() {
-                    hub.classList.remove('open');
-                    backdrop.classList.remove('visible');
-                    btn.setAttribute('aria-expanded', 'false');
-                    hub.setAttribute('aria-hidden', 'true');
-                    btn.focus();
-                }
-
-                btn.addEventListener('click', (e) => {
-                    const opened = btn.getAttribute('aria-expanded') === 'true';
-                    if(opened) closeHub(); else openHub();
-                });
-
-                backdrop.addEventListener('click', closeHub);
-
-                document.addEventListener('keydown', (e) => {
-                    if(e.key === 'Escape') closeHub();
-                });
-
-                hub.addEventListener('click', (e) => {
-                    if(e.target.tagName === 'A') closeHub();
-                });
-            })();
+            backdrop.addEventListener('click', close);
         })();
-        
-        // --- GESTION DE LA MODALE D'ANNONCE ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const modal = document.getElementById('welcomeModal');
-            const closeModal = document.getElementById('closeModal');
-            const okModal = document.getElementById('okModal');
-
-            // Clé V1.1 pour forcer l'affichage de cette nouvelle version
-            const ANNOUNCEMENT_KEY = 'cf_announcement_v1_1';
-
-            // Fonction pour masquer la modale et définir le marqueur
-            const hideModal = () => {
-                modal.style.display = 'none';
-                localStorage.setItem(ANNOUNCEMENT_KEY, 'true');
-            };
-
-            // 1. Vérifier si l'utilisateur a déjà vu cette version de l'annonce
-            if (localStorage.getItem(ANNOUNCEMENT_KEY) !== 'true') {
-                modal.style.display = 'block';
-            }
-
-            // 2. Événements pour fermer la modale
-            closeModal.onclick = hideModal;
-            okModal.onclick = hideModal;
-            
-            // Fermer si l'utilisateur clique en dehors de la modale
-            window.onclick = function(event) {
-                if (event.target == modal) {
-                    hideModal();
-                }
-            }
-        });
+    
     </script>
 </body>
 </html>
