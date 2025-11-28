@@ -9,7 +9,26 @@
     <link rel="stylesheet" href="css/paris.css">
     
     <style>
-        
+        /* Styles spécifiques pour l'affichage des cotes combinées */
+        .bet-summary-total {
+            font-weight: bold;
+            color: white;
+            border-top: 1px dashed #555;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+        /* Style pour le nouvel avertissement combiné */
+        .combin-warning {
+            background-color: #3f1010;
+            border-left: 3px solid var(--accent-red);
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 0.75rem;
+            color: #ccc;
+        }
+        .combin-warning strong {
+            color: var(--accent-red);
+        }
     </style>
 </head>
 <body>
@@ -25,6 +44,7 @@
             <div class="sub-header">ESPACE PARIS & CLASSEMENT</div>
         </div>
         <div class="export-container">
+            <a href="boutique.html" class="btn-nav" style="margin-right: 5px;">BOUTIQUE</a>
             <span id="adminLink" style="display:none; margin-right: 5px;">
                 <a href="admin.html" class="btn-nav btn-admin">CMD</a>
             </span>
@@ -154,7 +174,7 @@
             signOut(auth).then(() => location.reload());
         });
         
-        // --- LOGIQUE DE PARI CLASSEMENT ---
+        // --- LOGIQUE DE PARI CLASSEMENT (MISE À JOUR) ---
         
         async function loadOpenMatches(userId) {
             openMatchList.innerHTML = '<p style="color: #666; text-align: center;">Synchronisation des données...</p>';
@@ -177,36 +197,56 @@
 
                 const rankOptions = Array.from({length: numPlayers}, (_, i) => `<option value="${i+1}">Rang #${i+1}</option>`).join('');
 
-                // Vérifier si l'utilisateur a déjà parié
+                // ⭐ Récupérer TOUS les paris de l'utilisateur pour ce match
                 const betQuery = query(collection(db, "bets"), 
                     where("matchId", "==", matchId),
-                    where("userId", "==", userId)
+                    where("userId", "==", userId),
+                    where("isSettled", "==", false) // N'affiche que les paris en cours
                 );
                 const betSnapshot = await getDocs(betQuery);
-                const hasUserBet = !betSnapshot.empty;
-                const userBet = hasUserBet ? betSnapshot.docs[0].data() : null;
+                const userBets = betSnapshot.docs;
                 
-                if (hasUserBet) {
-                    let summaryHtml = `<p style="font-weight: bold; margin-bottom: 10px; color:#aaa;">RÉCAPITULATIF DE MISSION :</p>`;
-                    for (const [player, rank] of Object.entries(userBet.prediction)) {
-                        const cote = userBet.odds[player][rank] ?? 1.00; 
-                        summaryHtml += `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:5px 0;"><span style="color:white;">${player}</span> <span style="color:var(--codm-yellow);">Rang ${rank} (x${cote.toFixed(2)})</span></div>`;
-                    }
-
+                // --- 1. AFFICHAGE DES PARIS EXISTANTS ---
+                if (userBets.length > 0) {
                     html += `
-                        <div class="ranking-card" style="border-left: 4px solid #4CAF50;">
-                            <div class="card-header">
-                                <h4>✅ PARI VALIDÉ</h4>
-                                <span style="font-size:0.8rem; color:#4CAF50;">MISE: ${userBet.amount} CF</span>
-                            </div>
-                            <div class="card-body">
-                                ${summaryHtml}
-                                <div style="margin-top:15px; text-align:center; font-size:0.8rem; color:#666;">Attente des résultats finaux...</div>
-                            </div>
-                        </div>
+                        <h5 style="color: #ccc; font-family: 'Rajdhani'; margin: 20px 0 10px; border-bottom: 1px solid #333; padding-bottom: 5px;">
+                            ▶ Vos ${userBets.length} paris en attente sur cet événement :
+                        </h5>
                     `;
-                    continue;
+                    userBets.forEach((betDoc, index) => {
+                        const userBet = betDoc.data();
+                        let summaryHtml = '';
+                        const storedTotalOdd = userBet.totalOdd || 1.0;
+
+                        for (const [player, rank] of Object.entries(userBet.prediction)) {
+                            // On essaie d'abord d'utiliser la cote figée au moment du pari
+                            const cote = userBet.odds && userBet.odds[player] && userBet.odds[player][rank] ? userBet.odds[player][rank] : 1.0;
+                            
+                            summaryHtml += `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:5px 0;">
+                                <span style="color:white;">${player}</span> 
+                                <span style="color:var(--codm-yellow);">Rang ${rank} (x${cote.toFixed(2)})</span>
+                            </div>`;
+                        }
+                        
+                        html += `
+                            <div class="ranking-card" style="border-left: 4px solid #4CAF50; margin-bottom: 15px;">
+                                <div class="card-header">
+                                    <h4>✅ Pari #${index + 1} Validé</h4>
+                                    <span style="font-size:0.8rem; color:#4CAF50;">MISE: ${userBet.amount} CF</span>
+                                </div>
+                                <div class="card-body">
+                                    ${summaryHtml}
+                                    <div class="bet-summary-total" style="color: var(--accent-red); margin-top: 10px;">
+                                        Cote Totale: x${storedTotalOdd.toFixed(2)}
+                                    </div>
+                                    <div style="margin-top:15px; text-align:center; font-size:0.8rem; color:#666;">Attente des résultats finaux...</div>
+                                </div>
+                            </div>
+                        `;
+                    });
                 }
+                
+                // --- 2. AFFICHAGE DU FORMULAIRE DE NOUVEAU PARI (Toujours affiché) ---
                 
                 // Formulaire de prédiction
                 html += `
@@ -215,7 +255,7 @@
                             <h4>PRÉDICTION CLASSEMENT (TOP ${numPlayers})</h4>
                         </div>
                         <div class="card-body">
-                            <p style="color: #888; font-size: 0.85rem; margin-bottom: 15px;">Assignez un rang final à chaque joueur. Laissez vide si incertain.</p>
+                            <p style="color: #888; font-size: 0.85rem; margin-bottom: 15px;">Assignez un rang final à chaque joueur. Rangs non attribués non pris en compte.</p>
 
                             <div class="player-ranking-grid" id="ranking-grid-${matchId}">
                 `;
@@ -244,6 +284,8 @@
                 html += `
                             </div>
                             
+                            <div id="combin-msg-${matchId}" class="combin-warning" style="display:none;"></div>
+
                             <div class="bet-summary">
                                 <div id="selected-bets-${matchId}" style="margin-bottom: 15px; font-size: 0.9em; color: #aaa; font-style: italic;">Aucune sélection active.</div>
                                 
@@ -262,15 +304,19 @@
             openMatchList.innerHTML = html;
         }
         
+        // ⭐ MISE À JOUR : Ajout de l'avertissement pour les paris combinés
         window.updateBetSummary = (matchId) => {
             const card = document.getElementById(`card-${matchId}`);
             const amount = parseInt(document.getElementById(`amount-${matchId}`).value) || 0;
             const msgElement = document.getElementById(`msg-${matchId}`);
+            const combinMsgElement = document.getElementById(`combin-msg-${matchId}`);
             const selectedBetsDiv = document.getElementById(`selected-bets-${matchId}`);
 
             const selectedRanks = {};
             const selectedRankElements = card.querySelectorAll('select[data-player]');
             let summaryText = '';
+            
+            let totalCombinedOdd = 1.0; 
             
             selectedRankElements.forEach(select => {
                 const playerName = select.getAttribute('data-player');
@@ -278,24 +324,49 @@
                 const coteElement = document.getElementById(`cote-${matchId}-${playerName}`);
                 const numPlayers = Object.keys(matchDataCache[matchId].players).length;
                 
-                // Récupération des stats du joueur spécifique
                 const playerStats = globalStats.find(p => p.name === playerName);
                 
                 if (selectedRank && playerStats) {
-                    // CALCUL TEMPS RÉEL : On calcule la cote pour ce rang spécifique
                     const cote = calculateRealTimeOdds(playerStats, selectedRank, numPlayers);
                     
                     coteElement.innerHTML = `Cote: <span>x${cote.toFixed(2)}</span>`;
                     selectedRanks[playerName] = selectedRank;
+                    
+                    totalCombinedOdd *= cote; 
+                    
                     summaryText += `<span style="color:var(--codm-yellow)">${playerName}</span> ➝ Rang ${selectedRank} (x${cote.toFixed(2)})<br>`;
                 } else if (playerStats) {
-                    // Retour à la cote par défaut (Rang 1)
                     const defaultCote = calculateRealTimeOdds(playerStats, 1, numPlayers);
                     coteElement.innerHTML = `Cote: <span>x${defaultCote.toFixed(2)}</span>`;
                 }
             });
             
-            selectedBetsDiv.innerHTML = summaryText || "Aucune sélection active.";
+            const numSelections = Object.keys(selectedRanks).length;
+
+            // Affichage du récapitulatif
+            if (numSelections > 0) {
+                 selectedBetsDiv.innerHTML = `
+                    ${summaryText}
+                    <div class="bet-summary-total">
+                        Cote Combinée Totale : <span style="color:var(--accent-red)">x${totalCombinedOdd.toFixed(2)}</span>
+                    </div>
+                `;
+            } else {
+                 selectedBetsDiv.innerHTML = "Aucune sélection active.";
+            }
+
+            // ⭐ LOGIQUE D'AVERTISSEMENT pour 2 sélections ou plus
+            if (numSelections >= 2) {
+                combinMsgElement.style.display = 'block';
+                combinMsgElement.innerHTML = `
+                    <strong>Attention: Pari Combiné (Multi) !</strong>
+                    <br>Vos cotes sont multipliées pour ce pari. 
+                    <br>Si l'un des classements sélectionnés (${numSelections} tops) est incorrect, <strong>tout le pari est perdu.</strong>
+                `;
+            } else {
+                combinMsgElement.style.display = 'none';
+            }
+
 
             const ranksSelected = Object.values(selectedRanks);
             const uniqueRanks = new Set(ranksSelected);
@@ -310,7 +381,8 @@
             
             window.userPredictions[matchId] = {
                 prediction: selectedRanks,
-                amount: amount
+                amount: amount,
+                totalOdd: totalCombinedOdd.toFixed(2)
             };
         };
         
@@ -347,38 +419,41 @@
                 const numPlayers = Object.keys(matchData.players).length;
                 const oddsAtBet = {};
                 
-                // ON FIGE LES COTES ICI AU MOMENT DU PAIEMENT
+                // ON FIGE LES COTES INDIVIDUELLES POUR LA TRAÇABILITÉ
                 for (const player in selectedPredictions) {
-                      const rank = selectedPredictions[player];
-                      const playerStats = globalStats.find(p => p.name === player);
-                      
-                      if(playerStats) {
+                     const rank = selectedPredictions[player];
+                     const playerStats = globalStats.find(p => p.name === player);
+                     
+                     if(playerStats) {
                           oddsAtBet[player] = {};
-                          // On recalcule une dernière fois pour être sûr
                           const finalCote = calculateRealTimeOdds(playerStats, rank, numPlayers);
                           oddsAtBet[player][rank] = finalCote;
-                      }
+                     }
                 }
+                
+                const uniqueBetId = `BET-${auth.currentUser.uid}-${matchId}-${Date.now()}`;
 
-                await setDoc(doc(db, "bets", `BET-${auth.currentUser.uid}-${matchId}`), {
+                await setDoc(doc(db, "bets", uniqueBetId), {
                     matchId: matchId,
                     userId: auth.currentUser.uid,
                     amount: amount,
                     isSettled: false,
                     prediction: selectedPredictions,
-                    odds: oddsAtBet, // On stocke les cotes calculées
+                    totalOdd: parseFloat(predictionData.totalOdd), 
+                    odds: oddsAtBet,
                     betTime: new Date().toISOString()
                 });
 
                 msgElement.className = "success-msg";
-                msgElement.innerText = "Pari enregistré avec succès.";
+                msgElement.innerText = "Pari enregistré avec succès. Vous pouvez en faire un autre !";
                 currentUserData.cfPoints = newPoints;
                 document.getElementById('userPoints').innerText = newPoints;
-                setTimeout(() => loadOpenMatches(auth.currentUser.uid), 1500);
+                
+                setTimeout(() => loadOpenMatches(auth.currentUser.uid), 1500); 
 
             } catch (e) {
                 console.error("Erreur:", e);
-                msgElement.innerText = "Erreur système critique.";
+                msgElement.innerText = "Erreur système critique lors de l'enregistrement du pari.";
             }
         };
 
