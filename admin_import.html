@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importation Données 1v1 | Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: #111; color: white; font-family: 'Rajdhani'; padding: 20px; }
+        h1 { color: #ffc107; text-align: center; }
+        .user-row {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #222; padding: 10px; margin-bottom: 10px; border: 1px solid #333;
+        }
+        .user-name { flex: 1; font-weight: bold; font-size: 1.2rem; }
+        .input-group { display: flex; gap: 10px; align-items: center; }
+        input { width: 60px; padding: 5px; background: #000; color: white; border: 1px solid #555; text-align: center; }
+        button { background: #ffc107; border: none; padding: 5px 15px; font-weight: bold; cursor: pointer; }
+        button:hover { background: white; }
+    </style>
+</head>
+<body>
+
+    <h1>OUTIL D'IMPORTATION 1V1</h1>
+    <p style="text-align:center; color:#888;">Modifie directement les stats Win/Loss des joueurs.</p>
+    
+    <div id="listContainer">Chargement...</div>
+
+    <script type="module">
+        import { auth, db, collection, getDocs, doc, updateDoc, onAuthStateChanged } from './js/firebase.js';
+
+        const listContainer = document.getElementById('listContainer');
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) return window.location.href = "login.html"; // Sécurité
+            
+            // On charge tous les users
+            const snap = await getDocs(collection(db, "users"));
+            let html = '';
+
+            snap.forEach(d => {
+                const u = d.data();
+                if(u.pseudo === "Admin") return;
+
+                html += `
+                    <div class="user-row">
+                        <div class="user-name">${u.pseudo}</div>
+                        <div class="input-group">
+                            <label>Wins:</label>
+                            <input type="number" id="w-${d.id}" value="${u.oneVsOneWins || 0}">
+                            <label>Loss:</label>
+                            <input type="number" id="l-${d.id}" value="${u.oneVsOneLosses || 0}">
+                            <button onclick="window.saveStats('${d.id}')">SAUVEGARDER</button>
+                        </div>
+                    </div>
+                `;
+            });
+            listContainer.innerHTML = html;
+        });
+
+        window.saveStats = async (uid) => {
+            const w = parseInt(document.getElementById(`w-${uid}`).value);
+            const l = parseInt(document.getElementById(`l-${uid}`).value);
+
+            try {
+                await updateDoc(doc(db, "users", uid), {
+                    oneVsOneWins: w,
+                    oneVsOneLosses: l
+                });
+                alert("Sauvegardé !");
+            } catch (e) {
+                console.error(e);
+                alert("Erreur");
+            }
+        };
+    </script>
+</body>
+</html>

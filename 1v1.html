@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arène 1v1 | Circled Fight</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/members.css"> 
+    
+    <style>
+        /* --- STYLE SPÉCIFIQUE ARÈNE 1V1 --- */
+        body { background-color: #050505; }
+
+        /* HEADER & NAVIGATION (Identique aux autres pages) */
+        /* ... (Hérité de members.css) ... */
+
+        /* RULES SECTION */
+        .arena-rules {
+            background: rgba(20, 20, 20, 0.9);
+            border: 1px solid #333;
+            border-left: 4px solid var(--codm-yellow);
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 1000px;
+            border-radius: 4px;
+        }
+        .arena-rules h3 { color: var(--codm-yellow); font-family: 'Orbitron'; margin-top: 0; }
+        .arena-rules ul { list-style: none; padding: 0; color: #ccc; font-size: 0.9rem; }
+        .arena-rules li { margin-bottom: 8px; padding-left: 15px; position: relative; }
+        .arena-rules li::before { content: '>'; color: var(--codm-yellow); position: absolute; left: 0; font-weight: bold; }
+
+        /* LEADERBOARD (WIN RATE) */
+        .ladder-section { max-width: 1000px; margin: 40px auto; }
+        .ladder-table { width: 100%; border-collapse: collapse; background: #111; border-radius: 8px; overflow: hidden; }
+        .ladder-table th { background: #222; color: var(--codm-yellow); padding: 15px; text-align: left; font-family: 'Orbitron'; }
+        .ladder-table td { padding: 12px 15px; border-bottom: 1px solid #333; color: #eee; font-family: 'Rajdhani'; font-size: 1.1rem; }
+        .ladder-table tr:hover { background: rgba(255,193,7,0.05); }
+        .win-rate-high { color: #00e676; font-weight: bold; }
+        .win-rate-med { color: #ffeb3b; }
+        .win-rate-low { color: #ff3d00; }
+
+        /* FIGHT CARDS (BOXING STYLE) */
+        .fights-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .fight-card {
+            background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            border: 1px solid #333;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.3s;
+        }
+        .fight-card:hover { transform: translateY(-5px); border-color: var(--codm-yellow); }
+
+        .fight-header {
+            background: #000; color: #888; text-align: center; 
+            padding: 5px; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase;
+        }
+
+        .fighters-split {
+            display: flex;
+            height: 150px;
+            position: relative;
+        }
+        
+        .fighter {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            position: relative;
+        }
+        .fighter-left { background: linear-gradient(to right, rgba(0,0,255,0.1), transparent); border-right: 1px solid rgba(255,255,255,0.1); }
+        .fighter-right { background: linear-gradient(to left, rgba(255,0,0,0.1), transparent); }
+
+        .fighter-name { font-family: 'Orbitron'; font-size: 1.2rem; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; }
+        .fighter-stats { font-size: 0.8rem; color: #aaa; }
+
+        /* VS LOGO */
+        .vs-logo {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: #000;
+            color: var(--codm-yellow);
+            font-family: 'Orbitron';
+            font-weight: 900;
+            font-size: 1.5rem;
+            padding: 10px;
+            border-radius: 50%;
+            border: 2px solid var(--codm-yellow);
+            box-shadow: 0 0 15px var(--codm-yellow);
+            z-index: 10;
+        }
+
+        /* ACTIONS (ADMIN & CHALLENGE) */
+        .fight-actions { padding: 15px; text-align: center; border-top: 1px solid #333; }
+        .btn-win {
+            background: transparent; border: 1px solid #444; color: #fff;
+            padding: 5px 10px; cursor: pointer; margin: 0 5px; font-size: 0.8rem;
+            transition: 0.3s;
+        }
+        .btn-win:hover { background: var(--codm-yellow); color: #000; border-color: var(--codm-yellow); }
+        
+        .section-title-arena {
+            text-align: center; font-family: 'Orbitron'; font-size: 2rem; color: #fff;
+            margin-top: 40px; text-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        /* CHALLENGE BUTTON FAB */
+        .fab-challenge {
+            position: fixed; bottom: 30px; right: 30px;
+            background: var(--codm-yellow); color: #000;
+            width: 60px; height: 60px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; border: none; cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
+            z-index: 100; transition: transform 0.2s;
+        }
+        .fab-challenge:hover { transform: scale(1.1); }
+
+        /* MODAL CHALLENGE */
+        .modal-challenge-content { background: #1a1a1a; padding: 25px; border-radius: 8px; border: 1px solid var(--codm-yellow); width: 90%; max-width: 400px; }
+        .challenge-select { width: 100%; padding: 12px; background: #000; color: white; border: 1px solid #444; margin: 15px 0; font-family: 'Rajdhani'; font-size: 1.1rem; }
+        @media (max-width: 768px) {
+
+    /* TITRES */
+    .section-title-arena {
+        font-size: 1.5rem;
+        margin-top: 20px;
+    }
+
+    /* RULES */
+    .arena-rules {
+        margin: 15px;
+        padding: 15px;
+    }
+    .arena-rules ul {
+        font-size: 0.85rem;
+    }
+
+    /* FIGHTS GRID → 1 COLONNE SUR MOBILE */
+    .fights-container {
+        grid-template-columns: 1fr !important;
+        gap: 20px;
+        padding: 0 10px;
+    }
+
+    /* FIGHT CARD ADAPTATION */
+    .fight-card {
+        border-radius: 10px;
+    }
+
+    .fighters-split {
+        flex-direction: row;
+        height: auto;
+        padding: 15px 0;
+    }
+
+    .fighter {
+        padding: 8px;
+    }
+
+    .fighter-name {
+        font-size: 1rem;
+    }
+
+    .fighter-stats {
+        font-size: 0.75rem;
+    }
+
+    /* VS LOGO */
+    .vs-logo {
+        font-size: 1.2rem;
+        padding: 7px;
+        top: 50%;
+    }
+
+    /* ADMIN BUTTONS */
+    .fight-actions {
+        padding: 10px;
+    }
+
+    .btn-win {
+        width: 100%;
+        margin: 5px 0;
+        font-size: 0.75rem;
+    }
+
+    /* FAB BUTTON */
+    .fab-challenge {
+        width: 55px;
+        height: 55px;
+        bottom: 20px;
+        right: 20px;
+        font-size: 1.7rem;
+    }
+
+    /* WIN RATE TABLE → SCROLL HORIZONTAL */
+    .ladder-section {
+        padding: 0 10px;
+    }
+
+    .ladder-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        font-size: 0.85rem;
+    }
+
+    .ladder-table th,
+    .ladder-table td {
+        padding: 10px 12px;
+    }
+
+    /* MODAL RESPONSIVE */
+    .modal-challenge-content {
+        width: 95%;
+        max-width: none;
+        margin: 20px auto;
+        padding: 20px;
+    }
+
+    .challenge-select {
+        font-size: 1rem;
+    }
+
+    /* AUTH SCREEN MOBILE */
+    .auth-lock-screen {
+        padding: 20px;
+        text-align: center;
+    }
+}
+
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="logo-container">
+            <h1>Circled Fight <span class="tag">CF</span></h1>
+        </div>
+        <button id="hamburgerMenu" class="hamburger-menu" aria-label="Menu">☰</button>
+        <nav id="mobileHub" class="mobile-hub">
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="members.html">Membres du Clan</a></li>
+                <li><a href="dashboard.html">Scores MJ</a></li>
+                <li><a href="br_dashboard.html">Scores BR</a></li>
+                <li><a href="paris.html">Espace Paris</a></li>
+                <li><a href="tournament.html">Tournoi du Week-end</a></li>
+                <li><a href="1v1.html">1v1</a></li>                
+                <li><a href="join.html">Nous Rejoindre</a></li>
+            </ul>
+        </nav>
+        <div id="mobileHubBackdrop" class="mobile-hub-backdrop"></div>
+    </header>
+
+    <main style="padding-top: 80px; padding-bottom: 80px;">
+        
+        <div id="authLock" class="auth-lock-screen" style="display: flex;">
+            <div class="lock-icon">🔒</div>
+            <div class="lock-title">ACCÈS RESTREINT</div>
+            <p class="lock-msg">Connecte-toi pour accéder à l'arène 1v1.</p>
+            <div class="lock-actions">
+                <a href="login2.html" class="btn-lock-login" style="text-decoration:none;">S'IDENTIFIER</a>
+            </div>
+        </div>
+
+        <div id="arenaContent" style="display: none;">
+            
+            <div class="section-title-arena">ARÈNE <span style="color:var(--codm-yellow)">1 VS 1</span></div>
+
+            <section class="arena-rules">
+                <h3>📜 RÈGLEMENT DUEL</h3>
+                <ul>
+                    <li><strong>Organisation :</strong> Le déroulement est géré par les 2 joueurs concernés (Map, Horaire).</li>
+                    <li><strong>Format :</strong> 2 manches gagnantes de 20 kills (3 manches max).</li>
+                    <li><strong>Score :</strong> Une victoire = 1 Point au classement Win Rate.</li>
+                    <li><strong>Fairplay :</strong> Obligatoire. Mauvaise foi = Ban de l'arène.</li>
+                    <li><strong>Preuve :</strong> Envoyer un screen du résultat à un chef pour validation.</li>
+                </ul>
+            </section>
+
+            <button class="fab-challenge" onclick="openChallengeModal()" title="Lancer un défi">+</button>
+
+            <h2 style="text-align:center; color:#fff; font-family:'Orbitron'; margin-top:50px;">DUELS EN COURS</h2>
+            <div id="fightsContainer" class="fights-container">
+                <p style="text-align:center; color:#666; width:100%;">Aucun duel programmé pour le moment.</p>
+            </div>
+
+            <section class="ladder-section">
+                <h2 style="color:#fff; font-family:'Orbitron'; border-bottom:1px solid #333; padding-bottom:10px;">CLASSEMENT WIN RATE</h2>
+                <table class="ladder-table">
+                    <thead>
+                        <tr>
+                            <th>RANG</th>
+                            <th>SOLDAT</th>
+                            <th>VICTOIRES</th>
+                            <th>DÉFAITES</th>
+                            <th>WIN RATE</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ladderBody">
+                        </tbody>
+                </table>
+            </section>
+
+        </div>
+    </main>
+
+    <div id="challengeModal" class="admin-modal" style="display: none;">
+        <div class="modal-challenge-content">
+            <h2 style="color: var(--codm-yellow); font-family: 'Orbitron'; margin-top:0;">DÉFIER UN JOUEUR</h2>
+            <p style="color:#ccc;">Choisis ton adversaire. Le combat sera affiché publiquement.</p>
+            
+            <select id="opponentSelect" class="challenge-select">
+                <option value="">Chargement des soldats...</option>
+            </select>
+
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button onclick="document.getElementById('challengeModal').style.display='none'" style="flex:1; background:transparent; border:1px solid #555; color:white; padding:10px; cursor:pointer;">ANNULER</button>
+                <button onclick="createChallenge()" style="flex:1; background:var(--codm-yellow); border:none; color:black; padding:10px; font-weight:bold; cursor:pointer;">DÉFIER !</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db, collection, addDoc, getDocs, getDoc, doc, updateDoc, deleteDoc, increment, onAuthStateChanged } from './js/firebase.js';
+
+        const authLock = document.getElementById('authLock');
+        const arenaContent = document.getElementById('arenaContent');
+        const fightsContainer = document.getElementById('fightsContainer');
+        const ladderBody = document.getElementById('ladderBody');
+        const opponentSelect = document.getElementById('opponentSelect');
+
+        let currentUser = null;
+        let isAdmin = false;
+        let allUsersData = []; // Cache pour les pseudos
+
+        // --- AUTH CHECK ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                authLock.style.display = 'none';
+                arenaContent.style.display = 'block';
+
+                // Check Admin & Get User Data
+                const userSnap = await getDoc(doc(db, "users", user.uid));
+                const userData = userSnap.exists() ? userSnap.data() : {};
+                
+                if (userData.pseudo === "Admin") isAdmin = true;
+
+                // Load Data
+                await loadUsersAndLadder();
+                await loadActiveFights();
+
+            } else {
+                authLock.style.display = 'flex';
+                arenaContent.style.display = 'none';
+            }
+        });
+
+        // --- 1. LEADERBOARD SYSTEM ---
+        async function loadUsersAndLadder() {
+            const snap = await getDocs(collection(db, "users"));
+            allUsersData = [];
+            let ladderData = [];
+
+            snap.forEach(d => {
+                const u = d.data();
+                u.uid = d.id;
+                allUsersData.push(u);
+
+                // Stats 1v1 (si pas existantes, on met 0)
+                const wins = u.oneVsOneWins || 0;
+                const losses = u.oneVsOneLosses || 0;
+                const total = wins + losses;
+                let winRate = 0;
+                if (total > 0) winRate = ((wins / total) * 100).toFixed(1);
+
+                if (u.pseudo !== "Admin") {
+                    ladderData.push({ pseudo: u.pseudo, wins, losses, winRate, total });
+                }
+            });
+
+            // Tri par WinRate (si égalité, par nombre de victoires)
+            ladderData.sort((a, b) => {
+                if (b.winRate !== a.winRate) return b.winRate - a.winRate;
+                return b.wins - a.wins;
+            });
+
+            // Affichage
+            let html = '';
+            ladderData.forEach((p, index) => {
+                let wrClass = 'win-rate-low';
+                if (p.winRate >= 70) wrClass = 'win-rate-high';
+                else if (p.winRate >= 50) wrClass = 'win-rate-med';
+
+                html += `
+                    <tr>
+                        <td style="color:#666;">#${index + 1}</td>
+                        <td style="font-weight:bold; color:#fff;">${p.pseudo}</td>
+                        <td>${p.wins}</td>
+                        <td>${p.losses}</td>
+                        <td class="${wrClass}">${p.winRate}% <span style="font-size:0.8em; color:#555;">(${p.total} matchs)</span></td>
+                    </tr>
+                `;
+            });
+            ladderBody.innerHTML = html;
+
+            // Remplir le select pour le défi (exclure soi-même et Admin)
+            let optionsHtml = '<option value="">Choisir un adversaire...</option>';
+            allUsersData.forEach(u => {
+                if (u.uid !== currentUser.uid && u.pseudo !== "Admin") {
+                    optionsHtml += `<option value="${u.uid}">${u.pseudo}</option>`;
+                }
+            });
+            opponentSelect.innerHTML = optionsHtml;
+        }
+
+        // --- 2. FIGHT CARDS SYSTEM ---
+        async function loadActiveFights() {
+            // On suppose une collection 'challenges'
+            const snap = await getDocs(collection(db, "challenges"));
+            let fightsHtml = '';
+
+            if (snap.empty) {
+                fightsContainer.innerHTML = '<p style="text-align:center; color:#666; width:100%; padding:20px;">L\'arène est calme... pour le moment.</p>';
+                return;
+            }
+
+            snap.forEach(docSnap => {
+                const fight = docSnap.data();
+                const fightId = docSnap.id;
+
+                // Admin Controls
+                let adminControls = '';
+                if (isAdmin) {
+                    adminControls = `
+                        <div class="fight-actions">
+                            <p style="margin:0 0 5px 0; color:#var(--codm-yellow); font-size:0.7rem;">ADMINISTRATION DU MATCH</p>
+                            <button class="btn-win" onclick="window.declareWinner('${fightId}', '${fight.challengerUid}', '${fight.opponentUid}')">Vainqueur: ${fight.challengerName}</button>
+                            <button class="btn-win" onclick="window.declareWinner('${fightId}', '${fight.opponentUid}', '${fight.challengerUid}')">Vainqueur: ${fight.opponentName}</button>
+                            <button class="btn-win" style="border-color:red; color:red;" onclick="window.cancelMatch('${fightId}')">Annuler</button>
+                        </div>
+                    `;
+                }
+
+                fightsHtml += `
+                    <div class="fight-card">
+                        <div class="fight-header">FIGHT NIGHT • 1V1 RANKED</div>
+                        <div class="fighters-split">
+                            <div class="fighter fighter-left">
+                                <div class="fighter-name">${fight.challengerName}</div>
+                                <div class="fighter-stats">CHALLENGER</div>
+                            </div>
+                            <div class="vs-logo">VS</div>
+                            <div class="fighter fighter-right">
+                                <div class="fighter-name">${fight.opponentName}</div>
+                                <div class="fighter-stats">OPPONENT</div>
+                            </div>
+                        </div>
+                        ${adminControls}
+                    </div>
+                `;
+            });
+
+            fightsContainer.innerHTML = fightsHtml;
+        }
+
+        // --- 3. ACTIONS (CHALLENGE & ADMIN) ---
+        
+        window.openChallengeModal = () => {
+            document.getElementById('challengeModal').style.display = 'flex'; // Centré grâce au CSS du modal
+        };
+
+        window.createChallenge = async () => {
+            const targetUid = opponentSelect.value;
+            if (!targetUid) return alert("Sélectionne un adversaire !");
+
+            // Récupérer les pseudos
+            const challengerName = allUsersData.find(u => u.uid === currentUser.uid).pseudo;
+            const opponentName = allUsersData.find(u => u.uid === targetUid).pseudo;
+
+            try {
+                await addDoc(collection(db, "challenges"), {
+                    challengerUid: currentUser.uid,
+                    challengerName: challengerName,
+                    opponentUid: targetUid,
+                    opponentName: opponentName,
+                    status: 'pending',
+                    timestamp: new Date()
+                });
+                alert("DÉFI LANCÉ ! Prépare tes armes.");
+                document.getElementById('challengeModal').style.display = 'none';
+                loadActiveFights(); // Refresh
+            } catch (e) {
+                console.error(e);
+                alert("Erreur lors de la création du défi.");
+            }
+        };
+
+        // Fonction Admin : Déclarer vainqueur
+        window.declareWinner = async (fightId, winnerUid, loserUid) => {
+            if(!confirm("Confirmer le résultat ? Cette action est irréversible.")) return;
+
+            try {
+                // 1. Update Winner
+                const winnerRef = doc(db, "users", winnerUid);
+                await updateDoc(winnerRef, {
+                    oneVsOneWins: increment(1)
+                });
+
+                // 2. Update Loser
+                const loserRef = doc(db, "users", loserUid);
+                await updateDoc(loserRef, {
+                    oneVsOneLosses: increment(1)
+                });
+
+                // 3. Delete Fight Card
+                await deleteDoc(doc(db, "challenges", fightId));
+
+                alert("Résultat enregistré. Classement mis à jour.");
+                loadActiveFights();
+                loadUsersAndLadder();
+
+            } catch (e) {
+                console.error("Erreur validation match:", e);
+                alert("Erreur validation.");
+            }
+        };
+
+        // Fonction Admin : Annuler
+        window.cancelMatch = async (fightId) => {
+            if(!confirm("Supprimer ce combat sans score ?")) return;
+            await deleteDoc(doc(db, "challenges", fightId));
+            loadActiveFights();
+        };
+
+    </script>
+
+    <script>
+        (function(){
+            const btn = document.getElementById('hamburgerMenu');
+            const hub = document.getElementById('mobileHub');
+            const backdrop = document.getElementById('mobileHubBackdrop');
+            if (btn && hub && backdrop) {
+                const close = () => { hub.classList.remove('open'); backdrop.classList.remove('visible'); btn.setAttribute('aria-expanded','false'); };
+                btn.addEventListener('click', () => { 
+                    if(hub.classList.contains('open')) close(); 
+                    else { hub.classList.add('open'); backdrop.classList.add('visible'); btn.setAttribute('aria-expanded','true'); }
+                });
+                backdrop.addEventListener('click', close);
+            }
+        })();
+    </script>
+</body>
+</html>

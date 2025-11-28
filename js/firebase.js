@@ -1,6 +1,9 @@
+// firebase.js (VERSION CORRIGÉE pour 1v1)
+
 // 1. On importe les outils Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
 import { 
     getFirestore, 
     doc, 
@@ -11,18 +14,22 @@ import {
     query, 
     where, 
     getDocs,
-    // AJOUTEZ arrayUnion ici :
-    arrayUnion // NOUVEAU pour les badges
+    // --- NOUVEAUX IMPORTS POUR 1V1 ---
+    addDoc,       // Pour créer un nouveau défi
+    deleteDoc,    // Pour supprimer un défi après validation
+    increment,    // Pour augmenter les scores de +1
+    // ---------------------------------
+    arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // 2. TA CONFIGURATION (Utilise ta vraie configuration ici !)
 const firebaseConfig = {
-  apiKey: "AIzaSyDmB93XV2HP54I5tiHfd02wDoa0F10qwKg",
-  authDomain: "circled-fight-app.firebaseapp.com",
-  projectId: "circled-fight-app",
-  storageBucket: "circled-fight-app.firebasestorage.app",
-  messagingSenderId: "978955769876",
-  appId: "1:978955769876:web:cfa51bdb651e06756d6f01"
+    apiKey: "AIzaSyDmB93XV2HP54I5tiHfd02wDoa0F10qwKg",
+    authDomain: "circled-fight-app.firebaseapp.com",
+    projectId: "circled-fight-app",
+    storageBucket: "circled-fight-app.firebasestorage.app",
+    messagingSenderId: "978955769876",
+    appId: "1:978955769876:web:cfa51bdb651e06756d6f01"
 };
 
 // 3. On lance Firebase
@@ -44,6 +51,10 @@ export {
     getDocs,
     onAuthStateChanged, 
     signOut,
-    // EXPORTE arrayUnion :
+    // --- NOUVEAUX EXPORTS POUR 1V1 ---
+    addDoc,       
+    deleteDoc,    
+    increment,
+    // ---------------------------------
     arrayUnion
 };

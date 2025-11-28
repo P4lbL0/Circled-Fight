@@ -14,7 +14,7 @@ export const rawData = [
     { name: "Black",     scores: [null, 13, null, null, null, null, null] },
     { name: "Excentrizc",scores: [null, null, null, 28, 21, null, null] },
     { name: "Seong",     scores: [null, null, null, 16, 15, null, null] },
-    { name: "Gabriel",   scores: [null, null, null, 16, 15, 11, null] },
+    { name: "Oscar",     scores: [null, null, null, 16, 15, 11, null] },
     { name: "Lucas",     scores: [null, null, null, null, 40, null, null] },
     { name: "Manu",      scores: [null, null, null, null, 15, 11, null] },
     { name: "Angel",     scores: [null, null, null, null, null, 61, 17] },

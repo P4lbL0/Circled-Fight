@@ -2,7 +2,7 @@ export const weeks = ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10
 
 export let rawData = [
     { name: "Dorian", scores: [63, null, null, null, null, 44, null, null, 50.5, 72, null, null, 54.5] },
-    { name: "Angelos", scores: [58, 57, 57, 70, 55, 64, 70.5, 61.5, 68.5, 68, 91, 74.5, 69.5] },
+    { name: "Angelos", scores: [62, 60  , 60, 70, 65, 64, 70.5, 61.5, 68.5, 68, 91, 74.5, 69.5] },
     { name: "Ghost", scores: [57, 69, 67, 49, 30, 52, 56.5, 51.5, 55.5, 64.5, 74, 68.5, 88.5] },
     { name: "Gaspard", scores: [36, null, null, 33, 21, null, null, null, null, null, null, null, null] },
     { name: "Paul", scores: [31, null, 23, 32, 28, 25, 29, 20.5, null, null, 31.5, 24.5, null] },
