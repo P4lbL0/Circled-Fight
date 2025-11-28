@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique | Circled Fight</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/members.css"> <style>
+        body { background-color: #050505; color: white; display: flex; flex-direction: column; min-height: 100vh; }
+        .coming-soon-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+        .lock-icon-large { font-size: 4rem; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--codm-yellow)); }
+        h2 { font-family: 'Orbitron'; font-size: 2.5rem; color: white; margin: 0; }
+        p { font-family: 'Rajdhani'; color: #888; font-size: 1.2rem; max-width: 600px; margin-top: 10px; }
+        .progress-bar {
+            width: 300px; height: 4px; background: #333; margin-top: 30px; border-radius: 2px; position: relative; overflow: hidden;
+        }
+        .progress-fill {
+            position: absolute; left: 0; top: 0; height: 100%; width: 50%; /* 50% Loading */
+            background: var(--codm-yellow);
+            box-shadow: 0 0 10px var(--codm-yellow);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="logo-container">
+            <h1>Circled Fight <span class="tag">CF</span></h1>
+        </div>
+        <button id="hamburgerMenu" class="hamburger-menu" aria-label="Menu">☰</button>
+        <nav id="mobileHub" class="mobile-hub">
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="members.html">Membres du Clan</a></li>
+                <li><a href="dashboard.html">Scores MJ</a></li>
+                <li><a href="br_dashboard.html">Scores BR</a></li>
+                <li><a href="paris.html">Espace Paris</a></li>
+                <li><a href="tournament.html">Tournoi du Week-end</a></li>
+                <li><a href="1v1.html">1v1</a></li>
+                <li><a href="boutique.html" style="color:var(--codm-yellow);">Boutique</a></li>
+                <li><a href="join.html">Nous Rejoindre</a></li>
+            </ul>
+        </nav>
+        <div id="mobileHubBackdrop" class="mobile-hub-backdrop"></div>
+    </header>
+
+    <main class="coming-soon-container">
+        <div class="lock-icon-large">🔒</div>
+        <h2>BOUTIQUE <span style="color:var(--codm-yellow)">PROCHAINEMENT</span></h2>
+        <p>L'armurerie est en cours de construction. Préparez vos CF Points pour des skins de profil exclusifs, des badges et des avantages.</p>
+        
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        <div style="font-family: 'Orbitron'; font-size: 0.8rem; color: #666; margin-top: 10px;">DEV PROGRESS: 45%</div>
+    </main>
+
+    <script>
+        // Script Menu Mobile
+        (function(){
+            const btn = document.getElementById('hamburgerMenu');
+            const hub = document.getElementById('mobileHub');
+            const backdrop = document.getElementById('mobileHubBackdrop');
+            if (btn && hub && backdrop) {
+                const close = () => { hub.classList.remove('open'); backdrop.classList.remove('visible'); btn.setAttribute('aria-expanded','false'); };
+                btn.addEventListener('click', () => { 
+                    if(hub.classList.contains('open')) close(); 
+                    else { hub.classList.add('open'); backdrop.classList.add('visible'); btn.setAttribute('aria-expanded','true'); }
+                });
+                backdrop.addEventListener('click', close);
+            }
+        })();
+    </script>
+</body>
+</html>

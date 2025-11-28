@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recrutement | Circled Fight</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/members.css"> <style>
+        body { background-color: #0b0b0b; }
+        .form-container {
+            max-width: 600px; margin: 40px auto; padding: 20px;
+            background: #141414; border: 1px solid #333; border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .section-title { text-align: center; color: white; margin-bottom: 30px; font-family: 'Orbitron'; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; color: var(--codm-yellow); font-family: 'Orbitron'; font-size: 0.9rem; margin-bottom: 8px; }
+        input, select {
+            width: 100%; padding: 12px; background: #080808; border: 1px solid #444; color: white;
+            font-family: 'Rajdhani'; font-size: 1.1rem; border-radius: 4px; box-sizing: border-box;
+        }
+        input:focus, select:focus { border-color: var(--codm-yellow); outline: none; }
+        
+        .btn-submit {
+            width: 100%; padding: 15px; background: var(--codm-yellow); color: black;
+            border: none; font-family: 'Orbitron'; font-weight: bold; font-size: 1.2rem;
+            cursor: pointer; margin-top: 10px; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+        .btn-submit:hover { background: white; }
+        
+        .success-box { background: rgba(76, 175, 80, 0.1); border: 1px solid #4CAF50; color: #4CAF50; padding: 15px; text-align: center; display: none; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="logo-container"><h1>Circled Fight <span class="tag">CF</span></h1></div>
+        <button id="hamburgerMenu" class="hamburger-menu">☰</button>
+        <nav id="mobileHub" class="mobile-hub">
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="members.html">Membres du Clan</a></li>
+                <li><a href="join.html">Nous Rejoindre</a></li>
+            </ul>
+        </nav>
+        <div id="mobileHubBackdrop" class="mobile-hub-backdrop"></div>
+    </header>
+
+    <main style="padding-top: 80px;">
+        <div class="form-container">
+            <h2 class="section-title">FORMULAIRE D'ENRÔLEMENT</h2>
+            
+            <div id="successMsg" class="success-box">
+                ✅ CANDIDATURE ENVOYÉE !<br>Un officier examinera ton dossier.
+            </div>
+
+            <form id="recruitmentForm">
+                <div class="form-group">
+                    <label>PRÉNOM / PSEUDO</label>
+                    <input type="text" id="prenom" placeholder="Ton prénom ou pseudo..." required>
+                </div>
+
+                <div class="form-group">
+                    <label>UID (ID DU JEU)</label>
+                    <input type="text" id="uidGame" placeholder="Copie ton UID ici..." required>
+                </div>
+
+                <div class="form-group">
+                    <label>ÂGE</label>
+                    <input type="number" id="age" placeholder="Ton âge..." required min="10" max="99">
+                </div>
+
+                <div class="form-group">
+                    <label>MODE PRÉFÉRÉ</label>
+                    <select id="modePref" required>
+                        <option value="">Choisir...</option>
+                        <option value="Multi">Multijoueur (MJ)</option>
+                        <option value="BR">Battle Royale (BR)</option>
+                        <option value="Aucun">Aucun des deux</option>
+                        <option value="Les deux">Les deux</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>PARTICIPATION TOURNOIS</label>
+                    <select id="tournoiFreq" required>
+                        <option value="">Choisir...</option>
+                        <option value="Semaine">Oui, toutes les semaines</option>
+                        <option value="Rarement">Rarement</option>
+                        <option value="Jamais">Jamais</option>
+                        <option value="MJ Only">Seulement MJ</option>
+                        <option value="BR Only">Seulement BR</option>
+                        <option value="Les deux">Les deux</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-submit">ENVOYER LE DOSSIER</button>
+            </form>
+        </div>
+    </main>
+
+    <script type="module">
+        import { db, collection, addDoc } from './js/firebase.js';
+
+        // Script Menu Mobile
+        const btn = document.getElementById('hamburgerMenu');
+        const hub = document.getElementById('mobileHub');
+        const backdrop = document.getElementById('mobileHubBackdrop');
+        if (btn && hub && backdrop) {
+            const close = () => { hub.classList.remove('open'); backdrop.classList.remove('visible'); btn.setAttribute('aria-expanded','false'); };
+            btn.addEventListener('click', () => { 
+                if(hub.classList.contains('open')) close(); 
+                else { hub.classList.add('open'); backdrop.classList.add('visible'); btn.setAttribute('aria-expanded','true'); }
+            });
+            backdrop.addEventListener('click', close);
+        }
+
+        // Gestion du Formulaire
+        const form = document.getElementById('recruitmentForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.querySelector('.btn-submit');
+            btn.innerText = "ENVOI EN COURS...";
+            btn.disabled = true;
+
+            const data = {
+                prenom: document.getElementById('prenom').value,
+                uidGame: document.getElementById('uidGame').value,
+                age: document.getElementById('age').value,
+                mode: document.getElementById('modePref').value,
+                tournoi: document.getElementById('tournoiFreq').value,
+                date: new Date().toISOString()
+            };
+
+            try {
+                // Envoi dans la collection "recruitment"
+                await addDoc(collection(db, "recruitment"), data);
+                
+                document.getElementById('successMsg').style.display = 'block';
+                form.reset();
+                btn.innerText = "DOSSIER ENVOYÉ";
+            } catch (err) {
+                console.error("Erreur", err);
+                alert("Erreur lors de l'envoi. Vérifie ta connexion.");
+                btn.innerText = "RÉESSAYER";
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

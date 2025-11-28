@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Importation Données 1v1 | Admin</title>
+    <title>Admin Dashboard | Circled Fight</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #111; color: white; font-family: 'Rajdhani'; padding: 20px; }
-        h1 { color: #ffc107; text-align: center; }
+        body { background: #111; color: white; font-family: 'Rajdhani'; padding: 20px; max-width: 1000px; margin: 0 auto; }
+        h1 { color: #ffc107; text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-top: 40px; }
+        
+        /* Style 1v1 */
         .user-row {
             display: flex; align-items: center; justify-content: space-between;
             background: #222; padding: 10px; margin-bottom: 10px; border: 1px solid #333;
@@ -15,26 +17,58 @@
         .user-name { flex: 1; font-weight: bold; font-size: 1.2rem; }
         .input-group { display: flex; gap: 10px; align-items: center; }
         input { width: 60px; padding: 5px; background: #000; color: white; border: 1px solid #555; text-align: center; }
+        
+        /* Style Recrutement */
+        .recruitment-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .recruitment-table th { background: #ffc107; color: black; padding: 10px; text-align: left; }
+        .recruitment-table td { background: #222; border-bottom: 1px solid #333; padding: 10px; font-size: 0.95rem; }
+        .recruitment-table tr:hover td { background: #333; }
+        
         button { background: #ffc107; border: none; padding: 5px 15px; font-weight: bold; cursor: pointer; }
         button:hover { background: white; }
+        .btn-delete { background: #d32f2f; color: white; padding: 5px 10px; }
     </style>
 </head>
 <body>
 
     <h1>OUTIL D'IMPORTATION 1V1</h1>
     <p style="text-align:center; color:#888;">Modifie directement les stats Win/Loss des joueurs.</p>
+    <div id="listContainer">Chargement 1v1...</div>
+
+    <h1 style="margin-top: 60px;">CANDIDATURES (RECRUTEMENT)</h1>
+    <p style="text-align:center; color:#888;">Liste des formulaires envoyés.</p>
     
-    <div id="listContainer">Chargement...</div>
+    <table class="recruitment-table">
+        <thead>
+            <tr>
+                <th>Prénom/Pseudo</th>
+                <th>UID</th>
+                <th>Age</th>
+                <th>Mode</th>
+                <th>Tournois</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="recruitmentBody">
+            <tr><td colspan="6" style="text-align:center;">Chargement...</td></tr>
+        </tbody>
+    </table>
 
     <script type="module">
-        import { auth, db, collection, getDocs, doc, updateDoc, onAuthStateChanged } from './js/firebase.js';
+        import { auth, db, collection, getDocs, doc, updateDoc, deleteDoc, onAuthStateChanged } from './js/firebase.js';
 
         const listContainer = document.getElementById('listContainer');
+        const recruitmentBody = document.getElementById('recruitmentBody');
 
         onAuthStateChanged(auth, async (user) => {
-            if (!user) return window.location.href = "login.html"; // Sécurité
+            if (!user) return window.location.href = "login.html"; // Sécurité de base
             
-            // On charge tous les users
+            await load1v1Stats();
+            await loadRecruitment();
+        });
+
+        // --- 1. CHARGEMENT STATS 1V1 ---
+        async function load1v1Stats() {
             const snap = await getDocs(collection(db, "users"));
             let html = '';
 
@@ -50,28 +84,58 @@
                             <input type="number" id="w-${d.id}" value="${u.oneVsOneWins || 0}">
                             <label>Loss:</label>
                             <input type="number" id="l-${d.id}" value="${u.oneVsOneLosses || 0}">
-                            <button onclick="window.saveStats('${d.id}')">SAUVEGARDER</button>
+                            <button onclick="window.saveStats('${d.id}')">SAVE</button>
                         </div>
                     </div>
                 `;
             });
             listContainer.innerHTML = html;
-        });
+        }
 
+        // --- 2. CHARGEMENT RECRUTEMENT ---
+        async function loadRecruitment() {
+            const snap = await getDocs(collection(db, "recruitment"));
+            let html = '';
+
+            if(snap.empty) {
+                recruitmentBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#666;">Aucune candidature en attente.</td></tr>';
+                return;
+            }
+
+            snap.forEach(d => {
+                const r = d.data();
+                html += `
+                    <tr>
+                        <td style="color:var(--codm-yellow); font-weight:bold;">${r.prenom}</td>
+                        <td style="font-family:monospace; color:#ccc;">${r.uidGame}</td>
+                        <td>${r.age}</td>
+                        <td>${r.mode}</td>
+                        <td>${r.tournoi}</td>
+                        <td>
+                            <button class="btn-delete" onclick="window.deleteRecruitment('${d.id}')">SUPPR</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            recruitmentBody.innerHTML = html;
+        }
+
+        // --- ACTIONS ---
         window.saveStats = async (uid) => {
             const w = parseInt(document.getElementById(`w-${uid}`).value);
             const l = parseInt(document.getElementById(`l-${uid}`).value);
-
             try {
-                await updateDoc(doc(db, "users", uid), {
-                    oneVsOneWins: w,
-                    oneVsOneLosses: l
-                });
+                await updateDoc(doc(db, "users", uid), { oneVsOneWins: w, oneVsOneLosses: l });
                 alert("Sauvegardé !");
-            } catch (e) {
-                console.error(e);
-                alert("Erreur");
-            }
+            } catch (e) { console.error(e); alert("Erreur"); }
+        };
+
+        window.deleteRecruitment = async (docId) => {
+            if(!confirm("Supprimer cette candidature ?")) return;
+            try {
+                await deleteDoc(doc(db, "recruitment", docId));
+                loadRecruitment(); // Recharger la liste
+            } catch (e) { console.error(e); alert("Erreur suppression"); }
         };
     </script>
 </body>
