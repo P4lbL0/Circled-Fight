@@ -2,7 +2,7 @@ export const weeks = ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10
 
 export let rawData = [
     { name: "Dorian", scores: [63, null, null, null, null, 44, null, null, 50.5, 72, null, null, 54.5, null] },
-    { name: "Angelos", scores: [62, 60  , 60, 70, 65, 64, 70.5, 61.5, 68.5, 68, 91, 74.5, 69.5, 68,5] },
+    { name: "Angelos", scores: [62, 60, 60, 70, 65, 64, 70.5, 61.5, 68.5, 68, 91, 74.5, 69.5, 68.5] },
     { name: "Ghost", scores: [57, 69, 67, 49, 30, 52, 56.5, 51.5, 55.5, 64.5, 74, 68.5, 88.5, 74] },
     { name: "Gaspard", scores: [36, null, null, 33, 21, null, null, null, null, null, null, null, null, null] },
     { name: "Paul", scores: [31, null, 23, 32, 28, 25, 29, 20.5, null, null, 31.5, 24.5, null, 24] },
@@ -18,7 +18,7 @@ export let rawData = [
     { name: "Oxy", scores: [null, null, null, null, null, null, null, null, null, 41.5, null, null, null, null] },
     { name: "Iassonas", scores: [null, null, null, null, null, null, null, null, null, 19, 25, null, 34.5, 17] },
     { name: "Myem", scores: [null, null, null, null, null, null, null, null, null, null, 44, null, null, null] },
-    { name: "Excentrizc", scores: [null, null, null, null, null, null, null, null, null, null, 26.5, 42, null, 39,5] },
+    { name: "Excentrizc", scores: [null, null, null, null, null, null, null, null, null, null, 26.5, 42, null, 39.5] },
     { name: "Gabriel", scores: [null, null, null, null, null, null, null, null, null, null, null, 39.5, 36, null] },
     { name: "Silence", scores: [null, null, null, null, null, null, null, null, null, null, null, null, 75.5, 90] },
     { name: "Seveun", scores:    [null, null, null, null, null, null, null, null, null, null, null, null, 41, null] },
