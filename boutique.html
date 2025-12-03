@@ -5,79 +5,370 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boutique | Circled Fight</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/members.css"> <style>
-        body { background-color: #050505; color: white; display: flex; flex-direction: column; min-height: 100vh; }
-        .coming-soon-container {
-            flex: 1;
+    <link rel="stylesheet" href="css/members.css"> 
+    
+    <style>
+        body { background-color: #050505; color: #e0e0e0; min-height: 100vh; display: block; }
+        
+        /* BARRE UTILISATEUR (Sticky Top) */
+        .user-wallet-bar {
+            background: rgba(20, 20, 20, 0.95);
+            border-bottom: 1px solid #333;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .wallet-info { font-family: 'Orbitron'; font-size: 1.1rem; }
+        .cf-amount { color: var(--codm-yellow); font-weight: bold; font-size: 1.3rem; margin-left: 5px; }
+
+        /* GRID BOUTIQUE */
+        .shop-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            padding-bottom: 80px;
+        }
+        .shop-title {
+            text-align: center; font-family: 'Orbitron'; margin-bottom: 30px;
+            font-size: 2rem; color: white; text-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+        }
+        
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* CARTE ARTICLE */
+        .item-card {
+            background: #121212;
+            border: 1px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
         }
-        .lock-icon-large { font-size: 4rem; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--codm-yellow)); }
-        h2 { font-family: 'Orbitron'; font-size: 2.5rem; color: white; margin: 0; }
-        p { font-family: 'Rajdhani'; color: #888; font-size: 1.2rem; max-width: 600px; margin-top: 10px; }
-        .progress-bar {
-            width: 300px; height: 4px; background: #333; margin-top: 30px; border-radius: 2px; position: relative; overflow: hidden;
+        .item-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--codm-yellow);
+            box-shadow: 0 0 20px rgba(255, 193, 7, 0.15);
         }
-        .progress-fill {
-            position: absolute; left: 0; top: 0; height: 100%; width: 50%; /* 50% Loading */
+        .item-icon {
+            height: 120px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3.5rem;
+            border-bottom: 1px solid #222;
+        }
+        .item-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+        .item-title { font-family: 'Orbitron'; font-size: 1.1rem; color: white; margin: 0 0 10px 0; }
+        .item-desc { font-family: 'Rajdhani'; color: #888; font-size: 0.95rem; line-height: 1.4; flex: 1; margin-bottom: 15px; }
+        .item-limit { font-size: 0.75rem; color: #555; text-transform: uppercase; margin-bottom: 10px; font-weight: bold; }
+        
+        .price-tag {
+            font-family: 'Orbitron';
+            font-size: 1.2rem;
+            color: var(--codm-yellow);
+            text-align: right;
+            margin-bottom: 15px;
+        }
+
+        .btn-buy {
             background: var(--codm-yellow);
-            box-shadow: 0 0 10px var(--codm-yellow);
+            color: black;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            font-family: 'Orbitron';
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+        .btn-buy:hover { background: #ffca28; box-shadow: 0 0 10px var(--codm-yellow); }
+        .btn-buy:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
+
+        /* LOADING & MODAL */
+        #loader { text-align: center; padding: 50px; color: #666; font-family: 'Orbitron'; }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #111; border: 1px solid var(--codm-yellow); color: white;
+            padding: 15px 30px; border-radius: 50px; z-index: 1000;
+            font-family: 'Orbitron'; display: none; box-shadow: 0 0 20px rgba(0,0,0,0.8);
         }
     </style>
 </head>
 <body>
 
     <header class="main-header">
-        <div class="logo-container">
-            <h1>Circled Fight <span class="tag">CF</span></h1>
-        </div>
-        <button id="hamburgerMenu" class="hamburger-menu" aria-label="Menu">☰</button>
+        <div class="logo-container"><h1>Circled Fight <span class="tag">CF</span></h1></div>
+        <button id="hamburgerMenu" class="hamburger-menu">☰</button>
         <nav id="mobileHub" class="mobile-hub">
             <ul>
                 <li><a href="index.html">Accueil</a></li>
-                <li><a href="members.html">Membres du Clan</a></li>
+                <li><a href="members.html">Membres</a></li>
                 <li><a href="dashboard.html">Scores MJ</a></li>
-                <li><a href="br_dashboard.html">Scores BR</a></li>
-                <li><a href="paris.html">Espace Paris</a></li>
-                <li><a href="tournament.html">Tournoi du Week-end</a></li>
-                <li><a href="1v1.html">1v1</a></li>
-                <li><a href="boutique.html" style="color:var(--codm-yellow);">Boutique</a></li>
-                <li><a href="join.html">Nous Rejoindre</a></li>
+                <li><a href="boutique.html" style="color:var(--codm-yellow)">Boutique</a></li>
             </ul>
         </nav>
         <div id="mobileHubBackdrop" class="mobile-hub-backdrop"></div>
     </header>
 
-    <main class="coming-soon-container">
-        <div class="lock-icon-large">🔒</div>
-        <h2>BOUTIQUE <span style="color:var(--codm-yellow)">PROCHAINEMENT</span></h2>
-        <p>L'armurerie est en cours de construction. Préparez vos CF Points pour des skins de profil exclusifs, des badges et des avantages.</p>
-        
-        <div class="progress-bar">
-            <div class="progress-fill"></div>
+    <div class="user-wallet-bar">
+        <div class="wallet-info">
+            <span id="userPseudo">...</span>
         </div>
-        <div style="font-family: 'Orbitron'; font-size: 0.8rem; color: #666; margin-top: 10px;">DEV PROGRESS: 45%</div>
+        <div class="wallet-info">
+            SOLDE: <span class="cf-amount" id="userPoints">---</span> <span style="font-size:0.7em">CF</span>
+        </div>
+    </div>
+
+    <main class="shop-container">
+        <h2 class="shop-title">BOUTIQUE DU CLAN</h2>
+        
+        <div id="loader">Chargement du catalogue...</div>
+        <div id="shopGrid" class="items-grid" style="display: none;">
+            </div>
     </main>
 
-    <script>
-        // Script Menu Mobile
-        (function(){
+    <div id="toast" class="toast">✅ Achat effectué avec succès !</div>
+
+    <script type="module">
+    import { auth, db, doc, getDoc, addDoc, updateDoc, collection, onAuthStateChanged, increment, arrayUnion } from './js/firebase.js';
+
+    let currentUser = null;
+    let currentPoints = 0;
+    // Ajout du tableau pour stocker les IDs des articles possédés
+    let ownedItems = []; 
+
+    // --- CATALOGUE DES ARTICLES ---
+    // --- CATALOGUE DES ARTICLES COMPLET ---
+    const items = [
+        
+        {
+            id: "rename_card",
+            name: "Carte Changement Nom",
+            price: 1000,
+            icon: "🏷️",
+            desc: "Permet de renommer une de vos armes favorites.",
+            limit: "Limite: 5 / Personne"
+        },
+        {
+            id: "force_weapon_night",
+            name: "Arme Imposée (Soirée)",
+            price: 1000,
+            icon: "🎲",
+            desc: "La victime doit jouer UNIQUEMENT l'arme de votre choix en classé toute la soirée.",
+            limit: "Valable 1 Soirée"
+        },
+        {
+            id: "pass_combat",
+            name: "Passe de Combat",
+            price: 10000,
+            icon: "🎟️",
+            desc: "Débloque l'accès aux récompenses premium de la saison en cours.",
+            limit: "Limite: 1 / Personne",
+            isUnique: true
+        },
+        {
+            id: "force_rename_other",
+            name: "Rename Forcé (Cible)",
+            price: 10000,
+            icon: "🃏",
+            desc: "Changez le pseudo de n'importe quel membre (Troll autorisé, validé par Admin).",
+            limit: "Fun / Vengeance"
+        },
+        {
+            id: "force_top_arme",
+            name: "Forcer Top Arme",
+            price: 50000,
+            icon: "🎯",
+            desc: "Oblige un membre à grind un Top Arme (doit être atteignable/réaliste).",
+            limit: "Défi Majeur"
+        },
+        {
+            id: "exil_card",
+            name: "Droit d'Exil (1 Semaine)",
+            price: 100000,
+            icon: "🔨",
+            desc: "Exclut un membre des tournois et du clan pendant 7 jours.",
+            limit: "⚠️ Usage Stratégique"
+        },
+        {
+            id: "chef_upgrade",
+            name: "Upgrade Chef de Clan",
+            price: 9999999999999998,
+            icon: "👑",
+            desc: "Prenez le contrôle total du clan.",
+            limit: "Unique",
+            isUnique: true
+        }
+    ];
+
+    // --- 1. AUTH & CHARGEMENT ---
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUser = user;
+            await refreshUserData();
+            renderShop();
+            
+            // Logique Menu Mobile...
             const btn = document.getElementById('hamburgerMenu');
             const hub = document.getElementById('mobileHub');
-            const backdrop = document.getElementById('mobileHubBackdrop');
-            if (btn && hub && backdrop) {
-                const close = () => { hub.classList.remove('open'); backdrop.classList.remove('visible'); btn.setAttribute('aria-expanded','false'); };
-                btn.addEventListener('click', () => { 
-                    if(hub.classList.contains('open')) close(); 
-                    else { hub.classList.add('open'); backdrop.classList.add('visible'); btn.setAttribute('aria-expanded','true'); }
-                });
-                backdrop.addEventListener('click', close);
+            const bd = document.getElementById('mobileHubBackdrop');
+            const toggle = () => { hub.classList.toggle('open'); bd.classList.toggle('visible'); };
+            btn.onclick = toggle; bd.onclick = toggle;
+
+        } else {
+            window.location.href = "index.html";
+        }
+    });
+
+    async function refreshUserData() {
+        const snap = await getDoc(doc(db, "users", currentUser.uid));
+        if (snap.exists()) {
+            const data = snap.data();
+            currentPoints = data.cfPoints || 0;
+            // Récupère la liste des items déjà achetés
+            ownedItems = data.ownedItems || []; 
+            
+            document.getElementById('userPseudo').innerText = (data.pseudo || "Soldat").toUpperCase();
+            document.getElementById('userPoints').innerText = currentPoints.toLocaleString();
+            updateButtonsState();
+        }
+    }
+
+    // --- 2. RENDU HTML (Inchangé) ---
+    function renderShop() {
+        const grid = document.getElementById('shopGrid');
+        document.getElementById('loader').style.display = 'none';
+        grid.style.display = 'grid';
+        grid.innerHTML = '';
+
+        items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'item-card';
+            
+            // Mise à jour du contenu pour utiliser la classe 'item-limit' mise à jour
+            card.innerHTML = `
+                <div class="item-icon">${item.icon}</div>
+                <div class="item-body">
+                    <h3 class="item-title">${item.name}</h3>
+                    <div class="item-desc">${item.desc}</div>
+                    <div class="item-limit">${item.limit}</div>
+                    <div class="price-tag">${item.price.toLocaleString()} CF</div>
+                    <button class="btn-buy" id="btn-${item.id}" onclick="buyItem('${item.id}')">
+                        ACHETER
+                    </button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+        updateButtonsState();
+    }
+
+    // --- MISE À JOUR DE L'ÉTAT DES BOUTONS ---
+    function updateButtonsState() {
+        items.forEach(item => {
+            const btn = document.getElementById(`btn-${item.id}`);
+            if(btn) {
+                // 1. VÉRIFICATION : Article unique déjà possédé ?
+                const isOwnedUnique = item.isUnique && ownedItems.includes(item.id);
+
+                if (isOwnedUnique) {
+                    btn.disabled = true;
+                    btn.innerText = "Déjà Acheté";
+                    btn.style.backgroundColor = '#666'; // Couleur différente pour "Déjà Acheté"
+                } else if (currentPoints < item.price) {
+                    // 2. VÉRIFICATION : Fonds insuffisants ?
+                    btn.disabled = true;
+                    btn.innerText = "Fonds Insuffisants";
+                    btn.style.backgroundColor = '#333';
+                } else {
+                    // 3. Disponible à l'achat
+                    btn.disabled = false;
+                    btn.innerText = "ACHETER";
+                    btn.style.backgroundColor = 'var(--codm-yellow)';
+                }
             }
-        })();
-    </script>
+        });
+    }
+
+    // --- 3. LOGIQUE D'ACHAT (MODIFIÉE) ---
+    window.buyItem = async (itemId) => {
+        const item = items.find(i => i.id === itemId);
+        if (!item) return;
+
+        // Double vérification au cas où le bouton était actif mais les données anciennes
+        if (item.isUnique && ownedItems.includes(item.id)) {
+             alert(`Vous possédez déjà l'article : ${item.name}.`);
+             return;
+        }
+
+        if (!confirm(`Confirmer l'achat de "${item.name}" pour ${item.price.toLocaleString()} CF ?`)) return;
+
+        if (currentPoints < item.price) {
+            alert("Tu n'as pas assez de CF Points !");
+            return;
+        }
+
+        try {
+            const userRef = doc(db, "users", currentUser.uid);
+
+            // 1. Créer l'enregistrement de l'achat (POUR L'ADMIN)
+            await addDoc(collection(db, "purchases"), {
+                userId: currentUser.uid,
+                userPseudo: document.getElementById('userPseudo').innerText,
+                itemId: item.id,
+                itemName: item.name,
+                price: item.price,
+                status: 'pending',
+                timestamp: new Date().toISOString()
+            });
+
+            // 2. Retirer les points ET enregistrer l'article possédé si Unique
+            let updatePayload = {
+                cfPoints: increment(-item.price)
+            };
+            
+            if (item.isUnique) {
+                // Utiliser arrayUnion pour ajouter l'ID de l'item à la liste
+                updatePayload.ownedItems = arrayUnion(item.id);
+            }
+            
+            await updateDoc(userRef, updatePayload);
+
+
+            // 3. UI Feedback
+            showToast(`Achat réussi : ${item.name}`);
+            await refreshUserData(); // Rafraichir le solde et la liste des items possédés
+
+        } catch (e) {
+            console.error(e);
+            alert("Erreur lors de la transaction. Contactez Angelos.");
+        }
+    };
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = "✅ " + msg;
+        t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 3000);
+    }
+
+    // Expose function for HTML onclick
+    window.buyItem = buyItem;
+</script>
 </body>
 </html>

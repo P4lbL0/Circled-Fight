@@ -29,6 +29,7 @@ onAuthStateChanged(auth, (user) => {
         adminPanel.style.display = 'block';
         setupRankingSelects();
         loadMatches();
+        loadPurchases();
     } else {
         denied.style.display = 'block';
     }
@@ -230,10 +231,11 @@ function confirmSettleModal() {
 
 
 async function settleRankingMatch(matchId, finalRankingArray) {
-    if (!confirm("⚠️ ATTENTION : Cette action va payer les joueurs et est irréversible. Confirmer ?")) return;
+    if (!confirm("⚠️ ATTENTION : Cette action va payer les joueurs selon la logique COMBINÉ (Tout ou Rien). Confirmer ?")) return;
 
     try {
         // 1. Sauvegarder le résultat final dans le match
+        // finalRanking ressemble à : { "1": "Angelos", "2": "Ghost", ... }
         const finalRanking = finalRankingArray.reduce((acc, name, index) => {
             acc[index + 1] = name; 
             return acc;
@@ -257,31 +259,43 @@ async function settleRankingMatch(matchId, finalRankingArray) {
 
             const userPredictions = bet.prediction; 
             let totalGainForBet = 0;
-            
-            // Calcul des gains basé sur les cotes DANS LE TICKET (Historique)
+            let isWin = true; // On part du principe qu'il gagne, et on cherche l'erreur
+
+            // --- NOUVELLE LOGIQUE : COMBINÉ (Tout ou Rien) ---
             for (const predictedPlayer in userPredictions) {
                 const predictedRank = userPredictions[predictedPlayer];
-                const isCorrect = finalRanking[predictedRank] === predictedPlayer;
-
-                if (isCorrect) {
-                    // On récupère la cote qui était valide AU MOMENT DU PARI
-                    const cote = bet.odds[predictedPlayer][predictedRank];
-                    
-                    // Calcul au prorata de la mise (si pari combiné implicite ou split)
-                    // Dans ta logique actuelle, on divise la mise par le nombre de lignes
-                    const miseParLigne = bet.amount / Object.keys(userPredictions).length;
-                    
-                    totalGainForBet += Math.floor(miseParLigne * cote); 
+                
+                // Vérification : Est-ce que le joueur qui a fini à ce rang est bien celui prédit ?
+                // finalRanking[1] donne le nom du 1er. Si c'est différent de predictedPlayer, c'est perdu.
+                if (finalRanking[predictedRank] !== predictedPlayer) {
+                    isWin = false;
+                    break; // Une seule erreur suffit pour tout perdre
                 }
             }
-            
-            // Paiement
-            await updateDoc(betDoc.ref, { isSettled: true, gain: totalGainForBet });
 
+            if (isWin) {
+                // VICTOIRE ! On utilise la cote totale combinée stockée dans le ticket
+                // (bet.totalOdd a été calculé dans paris.html par multiplication)
+                totalGainForBet = Math.floor(bet.amount * bet.totalOdd);
+            } else {
+                // DÉFAITE
+                totalGainForBet = 0;
+            }
+            // --------------------------------------------------
+            
+            // Mise à jour du pari (Historique)
+            await updateDoc(betDoc.ref, { 
+                isSettled: true, 
+                gain: totalGainForBet,
+                status: isWin ? 'won' : 'lost' // Utile pour l'affichage historique futur
+            });
+
+            // Paiement de l'utilisateur si gagnant
             if (totalGainForBet > 0) {
                  totalWinningsPaid += totalGainForBet;
                  const userRef = doc(db, "users", bet.userId);
                  const userSnap = await getDoc(userRef);
+                 
                  if (userSnap.exists()) {
                      const newPoints = userSnap.data().cfPoints + totalGainForBet;
                      await updateDoc(userRef, { cfPoints: newPoints });
@@ -298,6 +312,63 @@ async function settleRankingMatch(matchId, finalRankingArray) {
         alert("Erreur critique lors du paiement. Vérifiez la console.");
     }
 }
+async function loadPurchases() {
+    const listContainer = document.getElementById('purchasesList');
+    if (!listContainer) return; // Si l'élément n'existe pas dans le HTML admin, on arrête
+
+    listContainer.innerHTML = '<p style="color:#888;">Chargement des commandes...</p>';
+
+    // On récupère les achats (Idéalement triés par date, mais Firebase demande un index pour ça, donc on trie en JS)
+    const q = query(collection(db, "purchases")); 
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+        listContainer.innerHTML = '<p style="color:#666;">Aucune commande récente.</p>';
+        return;
+    }
+
+    let html = '<table style="width:100%; border-collapse: collapse; color:white; font-size:0.9rem;">';
+    html += '<tr style="background:#222; text-align:left;"><th style="padding:8px;">Date</th><th style="padding:8px;">Soldat</th><th style="padding:8px;">Article</th><th style="padding:8px;">Prix</th><th style="padding:8px;">Action</th></tr>';
+
+    // Tri JS du plus récent au plus ancien
+    const purchases = [];
+    snapshot.forEach(doc => purchases.push({ id: doc.id, ...doc.data() }));
+    purchases.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    purchases.forEach(p => {
+        const date = new Date(p.timestamp).toLocaleDateString() + ' ' + new Date(p.timestamp).toLocaleTimeString();
+        const style = p.status === 'completed' ? 'opacity:0.5; text-decoration:line-through;' : '';
+        
+        html += `
+            <tr style="border-bottom:1px solid #333; ${style}">
+                <td style="padding:8px; color:#888;">${date}</td>
+                <td style="padding:8px; color:var(--codm-yellow); font-weight:bold;">${p.userPseudo}</td>
+                <td style="padding:8px;">${p.itemName}</td>
+                <td style="padding:8px;">${p.price} CF</td>
+                <td style="padding:8px;">
+                    ${p.status === 'pending' 
+                        ? `<button onclick="markPurchaseDone('${p.id}')" style="background:green; border:none; color:white; padding:2px 6px; cursor:pointer;">TRAITER</button>` 
+                        : '✅ Fait'}
+                </td>
+            </tr>
+        `;
+    });
+    html += '</table>';
+    listContainer.innerHTML = html;
+}
+
+// Fonction pour marquer une commande comme traitée
+window.markPurchaseDone = async (purchaseId) => {
+    if(!confirm("Marquer cette commande comme livrée/traitée ?")) return;
+    try {
+        await updateDoc(doc(db, "purchases", purchaseId), { status: 'completed' });
+        loadPurchases(); // Rafraichir la liste
+    } catch(e) { console.error(e); }
+};
+
+// Ajoutez cet appel dans votre listener d'authentification existant (Ligne ~32 dans votre code actuel)
+// Juste après "loadMatches();" ajoutez :
+// loadPurchases();
 
 // Expose les fonctions globales
 window.loadMatches = loadMatches;

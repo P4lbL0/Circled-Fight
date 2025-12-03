@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dossier Agent | Circled Fight</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/members.css"> <style>
+        /* --- STYLES SPÉCIFIQUES PROFIL --- */
+        :root {
+            --bg-dark: #0a0a0a;
+            --panel-bg: #141414;
+            --accent: #ffc107;
+            --text-main: #e0e0e0;
+            --text-muted: #888;
+        }
+        .badge {
+            position: relative;
+            /* overflow: hidden; Désactivé pour les cadres */
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: default;
+            transition: all 0.3s ease;
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 4px;
+            z-index: 1;
+            vertical-align: middle;
+        }
+
+        /* --- COULEURS --- */
+        .badge-gold    { background: #ffc107; color: #000; }
+        .badge-red     { background: #d32f2f; color: #fff; }
+        .badge-blue    { background: #1976d2; color: #fff; }
+        .badge-green   { background: #388e3c; color: #fff; }
+        .badge-purple  { background: #7b1fa2; color: #fff; }
+        .badge-cyan    { background: #00bcd4; color: #000; }
+        .badge-pink    { background: #e91e63; color: #fff; }
+        .badge-orange  { background: #f57c00; color: #fff; }
+        .badge-lime    { background: #cddc39; color: #000; }
+        .badge-black   { background: #111; color: #fff; border-color: #444; }
+        
+        /* Matières Précieuses */
+        .badge-realgold {
+            background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7);
+            background-size: 200% 200%; color: #222; font-weight: 900; border: 1px solid #fff;
+            text-shadow: 0px 1px 0px rgba(255,255,255,0.4); animation: gradientMove 5s ease infinite;
+        }
+        .badge-realsilver {
+            background: linear-gradient(135deg, #e0e0e0, #ffffff, #a0a0a0, #e6e6e6);
+            background-size: 200% 200%; color: #333; font-weight: 900; border: 1px solid #fff;
+            text-shadow: 0px 1px 0px rgba(255,255,255,0.4); animation: gradientMove 6s ease infinite alternate;
+        }
+        .badge-realdiamond {
+             background: linear-gradient(135deg, #e1f5fe, #b3e5fc, #ffffff, #e1f5fe);
+             color: #01579b; font-weight: 900; border: 1px solid #81d4fa;
+             text-shadow: 0 0 10px rgba(255,255,255,0.9);
+             box-shadow: inset 0 0 10px rgba(255,255,255,0.8);
+             animation: diamondSparkle 4s infinite linear;
+        }
+        .badge-magma { background: linear-gradient(45deg, #b71c1c, #f57f17); color: #fff; }
+        .badge-obsidian { background: #000; color: #ccc; border: 1px solid #7c4dff; box-shadow: 0 0 5px rgba(124, 77, 255, 0.2); }
+
+        /* NOUVEAUTÉS FUN/MYTHIC */
+        .badge-pigeon { 
+            background: linear-gradient(180deg, #e0e0e0, #9e9e9e); 
+            color: #222; border: 1px solid #fff; 
+        }
+        .badge-clown {
+            background-image: radial-gradient(#ff0000 15%, transparent 16%), radial-gradient(#ffff00 15%, transparent 16%);
+            background-color: #fff;
+            background-position: 0 0, 8px 8px;
+            background-size: 16px 16px;
+            color: #000; font-weight: 900; text-shadow: 1px 1px 0 #fff;
+            border: 1px solid #ff0000;
+        }
+        .badge-galaxy {
+            background: linear-gradient(45deg, #673ab7, #3f51b5, #e91e63);
+            color: #fff;
+        }
+
+        /* --- EFFETS --- */
+        .effect-lightning-red { border-color: #ff0000 !important; box-shadow: 0 0 5px #f00, inset 0 0 5px #f00; animation: redShock 1.2s infinite alternate ease-in-out; }
+        @keyframes redShock { 0% { box-shadow: 0 0 2px #d32f2f, inset 0 0 2px #d32f2f; opacity: 0.8; } 100% { box-shadow: 0 0 15px #ff1744, inset 0 0 10px #ff1744; border-color: #ff5252 !important; opacity: 1; } }
+        
+        .effect-pulse { animation: pulseAnim 2s infinite; }
+        .effect-electric { animation: electricAnim 0.8s infinite; }
+        .effect-glitch { animation: glitchAnim 4s infinite; }
+        .effect-burn { box-shadow: 0 0 10px currentColor; animation: burnAnim 1.5s alternate infinite; }
+        .effect-holo {
+            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.4) 100%);
+            background-size: 200% 200%; animation: holoAnim 2s infinite linear; mix-blend-mode: hard-light;
+        }
+        @keyframes holoAnim { 0% { background-position: 0% 0%; } 100% { background-position: 200% 200%; } }
+
+        .badge[class*="effect-shine"] { overflow: hidden; }
+        .effect-shine::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shineAnim 3s infinite; }
+
+        /* --- CADRES --- */
+        .frame-elite { border: none; box-shadow: 0 0 0 2px #660505, 0 0 0 4px #6d0000; margin: 6px; }
+        .frame-cyber { border: 1px solid #00e5ff; box-shadow: 0 0 5px #00e5ff, inset 0 0 5px #00e5ff; border-radius: 0; clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10% ); }
+        .frame-hazard { border: 2px dashed #ffeb3b; background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.2), rgba(0,0,0,0.2) 5px, transparent 5px, transparent 10px); }
+        .frame-spectral { border: none; box-shadow: 0 0 10px 2px rgba(124, 77, 255, 0.6); animation: pulseAnim 3s infinite reverse; }
+        .frame-blood { border: 3px solid #6d0000; box-shadow: 0 0 15px #b71c1c, 0 0 5px #ff5252 inset; border-radius: 8px; animation: pulseBlood 2s infinite alternate; }
+        
+        /* Cadres Fun/Mythic */
+        .frame-wings { border: none; box-shadow: 0 0 0 2px #fff; margin: 0 12px; }
+        .frame-wings::before, .frame-wings::after { content: '🪶'; position: absolute; top: 50%; transform: translateY(-50%); font-size: 14px; }
+        .frame-wings::before { left: -14px; transform: translateY(-50%) scaleX(-1); }
+        .frame-wings::after { right: -14px; }
+        
+        .frame-circus { border: 2px dashed #ffeb3b; box-shadow: 0 0 5px #e91e63; animation: spinBorder 10s linear infinite; }
+        .frame-mythic { border: 2px double #ffd700; box-shadow: 0 0 10px #9c27b0, inset 0 0 10px #9c27b0; animation: pulseMythic 3s infinite alternate; }
+        @keyframes pulseMythic { from { box-shadow: 0 0 5px #9c27b0; } to { box-shadow: 0 0 20px #e040fb, 0 0 40px #9c27b0; } }
+
+        @keyframes pulseBlood { from { border-color: #6d0000; box-shadow: 0 0 10px #b71c1c; } to { border-color: #ff5252; box-shadow: 0 0 20px #ff1744; } }
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+        @keyframes diamondSparkle { 0% { filter: brightness(1); } 50% { filter: brightness(1.3) hue-rotate(10deg); } 100% { filter: brightness(1); } }
+        @keyframes pulseAnim { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes electricAnim { 0% { transform: translate(0,0); } 20% { transform: translate(-1px, 1px); } 40% { transform: translate(1px, -1px); } 60% { transform: translate(-1px, 0); } 80% { transform: translate(1px, 1px); } 100% { transform: translate(0, 0); } }
+        @keyframes shineAnim { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+        @keyframes glitchAnim { 0% { clip-path: inset(0 0 0 0); } 5% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, 0); } 10% { clip-path: inset(80% 0 10% 0); transform: translate(2px, 0); filter: invert(1); } 15% { clip-path: inset(0 0 0 0); transform: translate(0); filter: none; } 100% { clip-path: inset(0 0 0 0); } }
+        @keyframes burnAnim { from { box-shadow: 0 0 5px currentColor; } to { box-shadow: 0 0 15px currentColor, 0 0 5px #fff; } }
+
+        body { background-color: var(--bg-dark); color: var(--text-main); padding-bottom: 50px; }
+
+        /* HEADER PROFIL */
+        .profile-header {
+            background: linear-gradient(180deg, rgba(20,20,20,1) 0%, rgba(10,10,10,0.8) 100%);
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+            position: relative;
+        }
+        .btn-back {
+            position: absolute; top: 20px; left: 20px;
+            background: rgba(255,255,255,0.1); border: 1px solid #444;
+            color: white; padding: 5px 12px; border-radius: 4px;
+            text-decoration: none; font-family: 'Rajdhani'; font-weight: bold;
+        }
+        .profile-avatar {
+            width: 100px; height: 100px; margin: 0 auto 15px;
+            background: #222; border: 2px solid var(--accent); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron'; font-size: 2.5rem; color: var(--accent);
+            box-shadow: 0 0 20px rgba(255, 193, 7, 0.2);
+        }
+        .profile-name { font-family: 'Orbitron'; font-size: 2rem; margin: 0; color: white; }
+        .profile-role { font-family: 'Rajdhani'; color: var(--accent); font-weight: bold; letter-spacing: 2px; }
+        
+        /* BANDEAU STATS CLÉS */
+        .key-stats-row {
+            display: flex; justify-content: center; gap: 20px; margin-top: 20px; flex-wrap: wrap;
+        }
+        .key-stat {
+            background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1); text-align: center; min-width: 100px;
+        }
+        .k-val { font-family: 'Orbitron'; font-size: 1.4rem; display: block; color: white; }
+        .k-label { font-size: 0.8rem; color: #888; text-transform: uppercase; }
+
+        /* ONGLETS NAVIGATION */
+        .tabs-container {
+            display: flex; justify-content: center; margin-top: 30px; border-bottom: 1px solid #333;
+            background: var(--panel-bg);
+        }
+        .tab-btn {
+            flex: 1; padding: 15px; background: transparent; border: none;
+            color: #666; font-family: 'Orbitron'; font-weight: bold; cursor: pointer;
+            border-bottom: 3px solid transparent; transition: 0.3s;
+        }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(255, 193, 7, 0.05); }
+
+        /* CONTENU DES ONGLETS */
+        .tab-content { display: none; padding: 20px; max-width: 1000px; margin: 0 auto; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* GRILLES DE STATS */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #333;
+            text-align: center; position: relative; overflow: hidden;
+        }
+        .stat-card h4 { margin: 0 0 5px; color: #aaa; font-size: 0.8rem; }
+        .stat-card .val { font-family: 'Orbitron'; font-size: 1.5rem; color: white; }
+        .stat-card .sub { font-size: 0.7rem; color: #666; margin-top: 5px; display: block; }
+        .stat-card.highlight { border-color: var(--accent); box-shadow: 0 0 10px rgba(255,193,7,0.1); }
+
+        /* CHART CONTAINERS */
+        .chart-box {
+            background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #333;
+            margin-bottom: 20px; position: relative; height: 300px;
+        }
+        .chart-title { font-family: 'Orbitron'; color: #ddd; margin-bottom: 15px; font-size: 0.9rem; border-left: 3px solid var(--accent); padding-left: 10px; }
+
+        /* BADGES (Importés du style précédent) */
+        .badges-wrapper { text-align: center; padding: 10px; }
+        /* Copie minimale des styles badges V5 pour que ça marche ici aussi */
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin: 3px; border: 1px solid rgba(255,255,255,0.1); }
+        .badge-gold { background: #ffc107; color: #000; }
+        .badge-red { background: #d32f2f; color: #fff; }
+        .badge-blue { background: #1976d2; color: #fff; }
+        /* ... (Les autres classes de badges seront injectées dynamiquement si besoin ou lien css) */
+
+        /* EMPTY STATE */
+        .no-data-msg {
+            text-align: center; padding: 40px 20px; background: rgba(255,0,0,0.05);
+            border: 1px dashed #d32f2f; border-radius: 8px; margin: 20px 0;
+        }
+        .no-data-msg h3 { color: #d32f2f; font-family: 'Orbitron'; margin-top: 0; }
+        .no-data-msg p { color: #aaa; font-size: 0.9rem; }
+        
+        /* Loading */
+        #loadingScreen { position: fixed; inset:0; background: #0a0a0a; z-index: 9999; display: flex; justify-content: center; align-items: center; color: var(--accent); font-family: 'Orbitron'; }
+    </style>
+</head>
+<body>
+
+    <div id="loadingScreen">CHARGEMENT DU DOSSIER...</div>
+
+    <div class="profile-header">
+        <a href="members.html" class="btn-back">← RETOUR</a>
+        <div class="profile-avatar" id="pAvatar">--</div>
+        <h1 class="profile-name" id="pName">Chargement...</h1>
+        <div class="profile-role" id="pRole">OPERATEUR</div>
+        
+        <div class="badges-wrapper" id="pBadges"></div>
+
+        <div class="key-stats-row">
+            <div class="key-stat">
+                <span class="k-val" id="pCfPoints" style="color:var(--accent)">--</span>
+                <span class="k-label">CF Points</span>
+            </div>
+            <div class="key-stat">
+                <span class="k-val" id="pTotalGames">--</span>
+                <span class="k-label">Saisons MJ</span>
+            </div>
+            <div class="key-stat">
+                <span class="k-val" id="pGlobalRating">--</span>
+                <span class="k-label">Note Globale</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabs-container">
+        <button class="tab-btn active" onclick="switchTab('mj')">MULTUJOUEUR</button>
+        <button class="tab-btn" onclick="switchTab('br')">BATTLE ROYALE</button>
+        <button class="tab-btn" onclick="switchTab('infos')">INFOS</button>
+    </div>
+
+    <div id="tab-mj" class="tab-content active">
+        <div id="mjDataContainer">
+            <div class="stats-grid">
+                <div class="stat-card highlight">
+                    <h4>Moyenne Score</h4>
+                    <span class="val" id="mjAvg">--</span>
+                    <span class="sub">Points par saison</span>
+                </div>
+                <div class="stat-card">
+                    <h4>Meilleure Saison</h4>
+                    <span class="val" id="mjBestScore">--</span>
+                    <span class="sub" id="mjBestSeasonName">S--</span>
+                </div>
+                <div class="stat-card" style="border-color: #d32f2f;">
+                    <h4>Total Kills</h4>
+                    <span class="val" id="mjTotalKills" style="color:#ff5252">--</span>
+                </div>
+                <div class="stat-card" style="border-color: #4caf50;">
+                    <h4>Victoires</h4>
+                    <span class="val" id="mjTotalWins" style="color:#69f0ae">--</span>
+                    <span class="sub" id="mjWinRate">--% Win Rate</span>
+                </div>
+                <div class="stat-card">
+                    <h4>SVP</h4>
+                    <span class="val" id="mjTotalSvp">--</span>
+                    <span class="sub">Titres MVP perdants</span>
+                </div>
+                <div class="stat-card">
+                    <h4>Assists</h4>
+                    <span class="val" id="mjTotalAssists">--</span>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <div class="chart-title">📈 ÉVOLUTION DES SCORES MJ</div>
+                <canvas id="chartMjScores"></canvas>
+            </div>
+
+            <div class="chart-box">
+                <div class="chart-title">📊 ANALYSE DÉTAILLÉE (Kills/Wins par Saison)</div>
+                <canvas id="chartMjDetails"></canvas>
+            </div>
+        </div>
+
+        <div id="mjNoData" class="no-data-msg" style="display:none;">
+            <h3>DONNÉES MJ INSUFFISANTES</h3>
+            <p>Cet agent n'a pas encore participé suffisamment aux tournois MJ.</p>
+            <p>Participe aux tournois du week-end pour débloquer ces graphiques !</p>
+        </div>
+    </div>
+
+    <div id="tab-br" class="tab-content">
+        <div id="brDataContainer">
+            <div class="stats-grid">
+                <div class="stat-card highlight">
+                    <h4>Moyenne BR</h4>
+                    <span class="val" id="brAvg">--</span>
+                </div>
+                <div class="stat-card">
+                    <h4>Meilleur Score</h4>
+                    <span class="val" id="brBest">--</span>
+                </div>
+                <div class="stat-card">
+                    <h4>Participations</h4>
+                    <span class="val" id="brCount">--</span>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <div class="chart-title">🏔️ ÉVOLUTION SCORES BATTLE ROYALE</div>
+                <canvas id="chartBrScores"></canvas>
+            </div>
+        </div>
+
+        <div id="brNoData" class="no-data-msg" style="display:none;">
+            <h3>AUCUNE DONNÉE BR</h3>
+            <p>Aucun enregistrement Battle Royale trouvé pour cet agent.</p>
+        </div>
+    </div>
+
+    <div id="tab-infos" class="tab-content">
+        <div class="stat-card" style="text-align:left; max-width:500px; margin:0 auto;">
+            <h4 style="margin-bottom:15px; font-size:1rem; color:var(--accent);">FICHE SIGNALÉTIQUE</h4>
+            <p><strong>Identifiant :</strong> <span id="infoUid" style="color:#666; font-size:0.8em;">...</span></p>
+            <p><strong>Pseudo :</strong> <span id="infoPseudo" style="color:white;">...</span></p>
+            <p><strong>Date d'arrivée :</strong> <span id="infoDate" style="color:white;">Inconnue</span></p>
+            <p><strong>Fortune Estimée :</strong> <span id="infoWealth" style="color:var(--accent);">...</span></p>
+            <hr style="border-color:#333; margin:15px 0;">
+            <p style="font-size:0.8rem; color:#888;">
+                Ce dossier est classifié. Toute modification non autorisée entraînera une exclusion immédiate du réseau Circled Fight.
+            </p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db, doc, getDoc } from './js/firebase.js';
+        import { rawData, weeks } from './js/data.js'; // Scores MJ
+        import { detailedData } from './js/data2.js'; // Détails MJ
+        import { brData } from './js/data3.js';       // Scores BR (Corrigé)
+
+        // Récupération de l'UID dans l'URL
+        const params = new URLSearchParams(window.location.search);
+        const targetUid = params.get('uid');
+
+        console.log("Script démarré. UID cible :", targetUid);
+
+        if (!targetUid) {
+            alert("Erreur: Aucun agent spécifié.");
+            window.location.href = "members.html";
+        }
+
+        async function initProfile() {
+            try {
+                console.log("Connexion Firebase...");
+                // 1. Récupérer les données Firebase
+                const userSnap = await getDoc(doc(db, "users", targetUid));
+                
+                if (!userSnap.exists()) {
+                    document.getElementById('loadingScreen').innerHTML = "AGENT INTROUVABLE DANS LA BDD";
+                    return;
+                }
+
+                const userData = userSnap.data();
+                const pseudo = userData.pseudo;
+                console.log("Profil trouvé :", pseudo);
+
+                // 2. Remplir le Header
+                document.getElementById('pName').innerText = pseudo;
+                document.getElementById('pAvatar').innerText = pseudo.substring(0,2).toUpperCase();
+                document.getElementById('pCfPoints').innerText = (userData.cfPoints || 0).toLocaleString();
+                
+                // --- RENDER BADGES ---
+                if (userData.customBadges) {
+                    let badgeHtml = '';
+                    userData.customBadges.forEach(b => {
+                        const effect = b.effect ? `effect-${b.effect}` : '';
+                        const frame = b.frame ? `frame-${b.frame}` : '';
+                        badgeHtml += `<span class="badge badge-${b.color} ${effect} ${frame}">${b.text}</span>`;
+                    });
+                    document.getElementById('pBadges').innerHTML = badgeHtml;
+                }
+
+                // --- INFOS TAB ---
+                document.getElementById('infoUid').innerText = targetUid;
+                document.getElementById('infoPseudo').innerText = pseudo;
+                if(userData.joinedAt) {
+                    const date = userData.joinedAt.toDate ? userData.joinedAt.toDate() : new Date(userData.joinedAt);
+                    document.getElementById('infoDate').innerText = date.toLocaleDateString();
+                }
+                document.getElementById('infoWealth').innerText = `${userData.cfPoints || 0} CF`;
+
+                // 3. ANALYSE DONNÉES LOCALES (MJ & BR)
+                processMjData(pseudo);
+                processBrData(pseudo);
+
+                // Tout est chargé, on enlève l'écran de chargement
+                document.getElementById('loadingScreen').style.display = 'none';
+
+            } catch (e) {
+                console.error("ERREUR CRITIQUE:", e);
+                document.getElementById('loadingScreen').innerHTML = "ERREUR SYSTÈME<br><small>Vérifiez la console (F12)</small>";
+            }
+        }
+
+        function processMjData(pseudo) {
+            // Recherche insensible à la casse
+            const mjRecord = rawData.find(p => p.name.toLowerCase() === pseudo.toLowerCase());
+            
+            // Pour detailedData, on essaie direct ou en minuscule si les clés diffèrent
+            let details = detailedData[pseudo];
+            if (!details) {
+                // Essai de trouver une clé correspondante en ignorant la casse
+                const key = Object.keys(detailedData).find(k => k.toLowerCase() === pseudo.toLowerCase());
+                if(key) details = detailedData[key];
+            }
+
+            // A. STATS SCORES
+            let avg = 0, count = 0, best = 0, bestS = "";
+            let scoresArray = [];
+
+            if (mjRecord) {
+                scoresArray = mjRecord.scores; 
+                const validScores = scoresArray.filter(s => typeof s === 'number' && s !== null);
+                count = validScores.length;
+                if (count > 0) {
+                    const sum = validScores.reduce((a,b)=>a+b, 0);
+                    avg = (sum / count).toFixed(1);
+                    best = Math.max(...validScores);
+                    const bestIndex = scoresArray.findIndex(s => s === best);
+                    if(weeks[bestIndex]) bestS = weeks[bestIndex];
+                }
+            }
+
+            document.getElementById('pTotalGames').innerText = count;
+            document.getElementById('mjAvg').innerText = avg;
+            document.getElementById('mjBestScore').innerText = best;
+            document.getElementById('mjBestSeasonName').innerText = bestS || "Aucune";
+
+            // Rating
+            let rating = "C";
+            if (avg > 80) rating = "S"; else if (avg > 60) rating = "A"; else if (avg > 40) rating = "B";
+            if (count < 2) rating = "-";
+            document.getElementById('pGlobalRating').innerText = rating;
+            document.getElementById('pGlobalRating').style.color = rating === "S" ? "var(--accent)" : "white";
+
+            // B. DETAILS STATS
+            let totalK = 0, totalW = 0, totalSvp = 0, totalA = 0;
+            let labelsDetails = [];
+            let dataKills = [];
+            let dataWins = [];
+
+            if (details) {
+                Object.keys(details).forEach(seasonKey => {
+                    const s = details[seasonKey];
+                    totalK += (s.k || 0);
+                    totalW += (s.w || 0);
+                    totalSvp += (s.svp || 0);
+                    totalA += (s.a || 0);
+                    labelsDetails.push(seasonKey);
+                    dataKills.push(s.k || 0);
+                    dataWins.push(s.w || 0);
+                });
+            }
+
+            document.getElementById('mjTotalKills').innerText = totalK;
+            document.getElementById('mjTotalWins').innerText = totalW;
+            document.getElementById('mjTotalSvp').innerText = totalSvp;
+            document.getElementById('mjTotalAssists').innerText = totalA;
+            
+            const seasonsPlayed = Object.keys(details || {}).length;
+            if(seasonsPlayed > 0) {
+                const wr = ((totalW / (seasonsPlayed * 4)) * 100).toFixed(0); 
+                document.getElementById('mjWinRate').innerText = `~${wr}% Win Rate (Est.)`;
+            }
+
+            // C. AFFICHAGE OU ERROR
+            if (count === 0 && !details) {
+                document.getElementById('mjDataContainer').style.display = 'none';
+                document.getElementById('mjNoData').style.display = 'block';
+            } else {
+                new Chart(document.getElementById('chartMjScores'), {
+                    type: 'line',
+                    data: {
+                        labels: weeks,
+                        datasets: [{
+                            label: 'Score MJ',
+                            data: scoresArray,
+                            borderColor: '#ffc107',
+                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true,
+                            spanGaps: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true, grid: { color: '#333' } }, x: { grid: { display: false } } },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+
+                if (labelsDetails.length > 0) {
+                    new Chart(document.getElementById('chartMjDetails'), {
+                        type: 'bar',
+                        data: {
+                            labels: labelsDetails,
+                            datasets: [
+                                { label: 'Kills', data: dataKills, backgroundColor: 'rgba(211, 47, 47, 0.7)', borderColor: '#d32f2f', borderWidth: 1 },
+                                { label: 'Victoires', data: dataWins, backgroundColor: 'rgba(76, 175, 80, 0.7)', borderColor: '#4caf50', borderWidth: 1, yAxisID: 'y1' }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: { beginAtZero: true, grid: { color: '#333' }, title: {display:true, text:'Kills'} },
+                                y1: { position: 'right', beginAtZero: true, max: 5, grid: { display:false }, title: {display:true, text:'Victoires'} },
+                                x: { grid: { color: '#333' } }
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        function processBrData(pseudo) {
+            // On vérifie que brData existe et n'est pas vide
+            if (!brData || brData.length === 0) {
+                showBrEmpty();
+                return;
+            }
+
+            const brRecord = brData.find(p => p.name.toLowerCase() === pseudo.toLowerCase());
+            
+            if (brRecord) {
+                const scores = brRecord.scores.filter(s => typeof s === 'number');
+                const count = scores.length;
+                
+                if (count > 0) {
+                    const avg = (scores.reduce((a,b)=>a+b,0) / count).toFixed(1);
+                    const best = Math.max(...scores);
+                    
+                    document.getElementById('brAvg').innerText = avg;
+                    document.getElementById('brBest').innerText = best;
+                    document.getElementById('brCount').innerText = count;
+
+                    new Chart(document.getElementById('chartBrScores'), {
+                        type: 'line',
+                        data: {
+                            labels: weeks, // On utilise les semaines globales
+                            datasets: [{
+                                label: 'Score BR',
+                                data: brRecord.scores,
+                                borderColor: '#00bcd4',
+                                backgroundColor: 'rgba(0, 188, 212, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.3,
+                                fill: true,
+                                spanGaps: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: { y: { beginAtZero: true, grid: { color: '#333' } }, x: { grid: { display: false } } },
+                            plugins: { legend: { display: false } }
+                        }
+                    });
+                } else {
+                    showBrEmpty();
+                }
+            } else {
+                showBrEmpty();
+            }
+        }
+
+        function showBrEmpty() {
+            document.getElementById('brDataContainer').style.display = 'none';
+            document.getElementById('brNoData').style.display = 'block';
+        }
+
+        window.switchTab = (tabName) => {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            const btns = document.querySelectorAll('.tab-btn');
+            if(tabName === 'mj') btns[0].classList.add('active');
+            if(tabName === 'br') btns[1].classList.add('active');
+            if(tabName === 'infos') btns[2].classList.add('active');
+        };
+
+        // Lancement
+        initProfile();
+    </script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 export const weeks = ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"];
 
-export const rawData = [
+// J'ai renommé 'rawData' en 'brData' pour éviter le conflit avec le MJ
+export const brData = [
     { name: "Rico",      scores: [33, 45, 38, 58, 40, 22, 28, 28] },
     { name: "Benji",     scores: [23, 41, 13, null, null, null, null, null] },
     { name: "Paul",      scores: [23, null, 13, 16, 15, 22, null, null] },
@@ -20,5 +21,5 @@ export const rawData = [
     { name: "Angel",     scores: [null, null, null, null, null, 61, 17, null] },
     { name: "Seveun",    scores: [null, null, null, null, null, null, 54, 42] },
     { name: "Afro",      scores: [null, null, null, null, null, null, 17, null] },
-    { name: "Gabriel",   scores: [null, null, null, null, null, 11, null, 16] },
+    { name: "Gabriel",   scores: [null, null, null, null, null, 11, null, 16] }
 ];
