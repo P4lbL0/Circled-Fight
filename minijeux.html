@@ -1,101 +1,431 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Snake</title>
-  <style>
-    body {
-      background: #000;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 0;
-      padding: 20px;
-      color: #fff;
-      font-family: Arial, sans-serif;
-    }
-    canvas {
-      background: #111;
-      border: 2px solid #444;
-    }
-    #score {
-      margin-top: 10px;
-      font-size: 1.2rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Entraînement Tactique | CF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        /* RESET & BASE */
+        body { background-color: #050505; color: white; overflow: hidden; touch-action: none; margin: 0; font-family: 'Rajdhani', sans-serif; }
+        
+        /* --- HEADER (INFO JOUEUR + JEU) --- */
+        .top-bar {
+            position: absolute; top: 0; left: 0; width: 100%; height: 80px;
+            background: rgba(15,15,15,0.95); border-bottom: 2px solid var(--codm-yellow, #ffc107);
+            z-index: 100; box-sizing: border-box;
+            display: flex; flex-direction: column;
+        }
+
+        /* Ligne 1 : Info Joueur & Quitter */
+        .user-row {
+            flex: 1; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 15px; border-bottom: 1px solid #333;
+        }
+        .user-info { font-family: 'Orbitron'; font-size: 0.9rem; color: #ccc; display: flex; align-items: center; gap: 10px; }
+        .cf-badge { color: #ffc107; font-weight: bold; background: rgba(255, 193, 7, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid #ffc107; }
+        .btn-quit {
+            background: #333; color: white; text-decoration: none; font-size: 0.75rem;
+            padding: 4px 10px; border-radius: 4px; border: 1px solid #555;
+        }
+
+        /* Ligne 2 : Stats du Jeu (Temps/Cibles) */
+        .game-stats-row {
+            flex: 1; display: flex; justify-content: space-around; align-items: center;
+            font-family: 'Orbitron'; font-size: 1rem; background: rgba(0,0,0,0.3);
+        }
+        .stat-val { color: #ffc107; font-weight: bold; font-size: 1.2rem; margin-left: 5px; }
+
+        /* --- ZONE DE JEU --- */
+        #gameArena {
+            position: absolute; top: 80px; bottom: 0; left: 0; right: 0;
+            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
+            overflow: hidden; cursor: crosshair; touch-action: none;
+        }
+
+        /* --- CIBLES --- */
+        .target {
+            position: absolute; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            user-select: none; -webkit-tap-highlight-color: transparent;
+            cursor: pointer; z-index: 10;
+        }
+        /* Ennemi */
+        .t-enemy { width: 60px; height: 60px; background: radial-gradient(circle, #ff0000 40%, #5c0000 100%); border: 2px solid white; box-shadow: 0 0 15px red; }
+        .t-enemy::after { content: '🎯'; font-size: 30px; pointer-events: none; }
+        /* Civil */
+        .t-civil { width: 50px; height: 50px; background: radial-gradient(circle, #00ff00 40%, #004d00 100%); border: 2px solid white; box-shadow: 0 0 10px lime; z-index: 11; }
+        .t-civil::after { content: '🙋‍♂️'; font-size: 25px; pointer-events: none; }
+        /* Bombe */
+        .t-bomb { width: 70px; height: 70px; background: #222; border: 2px dashed orange; animation: pulseBomb 0.5s infinite; z-index: 12; display: flex; align-items: center; justify-content: center; }
+        .t-bomb::before { content: '💣'; font-size: 25px; pointer-events: none; }
+        @keyframes pulseBomb { 0% { border-color: orange; } 50% { border-color: red; scale: 1.05; } 100% { border-color: orange; } }
+
+        /* --- ÉCRANS (Start, End) --- */
+        .overlay-screen {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 200;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 20px;
+        }
+        .screen-title { font-family: 'Orbitron'; font-size: 2rem; color: #ffc107; margin-bottom: 20px; }
+        .screen-desc { color: #ccc; margin-bottom: 30px; max-width: 500px; line-height: 1.5; font-size: 1.1rem; }
+        
+        .btn-action {
+            background: #ffc107; color: black; border: none;
+            padding: 15px 40px; font-family: 'Orbitron'; font-weight: bold; font-size: 1.2rem;
+            clip-path: polygon(10% 0, 100% 0, 100% 80%, 90% 100%, 0 100%, 0 20%);
+            cursor: pointer; text-transform: uppercase; margin: 10px; transition: 0.2s;
+        }
+        .btn-action:active { transform: scale(0.95); }
+        .btn-training { background: #00bcd4; color: black; }
+
+        /* MODAL CLASSEMENT */
+        #leaderboardModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 300; flex-direction: column; padding: 20px; overflow-y: auto; }
+        .lb-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #333; font-family: 'Rajdhani'; font-size: 1.1rem; }
+        
+        /* Loading */
+        #loadingMsg { font-family: 'Orbitron'; color: #ffc107; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+    </style>
 </head>
 <body>
 
-  <h1>Snake</h1>
-  <canvas id="game" width="300" height="300"></canvas>
-  <div id="score">Score : 0</div>
+    <div class="top-bar">
+        <div class="user-row">
+            <div class="user-info">
+                <span id="displayPseudo">Chargement...</span>
+                <span class="cf-badge"><span id="displayCF">--</span> CF</span>
+            </div>
+            <a href="index.html" class="btn-quit">QUITTER</a>
+        </div>
+        <div class="game-stats-row">
+            <div>NIV: <span class="stat-val" id="uiLevel">1</span>/10</div>
+            <div>TEMPS: <span class="stat-val" id="uiTime">00</span></div>
+            <div>CIBLES: <span class="stat-val" id="uiTargets">0</span></div>
+        </div>
+    </div>
 
-  <script>
-    const canvas = document.getElementById('game');
-    const ctx = canvas.getContext('2d');
+    <div id="gameArena"></div>
 
-    const box = 20;
-    const size = 15; // 15x15 cases
-    let snake = [{ x: 7, y: 7 }];
-    let dir = { x: 0, y: 0 };
-    let food = randomFood();
-    let score = 0;
+    <div id="startScreen" class="overlay-screen">
+        <h1 class="screen-title">TACTICAL DRILL</h1>
+        <div id="loadingMsg">CONNEXION AU RÉSEAU...</div>
+        
+        <div id="startContent" style="display:none;">
+            <p class="screen-desc" id="modeDesc">
+                Analyse de votre accès quotidien...
+            </p>
+            <button id="btnStart" class="btn-action">COMMENCER</button>
+            <br>
+            <button id="btnShowLb" class="btn-action" style="background:transparent; border:1px solid #555; color:white; font-size:0.9rem; padding:10px;">🏆 CLASSEMENT</button>
+        </div>
+    </div>
 
-    document.addEventListener('keydown', e => {
-      if (e.key === 'ArrowUp' && dir.y === 0) dir = { x: 0, y: -1 };
-      if (e.key === 'ArrowDown' && dir.y === 0) dir = { x: 0, y: 1 };
-      if (e.key === 'ArrowLeft' && dir.x === 0) dir = { x: -1, y: 0 };
-      if (e.key === 'ArrowRight' && dir.x === 0) dir = { x: 1, y: 0 };
-    });
+    <div id="levelScreen" class="overlay-screen" style="display:none;">
+        <h2 class="screen-title" style="color:#4CAF50">NIVEAU RÉUSSI !</h2>
+        <p class="screen-desc" id="levelRewardMsg">...</p>
+        <button id="btnNextLevel" class="btn-action">SUIVANT</button>
+    </div>
 
-    function randomFood() {
-      return {
-        x: Math.floor(Math.random() * size),
-        y: Math.floor(Math.random() * size)
-      };
-    }
+    <div id="gameOverScreen" class="overlay-screen" style="display:none;">
+        <h2 class="screen-title" style="color:red">MISSION ÉCHOUÉE</h2>
+        <p class="screen-desc" id="failReason">...</p>
+        <button onclick="location.reload()" class="btn-action" style="background:white; color:black;">REJOUER</button>
+    </div>
 
-    function draw() {
-      ctx.fillStyle = '#111';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    <div id="winScreen" class="overlay-screen" style="display:none;">
+        <h2 class="screen-title" style="color:gold">MISSION ACCOMPLIE</h2>
+        <p class="screen-desc">Entraînement terminé.</p>
+        <a href="index.html" class="btn-action">RETOUR QG</a>
+    </div>
 
-      // snake
-      snake.forEach((s, i) => {
-        ctx.fillStyle = i === 0 ? '#0f0' : '#0a0';
-        ctx.fillRect(s.x * box, s.y * box, box-1, box-1);
-      });
+    <div id="leaderboardModal">
+        <h2 class="screen-title">TOP SOLDATS</h2>
+        <button onclick="document.getElementById('leaderboardModal').style.display='none'" style="position:absolute; top:20px; right:20px; background:none; border:none; color:white; font-size:2rem;">✕</button>
+        <div id="lbContent" style="width:100%; max-width:500px; margin:0 auto;"></div>
+    </div>
 
-      // food
-      ctx.fillStyle = 'red';
-      ctx.fillRect(food.x * box, food.y * box, box-1, box-1);
+    <script type="module">
+        import { auth, db, doc, getDoc, updateDoc, increment, onAuthStateChanged, collection, getDocs, query } from './js/firebase.js';
 
-      // move snake
-      const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+        let currentUser = null;
+        let currentLevel = 1;
+        let timeLeft = 0;
+        let targetsLeft = 0;
+        let gameInterval = null;
+        let spawnInterval = null;
+        let gameActive = false;
+        let isRankedMode = true;
 
-      // check collisions
-      if (head.x < 0 || head.x >= size || head.y < 0 || head.y >= size
-          || snake.some(s => s.x === head.x && s.y === head.y)) {
-        alert('Game over! Score: ' + score);
-        snake = [{ x: 7, y: 7 }];
-        dir = { x: 0, y: 0 };
-        food = randomFood();
-        score = 0;
-      } else {
-        snake.unshift(head);
-        if (head.x === food.x && head.y === food.y) {
-          score++;
-          food = randomFood();
-        } else {
-          snake.pop();
+        // CONFIGURATION DES NIVEAUX
+        const levels = [
+            { id:1, time:20, targets:5,  civil:0, bomb:0, moving:false, spawnRate:1200 },
+            { id:2, time:20, targets:8,  civil:0, bomb:0, moving:false, spawnRate:1000 },
+            { id:3, time:20, targets:10, civil:2, bomb:0, moving:true,  spawnRate:900 },
+            { id:4, time:22, targets:12, civil:3, bomb:0, moving:true,  spawnRate:800 },
+            { id:5, time:25, targets:15, civil:4, bomb:1, moving:true,  spawnRate:750 },
+            { id:6, time:25, targets:18, civil:5, bomb:2, moving:true,  spawnRate:700 },
+            { id:7, time:30, targets:20, civil:6, bomb:3, moving:true,  spawnRate:650 },
+            { id:8, time:30, targets:22, civil:8, bomb:4, moving:true,  spawnRate:600 },
+            { id:9, time:30, targets:25, civil:5, bomb:5, moving:true,  spawnRate:550 },
+            { id:10,time:40, targets:30, civil:10, bomb:8, moving:true, spawnRate:500 }
+        ];
+
+        // --- 1. INITIALISATION ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await initGameData();
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        async function initGameData() {
+            try {
+                const userRef = doc(db, "users", currentUser.uid);
+                const snap = await getDoc(userRef);
+                
+                if (!snap.exists()) {
+                    alert("Erreur: Profil introuvable.");
+                    return;
+                }
+
+                const data = snap.data();
+                
+                // 1. Mise à jour UI Header
+                document.getElementById('displayPseudo').innerText = (data.pseudo || "Soldat").toUpperCase();
+                document.getElementById('displayCF').innerText = (data.cfPoints || 0).toLocaleString();
+
+                // 2. Vérification Date pour le Mode
+                const today = new Date().toDateString();
+                const lastPlayed = data.lastMinigameDate;
+                const modeDesc = document.getElementById('modeDesc');
+                const btnStart = document.getElementById('btnStart');
+
+                if (lastPlayed === today) {
+                    isRankedMode = false;
+                    modeDesc.innerHTML = `<span style="color:#00bcd4">MODE ENTRAÎNEMENT</span><br>Vous avez déjà joué aujourd'hui.<br>Score et CF désactivés.`;
+                    btnStart.innerText = "JOUER (FUN)";
+                    btnStart.classList.add('btn-training');
+                } else {
+                    isRankedMode = true;
+                    modeDesc.innerHTML = `<span style="color:#ffc107">MODE CLASSÉ</span><br>1 Essai Quotidien.<br>Gagnez des CF à chaque niveau.`;
+                    btnStart.innerText = "COMMENCER LE RUN";
+                }
+
+                // 3. Affichage
+                document.getElementById('loadingMsg').style.display = 'none';
+                document.getElementById('startContent').style.display = 'block';
+
+                // 4. Events
+                btnStart.onclick = startGame;
+                document.getElementById('btnShowLb').onclick = loadLeaderboard;
+
+            } catch (e) {
+                console.error("Erreur Init:", e);
+                document.getElementById('loadingMsg').innerText = "ERREUR CHARGEMENT DONNÉES";
+            }
         }
-      }
 
-      document.getElementById('score').textContent = 'Score : ' + score;
-    }
+        // --- 2. JEU ---
 
-    setInterval(draw, 150);
-  </script>
+        function startGame() {
+            document.getElementById('startScreen').style.display = 'none';
+            // Si classé, on bloque la date
+            if (isRankedMode) {
+                updateDoc(doc(db, "users", currentUser.uid), { lastMinigameDate: new Date().toDateString() });
+            }
+            loadLevel(1);
+        }
 
+        function loadLevel(lvlId) {
+            const config = levels.find(l => l.id === lvlId);
+            if (!config) { endGameVictory(); return; }
+
+            currentLevel = lvlId;
+            timeLeft = config.time;
+            targetsLeft = config.targets;
+
+            // UI
+            document.getElementById('uiLevel').innerText = currentLevel;
+            document.getElementById('uiTargets').innerText = targetsLeft;
+            document.getElementById('uiTime').innerText = timeLeft;
+            document.getElementById('levelScreen').style.display = 'none';
+
+            gameActive = true;
+            startTimer();
+            startSpawner(config);
+        }
+
+        function startTimer() {
+            if(gameInterval) clearInterval(gameInterval);
+            gameInterval = setInterval(() => {
+                if(!gameActive) return;
+                timeLeft--;
+                document.getElementById('uiTime').innerText = timeLeft;
+                if(timeLeft <= 0) gameOver("Temps écoulé !");
+            }, 1000);
+        }
+
+        function startSpawner(config) {
+            const arena = document.getElementById('gameArena');
+            arena.innerHTML = '';
+            
+            if(spawnInterval) clearInterval(spawnInterval);
+            spawnInterval = setInterval(() => {
+                if(!gameActive || targetsLeft <= 0) return;
+
+                const rand = Math.random();
+                let type = 'enemy';
+                if(config.bomb > 0 && rand > 0.9) type = 'bomb';
+                else if(config.civil > 0 && rand > 0.75) type = 'civil';
+
+                spawnEntity(type, config.moving);
+            }, config.spawnRate);
+        }
+
+        function spawnEntity(type, moving) {
+            const arena = document.getElementById('gameArena');
+            const el = document.createElement('div');
+            el.classList.add('target');
+
+            // --- CORRECTION POSITION (Restreindre à la zone visible) ---
+            const w = arena.offsetWidth - 70; 
+            const h = arena.offsetHeight - 70;
+            const x = Math.max(10, Math.random() * w);
+            const y = Math.max(10, Math.random() * h);
+
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+
+            if(type === 'enemy') {
+                el.classList.add('t-enemy');
+                el.onpointerdown = (e) => { e.preventDefault(); hitEnemy(el); };
+                setTimeout(() => { if(el.parentElement && gameActive) el.remove(); }, 2200);
+            } 
+            else if(type === 'civil') {
+                el.classList.add('t-civil');
+                el.onpointerdown = () => gameOver("Tir sur civil !");
+                setTimeout(() => { if(el.parentElement) el.remove(); }, 2500);
+            }
+            else if(type === 'bomb') {
+                el.classList.add('t-bomb');
+                el.onpointerdown = (e) => { e.preventDefault(); defuseBomb(el); };
+                setTimeout(() => { if(el.parentElement && gameActive) gameOver("BOOM !"); }, 3500);
+            }
+
+            if(moving) {
+                const mx = (Math.random() - 0.5) * 100;
+                const my = (Math.random() - 0.5) * 100;
+                el.style.transition = "transform 2s linear";
+                requestAnimationFrame(() => el.style.transform = `translate(${mx}px, ${my}px)`);
+            }
+
+            arena.appendChild(el);
+        }
+
+        function hitEnemy(el) {
+            if(!gameActive) return;
+            el.remove();
+            targetsLeft--;
+            document.getElementById('uiTargets').innerText = Math.max(0, targetsLeft);
+            if(targetsLeft <= 0) levelComplete();
+        }
+
+        function defuseBomb(el) {
+            if(!gameActive) return;
+            el.remove();
+            timeLeft += 2;
+            document.getElementById('uiTime').innerText = timeLeft;
+        }
+
+        async function levelComplete() {
+            gameActive = false;
+            clearInterval(gameInterval);
+            clearInterval(spawnInterval);
+            document.getElementById('gameArena').innerHTML = '';
+
+            if(isRankedMode) {
+                try {
+                    const userRef = doc(db, "users", currentUser.uid);
+                    await updateDoc(userRef, {
+                        cfPoints: increment(1),
+                        minigameMaxLevel: Math.max((await getDoc(userRef)).data().minigameMaxLevel || 0, currentLevel)
+                    });
+                    
+                    // Mise à jour visuelle immédiate
+                    const cfEl = document.getElementById('displayCF');
+                    let current = parseInt(cfEl.innerText.replace(/\s/g, ''));
+                    cfEl.innerText = (current + 1).toLocaleString();
+                    
+                    document.getElementById('levelRewardMsg').innerHTML = `<span style="color:#ffc107; font-size:1.5rem;">+1 CF</span><br>Solde mis à jour.`;
+                } catch(e) { console.error(e); }
+            } else {
+                document.getElementById('levelRewardMsg').innerText = "Mode Entraînement (0 Gain)";
+            }
+
+            if(currentLevel === 10) endGameVictory();
+            else {
+                document.getElementById('levelScreen').style.display = 'flex';
+                document.getElementById('btnNextLevel').onclick = () => loadLevel(currentLevel + 1);
+            }
+        }
+
+        function gameOver(reason) {
+            gameActive = false;
+            clearInterval(gameInterval);
+            clearInterval(spawnInterval);
+            document.getElementById('failReason').innerText = reason;
+            document.getElementById('gameOverScreen').style.display = 'flex';
+        }
+
+        function endGameVictory() {
+            document.getElementById('winScreen').style.display = 'flex';
+        }
+
+        async function loadLeaderboard() {
+            const modal = document.getElementById('leaderboardModal');
+            const content = document.getElementById('lbContent');
+            modal.style.display = 'flex';
+            content.innerHTML = 'Chargement...';
+
+            try {
+                const q = query(collection(db, "users"));
+                const snap = await getDocs(q);
+                let players = [];
+                
+                snap.forEach(d => {
+                    const data = d.data();
+                    if(data.minigameMaxLevel) {
+                        players.push({ 
+                            name: data.pseudo, 
+                            lvl: data.minigameMaxLevel, 
+                            cf: data.cfPoints || 0 
+                        });
+                    }
+                });
+
+                // Tri : Niveau > CF
+                players.sort((a,b) => b.lvl - a.lvl || b.cf - a.cf);
+                players = players.slice(0, 10);
+
+                let html = '';
+                players.forEach((p, i) => {
+                    let color = i===0 ? 'gold' : i===1 ? 'silver' : i===2 ? '#cd7f32' : 'white';
+                    html += `
+                        <div class="lb-row">
+                            <span style="color:${color}; width:30px;">#${i+1}</span>
+                            <span style="flex:1; color:${color}">${p.name}</span>
+                            <span>Niv. ${p.lvl} <small>(${p.cf} CF)</small></span>
+                        </div>
+                    `;
+                });
+                if(!html) html = "Aucun score enregistré.";
+                content.innerHTML = html;
+
+            } catch(e) { content.innerText = "Erreur chargement."; }
+        }
+    </script>
 </body>
 </html>
