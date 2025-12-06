@@ -57,7 +57,7 @@ export const detailedData = {
         S14: { w: 3, svp: 0, k: 25, a: 4 }
     },
 
-    Excentrixc: {
+    Excentrizc: {
         S14: { w: 4, svp: 0, k: 19, a: 1 }
     }
 };
