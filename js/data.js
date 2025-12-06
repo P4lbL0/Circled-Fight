@@ -22,5 +22,6 @@ export let rawData = [
     { name: "Gabriel", scores: [null, null, null, null, null, null, null, null, null, null, null, 39.5, 36, null] },
     { name: "Silence", scores: [null, null, null, null, null, null, null, null, null, null, null, null, 75.5, 90] },
     { name: "Seveun", scores:    [null, null, null, null, null, null, null, null, null, null, null, null, 41, null] },
-    { name: "Angel", scores:     [null, null, null, null, null, null, null, null, null, null, null, null, 40.5, null] }
+    { name: "Angel", scores:     [null, null, null, null, null, null, null, null, null, null, null, null, 40.5, null] },
+    { name: "Black", scores:     [null, null, null, null, null, null, null, null, null, null, null, null, null, null] }
 ];
