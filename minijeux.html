@@ -49,13 +49,25 @@
             display: flex; justify-content: center; align-items: center;
             user-select: none; -webkit-tap-highlight-color: transparent;
             cursor: pointer; z-index: 10;
+            will-change: transform; /* Optimisation pour le mouvement fluide */
         }
         /* Ennemi */
         .t-enemy { width: 60px; height: 60px; background: radial-gradient(circle, #ff0000 40%, #5c0000 100%); border: 2px solid white; box-shadow: 0 0 15px red; }
         .t-enemy::after { content: '🎯'; font-size: 30px; pointer-events: none; }
+        
         /* Civil */
         .t-civil { width: 50px; height: 50px; background: radial-gradient(circle, #00ff00 40%, #004d00 100%); border: 2px solid white; box-shadow: 0 0 10px lime; z-index: 11; }
         .t-civil::after { content: '🙋‍♂️'; font-size: 25px; pointer-events: none; }
+
+        /* Saboteur / Piégé (NOUVEAU) */
+        .t-trapped {
+            background: radial-gradient(circle, #00ff00 20%, #330000 100%); 
+            box-shadow: 0 0 20px 5px red; /* AURA ROUGE */
+            border: 2px solid red;
+            z-index: 13;
+        }
+        .t-trapped::after { content: '😈'; font-size: 25px; pointer-events: none; }
+
         /* Bombe */
         .t-bomb { width: 70px; height: 70px; background: #222; border: 2px dashed orange; animation: pulseBomb 0.5s infinite; z-index: 12; display: flex; align-items: center; justify-content: center; }
         .t-bomb::before { content: '💣'; font-size: 25px; pointer-events: none; }
@@ -117,7 +129,7 @@
             </p>
             <button id="btnStart" class="btn-action">COMMENCER</button>
             <br>
-            <button id="btnShowLb" class="btn-action" style="background:transparent; border:1px solid #555; color:white; font-size:0.9rem; padding:10px;">🏆 CLASSEMENT</button>
+            <button id="btnShowLb" class="btn-action" style="background:transparent; border:1px solid #555; color:white; font-size:0.9rem; padding:10px;">🏆 CLASSEMENT (Temps)</button>
         </div>
     </div>
 
@@ -140,12 +152,13 @@
     </div>
 
     <div id="leaderboardModal">
-        <h2 class="screen-title">TOP SOLDATS</h2>
+        <h2 class="screen-title">TOP CHRONOS</h2>
         <button onclick="document.getElementById('leaderboardModal').style.display='none'" style="position:absolute; top:20px; right:20px; background:none; border:none; color:white; font-size:2rem;">✕</button>
         <div id="lbContent" style="width:100%; max-width:500px; margin:0 auto;"></div>
     </div>
 
     <script type="module">
+        // J'ai remis ta liste d'import d'origine pour éviter le crash
         import { auth, db, doc, getDoc, updateDoc, increment, onAuthStateChanged, collection, getDocs, query } from './js/firebase.js';
 
         let currentUser = null;
@@ -154,21 +167,25 @@
         let targetsLeft = 0;
         let gameInterval = null;
         let spawnInterval = null;
+        let moveFrame = null;
         let gameActive = false;
         let isRankedMode = true;
+        
+        // Liste des cibles mouvantes pour l'animation JS
+        let movingTargets = []; 
 
-        // CONFIGURATION DES NIVEAUX
+        // CONFIGURATION DES NIVEAUX (Ajout de "trapped" pour les niveaux 8,9,10)
         const levels = [
-            { id:1, time:20, targets:5,  civil:0, bomb:0, moving:false, spawnRate:1200 },
-            { id:2, time:20, targets:8,  civil:0, bomb:0, moving:false, spawnRate:1000 },
-            { id:3, time:20, targets:10, civil:2, bomb:0, moving:true,  spawnRate:900 },
-            { id:4, time:22, targets:12, civil:3, bomb:0, moving:true,  spawnRate:800 },
-            { id:5, time:25, targets:15, civil:4, bomb:1, moving:true,  spawnRate:750 },
-            { id:6, time:25, targets:18, civil:5, bomb:2, moving:true,  spawnRate:700 },
-            { id:7, time:30, targets:20, civil:6, bomb:3, moving:true,  spawnRate:650 },
-            { id:8, time:30, targets:22, civil:8, bomb:4, moving:true,  spawnRate:600 },
-            { id:9, time:30, targets:25, civil:5, bomb:5, moving:true,  spawnRate:550 },
-            { id:10,time:40, targets:30, civil:10, bomb:8, moving:true, spawnRate:500 }
+            { id:1, time:20, targets:5,  civil:0, trapped:0, bomb:0, moving:false, spawnRate:1200 },
+            { id:2, time:20, targets:8,  civil:0, trapped:0, bomb:0, moving:false, spawnRate:1000 },
+            { id:3, time:20, targets:10, civil:2, trapped:0, bomb:0, moving:true,  spawnRate:900 },
+            { id:4, time:22, targets:12, civil:3, trapped:0, bomb:0, moving:true,  spawnRate:800 },
+            { id:5, time:25, targets:15, civil:4, trapped:0, bomb:1, moving:true,  spawnRate:750 },
+            { id:6, time:25, targets:18, civil:5, trapped:0, bomb:2, moving:true,  spawnRate:700 },
+            { id:7, time:30, targets:20, civil:6, trapped:0, bomb:3, moving:true,  spawnRate:650 },
+            { id:8, time:30, targets:22, civil:5, trapped:2, bomb:4, moving:true,  spawnRate:600 },
+            { id:9, time:30, targets:25, civil:5, trapped:3, bomb:5, moving:true,  spawnRate:550 },
+            { id:10,time:40, targets:30, civil:8, trapped:5, bomb:8, moving:true, spawnRate:500 }
         ];
 
         // --- 1. INITIALISATION ---
@@ -177,7 +194,7 @@
                 currentUser = user;
                 await initGameData();
             } else {
-                window.location.href = "index.html";
+                window.location.href = "login3.html";
             }
         });
 
@@ -210,7 +227,7 @@
                     btnStart.classList.add('btn-training');
                 } else {
                     isRankedMode = true;
-                    modeDesc.innerHTML = `<span style="color:#ffc107">MODE CLASSÉ</span><br>1 Essai Quotidien.<br>Gagnez des CF à chaque niveau.`;
+                    modeDesc.innerHTML = `<span style="color:#ffc107">MODE CLASSÉ</span><br>1 Essai Quotidien.<br>Le classement se joue au TEMPS RESTANT.`;
                     btnStart.innerText = "COMMENCER LE RUN";
                 }
 
@@ -246,6 +263,7 @@
             currentLevel = lvlId;
             timeLeft = config.time;
             targetsLeft = config.targets;
+            movingTargets = []; // Reset liste cibles mouvantes
 
             // UI
             document.getElementById('uiLevel').innerText = currentLevel;
@@ -256,6 +274,7 @@
             gameActive = true;
             startTimer();
             startSpawner(config);
+            if(config.moving) startMovementLoop();
         }
 
         function startTimer() {
@@ -278,8 +297,11 @@
 
                 const rand = Math.random();
                 let type = 'enemy';
-                if(config.bomb > 0 && rand > 0.9) type = 'bomb';
-                else if(config.civil > 0 && rand > 0.75) type = 'civil';
+                
+                // Logique de spawn probabilités
+                if (config.bomb > 0 && rand > 0.9) type = 'bomb';
+                else if (config.trapped > 0 && rand > 0.85) type = 'trapped'; 
+                else if (config.civil > 0 && rand > 0.70) type = 'civil';
 
                 spawnEntity(type, config.moving);
             }, config.spawnRate);
@@ -290,18 +312,20 @@
             const el = document.createElement('div');
             el.classList.add('target');
 
-            // --- CORRECTION POSITION (Restreindre à la zone visible) ---
+            // --- POSITION INITIALE ---
             const w = arena.offsetWidth - 70; 
             const h = arena.offsetHeight - 70;
-            const x = Math.max(10, Math.random() * w);
-            const y = Math.max(10, Math.random() * h);
+            let x = Math.max(10, Math.random() * w);
+            let y = Math.max(10, Math.random() * h);
 
             el.style.left = x + 'px';
             el.style.top = y + 'px';
 
+            // --- TYPES DE CIBLES ---
             if(type === 'enemy') {
                 el.classList.add('t-enemy');
                 el.onpointerdown = (e) => { e.preventDefault(); hitEnemy(el); };
+                // Durée de vie courte
                 setTimeout(() => { if(el.parentElement && gameActive) el.remove(); }, 2200);
             } 
             else if(type === 'civil') {
@@ -309,20 +333,95 @@
                 el.onpointerdown = () => gameOver("Tir sur civil !");
                 setTimeout(() => { if(el.parentElement) el.remove(); }, 2500);
             }
+            else if(type === 'trapped') {
+                // LE PIÉGÉ (Saboteur) : Ressemble à civil mais aura rouge
+                el.classList.add('t-civil', 't-trapped'); 
+                
+                // Il pond des bombes tant qu'il est vivant !
+                const bombDropper = setInterval(() => {
+                    if(el.parentElement && gameActive) {
+                        spawnEntity('bomb', false); // Spawn une bombe
+                    } else {
+                        clearInterval(bombDropper);
+                    }
+                }, 2000); 
+
+                // Il faut le tuer (contrairement au civil)
+                el.onpointerdown = (e) => { 
+                    e.preventDefault(); 
+                    clearInterval(bombDropper);
+                    hitEnemy(el); 
+                };
+
+                setTimeout(() => { 
+                    if(el.parentElement) {
+                         clearInterval(bombDropper);
+                         el.remove(); 
+                    }
+                }, 4000); 
+            }
             else if(type === 'bomb') {
                 el.classList.add('t-bomb');
                 el.onpointerdown = (e) => { e.preventDefault(); defuseBomb(el); };
                 setTimeout(() => { if(el.parentElement && gameActive) gameOver("BOOM !"); }, 3500);
             }
 
-            if(moving) {
-                const mx = (Math.random() - 0.5) * 100;
-                const my = (Math.random() - 0.5) * 100;
-                el.style.transition = "transform 2s linear";
-                requestAnimationFrame(() => el.style.transform = `translate(${mx}px, ${my}px)`);
+            // --- MOUVEMENT AVANCÉ (Rebond) ---
+            if(moving && (type === 'enemy' || type === 'trapped' || type === 'civil')) {
+                // Vitesse aléatoire X et Y
+                const speed = 2 + Math.random() * 3; 
+                const angle = Math.random() * Math.PI * 2;
+                
+                // On stocke les données physiques dans l'élément DOM
+                el.dataset.vx = Math.cos(angle) * speed;
+                el.dataset.vy = Math.sin(angle) * speed;
+                el.dataset.x = x;
+                el.dataset.y = y;
+                
+                movingTargets.push(el);
             }
 
             arena.appendChild(el);
+        }
+
+        // Boucle d'animation pour les mouvements fluides et rebonds
+        function startMovementLoop() {
+            if(moveFrame) cancelAnimationFrame(moveFrame);
+            
+            function animate() {
+                if(!gameActive) return;
+                
+                const arena = document.getElementById('gameArena');
+                const maxX = arena.offsetWidth - 60;
+                const maxY = arena.offsetHeight - 60;
+
+                // On filtre les cibles qui n'existent plus
+                movingTargets = movingTargets.filter(el => document.body.contains(el));
+
+                movingTargets.forEach(el => {
+                    let x = parseFloat(el.dataset.x);
+                    let y = parseFloat(el.dataset.y);
+                    let vx = parseFloat(el.dataset.vx);
+                    let vy = parseFloat(el.dataset.vy);
+
+                    // Mise à jour pos
+                    x += vx;
+                    y += vy;
+
+                    // Rebond Bords
+                    if(x <= 0 || x >= maxX) { vx *= -1; el.dataset.vx = vx; }
+                    if(y <= 0 || y >= maxY) { vy *= -1; el.dataset.vy = vy; }
+
+                    // Sauvegarde et Applique
+                    el.dataset.x = x;
+                    el.dataset.y = y;
+                    el.style.left = x + 'px';
+                    el.style.top = y + 'px';
+                });
+
+                moveFrame = requestAnimationFrame(animate);
+            }
+            moveFrame = requestAnimationFrame(animate);
         }
 
         function hitEnemy(el) {
@@ -344,14 +443,18 @@
             gameActive = false;
             clearInterval(gameInterval);
             clearInterval(spawnInterval);
+            if(moveFrame) cancelAnimationFrame(moveFrame);
             document.getElementById('gameArena').innerHTML = '';
 
             if(isRankedMode) {
                 try {
                     const userRef = doc(db, "users", currentUser.uid);
+                    
+                    // On gagne le niveau max + on ajoute le temps restant au score total
                     await updateDoc(userRef, {
                         cfPoints: increment(1),
-                        minigameMaxLevel: Math.max((await getDoc(userRef)).data().minigameMaxLevel || 0, currentLevel)
+                        minigameMaxLevel: Math.max((await getDoc(userRef)).data().minigameMaxLevel || 0, currentLevel),
+                        totalTimeSaved: increment(timeLeft) // SCORE BASÉ SUR LE TEMPS RESTANT
                     });
                     
                     // Mise à jour visuelle immédiate
@@ -359,7 +462,7 @@
                     let current = parseInt(cfEl.innerText.replace(/\s/g, ''));
                     cfEl.innerText = (current + 1).toLocaleString();
                     
-                    document.getElementById('levelRewardMsg').innerHTML = `<span style="color:#ffc107; font-size:1.5rem;">+1 CF</span><br>Solde mis à jour.`;
+                    document.getElementById('levelRewardMsg').innerHTML = `<span style="color:#ffc107; font-size:1.5rem;">+1 CF</span><br>Temps épargné: +${timeLeft} pts`;
                 } catch(e) { console.error(e); }
             } else {
                 document.getElementById('levelRewardMsg').innerText = "Mode Entraînement (0 Gain)";
@@ -376,6 +479,7 @@
             gameActive = false;
             clearInterval(gameInterval);
             clearInterval(spawnInterval);
+            if(moveFrame) cancelAnimationFrame(moveFrame);
             document.getElementById('failReason').innerText = reason;
             document.getElementById('gameOverScreen').style.display = 'flex';
         }
@@ -384,30 +488,33 @@
             document.getElementById('winScreen').style.display = 'flex';
         }
 
+        // CLASSEMENT BASÉ SUR LE TEMPS (JavaScript uniquement pour éviter les erreurs d'import)
         async function loadLeaderboard() {
             const modal = document.getElementById('leaderboardModal');
             const content = document.getElementById('lbContent');
             modal.style.display = 'flex';
-            content.innerHTML = 'Chargement...';
+            content.innerHTML = 'Chargement des meilleurs chronos...';
 
             try {
+                // On récupère tout et on trie en JS
                 const q = query(collection(db, "users"));
                 const snap = await getDocs(q);
                 let players = [];
                 
                 snap.forEach(d => {
                     const data = d.data();
-                    if(data.minigameMaxLevel) {
-                        players.push({ 
-                            name: data.pseudo, 
-                            lvl: data.minigameMaxLevel, 
-                            cf: data.cfPoints || 0 
-                        });
-                    }
+                    // On vérifie qu'ils ont un score de temps (sinon 0)
+                    players.push({ 
+                        name: data.pseudo || "Soldat Inconnu", 
+                        timeScore: data.totalTimeSaved || 0, 
+                        lvl: data.minigameMaxLevel || 0 
+                    });
                 });
 
-                // Tri : Niveau > CF
-                players.sort((a,b) => b.lvl - a.lvl || b.cf - a.cf);
+                // TRI : Celui qui a le PLUS de temps sauvegardé est PREMIER
+                players.sort((a,b) => b.timeScore - a.timeScore);
+
+                // On ne garde que les 10 premiers
                 players = players.slice(0, 10);
 
                 let html = '';
@@ -417,14 +524,17 @@
                         <div class="lb-row">
                             <span style="color:${color}; width:30px;">#${i+1}</span>
                             <span style="flex:1; color:${color}">${p.name}</span>
-                            <span>Niv. ${p.lvl} <small>(${p.cf} CF)</small></span>
+                            <span>${p.timeScore} pts <small>(Niv.${p.lvl})</small></span>
                         </div>
                     `;
                 });
                 if(!html) html = "Aucun score enregistré.";
                 content.innerHTML = html;
 
-            } catch(e) { content.innerText = "Erreur chargement."; }
+            } catch(e) { 
+                console.error(e);
+                content.innerHTML = "Erreur chargement."; 
+            }
         }
     </script>
 </body>
