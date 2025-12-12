@@ -1,7 +1,7 @@
 export const weeks = ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "S11", "S12", "S13", "S14", "S15"];
 
 export let rawData = [
-    // [Scores S1-S14] + [Score S15]
+ 
     { name: "Dorian", scores: [63, null, null, null, null, 44, null, null, 50.5, 72, null, null, 54.5, null, null] },
     { name: "Angelos", scores: [62, 60, 60, 70, 65, 64, 70.5, 61.5, 68.5, 68, 91, 74.5, 69.5, 68.5, 80.5] }, 
     { name: "Ghost", scores: [57, 69, 67, 49, 30, 52, 56.5, 51.5, 55.5, 64.5, 74, 68.5, 88.5, 74, null] },
