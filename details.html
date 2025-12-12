@@ -486,7 +486,7 @@
             
             const seasonsPlayed = Object.keys(details || {}).length;
             if(seasonsPlayed > 0) {
-                const wr = ((totalW / (seasonsPlayed * 4)) * 100).toFixed(0); 
+                const wr = ((totalW / (seasonsPlayed * 6)) * 100).toFixed(0); 
                 document.getElementById('mjWinRate').innerText = `~${wr}% Win Rate (Est.)`;
             }
 

@@ -9,31 +9,17 @@
         /* RESET & BASE */
         body { background-color: #050505; color: white; overflow: hidden; touch-action: none; margin: 0; font-family: 'Rajdhani', sans-serif; }
         
-        /* --- HEADER (INFO JOUEUR + JEU) --- */
+        /* --- HEADER --- */
         .top-bar {
             position: absolute; top: 0; left: 0; width: 100%; height: 80px;
             background: rgba(15,15,15,0.95); border-bottom: 2px solid var(--codm-yellow, #ffc107);
-            z-index: 100; box-sizing: border-box;
-            display: flex; flex-direction: column;
+            z-index: 100; box-sizing: border-box; display: flex; flex-direction: column;
         }
-
-        /* Ligne 1 : Info Joueur & Quitter */
-        .user-row {
-            flex: 1; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 15px; border-bottom: 1px solid #333;
-        }
+        .user-row { flex: 1; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 1px solid #333; }
         .user-info { font-family: 'Orbitron'; font-size: 0.9rem; color: #ccc; display: flex; align-items: center; gap: 10px; }
         .cf-badge { color: #ffc107; font-weight: bold; background: rgba(255, 193, 7, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid #ffc107; }
-        .btn-quit {
-            background: #333; color: white; text-decoration: none; font-size: 0.75rem;
-            padding: 4px 10px; border-radius: 4px; border: 1px solid #555;
-        }
-
-        /* Ligne 2 : Stats du Jeu (Temps/Cibles) */
-        .game-stats-row {
-            flex: 1; display: flex; justify-content: space-around; align-items: center;
-            font-family: 'Orbitron'; font-size: 1rem; background: rgba(0,0,0,0.3);
-        }
+        .btn-quit { background: #333; color: white; text-decoration: none; font-size: 0.75rem; padding: 4px 10px; border-radius: 4px; border: 1px solid #555; }
+        .game-stats-row { flex: 1; display: flex; justify-content: space-around; align-items: center; font-family: 'Orbitron'; font-size: 1rem; background: rgba(0,0,0,0.3); }
         .stat-val { color: #ffc107; font-weight: bold; font-size: 1.2rem; margin-left: 5px; }
 
         /* --- ZONE DE JEU --- */
@@ -49,31 +35,23 @@
             display: flex; justify-content: center; align-items: center;
             user-select: none; -webkit-tap-highlight-color: transparent;
             cursor: pointer; z-index: 10;
-            will-change: transform; /* Optimisation pour le mouvement fluide */
+            will-change: transform, left, top;
         }
         /* Ennemi */
         .t-enemy { width: 60px; height: 60px; background: radial-gradient(circle, #ff0000 40%, #5c0000 100%); border: 2px solid white; box-shadow: 0 0 15px red; }
         .t-enemy::after { content: '🎯'; font-size: 30px; pointer-events: none; }
-        
         /* Civil */
         .t-civil { width: 50px; height: 50px; background: radial-gradient(circle, #00ff00 40%, #004d00 100%); border: 2px solid white; box-shadow: 0 0 10px lime; z-index: 11; }
         .t-civil::after { content: '🙋‍♂️'; font-size: 25px; pointer-events: none; }
-
-        /* Saboteur / Piégé (NOUVEAU) */
-        .t-trapped {
-            background: radial-gradient(circle, #00ff00 20%, #330000 100%); 
-            box-shadow: 0 0 20px 5px red; /* AURA ROUGE */
-            border: 2px solid red;
-            z-index: 13;
-        }
+        /* Piégé */
+        .t-trapped { background: radial-gradient(circle, #00ff00 20%, #330000 100%); box-shadow: 0 0 20px 5px red; border: 2px solid red; z-index: 13; }
         .t-trapped::after { content: '😈'; font-size: 25px; pointer-events: none; }
-
         /* Bombe */
         .t-bomb { width: 70px; height: 70px; background: #222; border: 2px dashed orange; animation: pulseBomb 0.5s infinite; z-index: 12; display: flex; align-items: center; justify-content: center; }
         .t-bomb::before { content: '💣'; font-size: 25px; pointer-events: none; }
         @keyframes pulseBomb { 0% { border-color: orange; } 50% { border-color: red; scale: 1.05; } 100% { border-color: orange; } }
 
-        /* --- ÉCRANS (Start, End) --- */
+        /* --- ÉCRANS --- */
         .overlay-screen {
             position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 200;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -81,7 +59,6 @@
         }
         .screen-title { font-family: 'Orbitron'; font-size: 2rem; color: #ffc107; margin-bottom: 20px; }
         .screen-desc { color: #ccc; margin-bottom: 30px; max-width: 500px; line-height: 1.5; font-size: 1.1rem; }
-        
         .btn-action {
             background: #ffc107; color: black; border: none;
             padding: 15px 40px; font-family: 'Orbitron'; font-weight: bold; font-size: 1.2rem;
@@ -91,11 +68,8 @@
         .btn-action:active { transform: scale(0.95); }
         .btn-training { background: #00bcd4; color: black; }
 
-        /* MODAL CLASSEMENT */
         #leaderboardModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 300; flex-direction: column; padding: 20px; overflow-y: auto; }
         .lb-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #333; font-family: 'Rajdhani'; font-size: 1.1rem; }
-        
-        /* Loading */
         #loadingMsg { font-family: 'Orbitron'; color: #ffc107; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
     </style>
@@ -120,16 +94,13 @@
     <div id="gameArena"></div>
 
     <div id="startScreen" class="overlay-screen">
-        <h1 class="screen-title">TACTICAL DRILL</h1>
+        <h1 class="screen-title">TACTICAL DRILL (V.12.3.4)</h1>
         <div id="loadingMsg">CONNEXION AU RÉSEAU...</div>
-        
         <div id="startContent" style="display:none;">
-            <p class="screen-desc" id="modeDesc">
-                Analyse de votre accès quotidien...
-            </p>
+            <p class="screen-desc" id="modeDesc">Analyse...</p>
             <button id="btnStart" class="btn-action">COMMENCER</button>
             <br>
-            <button id="btnShowLb" class="btn-action" style="background:transparent; border:1px solid #555; color:white; font-size:0.9rem; padding:10px;">🏆 CLASSEMENT (Temps)</button>
+            <button id="btnShowLb" class="btn-action" style="background:transparent; border:1px solid #555; color:white; font-size:0.9rem; padding:10px;">🏆 CLASSEMENT REVENU</button>
         </div>
     </div>
 
@@ -152,13 +123,12 @@
     </div>
 
     <div id="leaderboardModal">
-        <h2 class="screen-title">TOP CHRONOS</h2>
+        <h2 class="screen-title">TOP REVENUS (CF)</h2>
         <button onclick="document.getElementById('leaderboardModal').style.display='none'" style="position:absolute; top:20px; right:20px; background:none; border:none; color:white; font-size:2rem;">✕</button>
         <div id="lbContent" style="width:100%; max-width:500px; margin:0 auto;"></div>
     </div>
 
     <script type="module">
-        // J'ai remis ta liste d'import d'origine pour éviter le crash
         import { auth, db, doc, getDoc, updateDoc, increment, onAuthStateChanged, collection, getDocs, query } from './js/firebase.js';
 
         let currentUser = null;
@@ -171,10 +141,8 @@
         let gameActive = false;
         let isRankedMode = true;
         
-        // Liste des cibles mouvantes pour l'animation JS
         let movingTargets = []; 
 
-        // CONFIGURATION DES NIVEAUX (Ajout de "trapped" pour les niveaux 8,9,10)
         const levels = [
             { id:1, time:20, targets:5,  civil:0, trapped:0, bomb:0, moving:false, spawnRate:1200 },
             { id:2, time:20, targets:8,  civil:0, trapped:0, bomb:0, moving:false, spawnRate:1000 },
@@ -188,7 +156,6 @@
             { id:10,time:40, targets:30, civil:8, trapped:5, bomb:8, moving:true, spawnRate:500 }
         ];
 
-        // --- 1. INITIALISATION ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
@@ -202,54 +169,41 @@
             try {
                 const userRef = doc(db, "users", currentUser.uid);
                 const snap = await getDoc(userRef);
-                
-                if (!snap.exists()) {
-                    alert("Erreur: Profil introuvable.");
-                    return;
-                }
-
+                if (!snap.exists()) return;
                 const data = snap.data();
                 
-                // 1. Mise à jour UI Header
                 document.getElementById('displayPseudo').innerText = (data.pseudo || "Soldat").toUpperCase();
                 document.getElementById('displayCF').innerText = (data.cfPoints || 0).toLocaleString();
 
-                // 2. Vérification Date pour le Mode
                 const today = new Date().toDateString();
                 const lastPlayed = data.lastMinigameDate;
-                const modeDesc = document.getElementById('modeDesc');
                 const btnStart = document.getElementById('btnStart');
 
                 if (lastPlayed === today) {
                     isRankedMode = false;
-                    modeDesc.innerHTML = `<span style="color:#00bcd4">MODE ENTRAÎNEMENT</span><br>Vous avez déjà joué aujourd'hui.<br>Score et CF désactivés.`;
+                    document.getElementById('modeDesc').innerHTML = `<span style="color:#00bcd4">MODE ENTRAÎNEMENT</span><br>Déjà joué aujourd'hui.`;
                     btnStart.innerText = "JOUER (FUN)";
                     btnStart.classList.add('btn-training');
                 } else {
                     isRankedMode = true;
-                    modeDesc.innerHTML = `<span style="color:#ffc107">MODE CLASSÉ</span><br>1 Essai Quotidien.<br>Le classement se joue au TEMPS RESTANT.`;
-                    btnStart.innerText = "COMMENCER LE RUN";
+                    document.getElementById('modeDesc').innerHTML = `<span style="color:#ffc107">MODE CLASSÉ</span><br>Gagnez des CF (Revenus cumulés).`;
+                    btnStart.innerText = "COMMENCER";
                 }
 
-                // 3. Affichage
                 document.getElementById('loadingMsg').style.display = 'none';
                 document.getElementById('startContent').style.display = 'block';
 
-                // 4. Events
                 btnStart.onclick = startGame;
                 document.getElementById('btnShowLb').onclick = loadLeaderboard;
 
             } catch (e) {
                 console.error("Erreur Init:", e);
-                document.getElementById('loadingMsg').innerText = "ERREUR CHARGEMENT DONNÉES";
+                document.getElementById('loadingMsg').innerText = "ERREUR CHARGEMENT";
             }
         }
 
-        // --- 2. JEU ---
-
         function startGame() {
             document.getElementById('startScreen').style.display = 'none';
-            // Si classé, on bloque la date
             if (isRankedMode) {
                 updateDoc(doc(db, "users", currentUser.uid), { lastMinigameDate: new Date().toDateString() });
             }
@@ -263,9 +217,8 @@
             currentLevel = lvlId;
             timeLeft = config.time;
             targetsLeft = config.targets;
-            movingTargets = []; // Reset liste cibles mouvantes
+            movingTargets = [];
 
-            // UI
             document.getElementById('uiLevel').innerText = currentLevel;
             document.getElementById('uiTargets').innerText = targetsLeft;
             document.getElementById('uiTime').innerText = timeLeft;
@@ -297,8 +250,6 @@
 
                 const rand = Math.random();
                 let type = 'enemy';
-                
-                // Logique de spawn probabilités
                 if (config.bomb > 0 && rand > 0.9) type = 'bomb';
                 else if (config.trapped > 0 && rand > 0.85) type = 'trapped'; 
                 else if (config.civil > 0 && rand > 0.70) type = 'civil';
@@ -312,7 +263,6 @@
             const el = document.createElement('div');
             el.classList.add('target');
 
-            // --- POSITION INITIALE ---
             const w = arena.offsetWidth - 70; 
             const h = arena.offsetHeight - 70;
             let x = Math.max(10, Math.random() * w);
@@ -321,11 +271,9 @@
             el.style.left = x + 'px';
             el.style.top = y + 'px';
 
-            // --- TYPES DE CIBLES ---
             if(type === 'enemy') {
                 el.classList.add('t-enemy');
                 el.onpointerdown = (e) => { e.preventDefault(); hitEnemy(el); };
-                // Durée de vie courte
                 setTimeout(() => { if(el.parentElement && gameActive) el.remove(); }, 2200);
             } 
             else if(type === 'civil') {
@@ -334,30 +282,21 @@
                 setTimeout(() => { if(el.parentElement) el.remove(); }, 2500);
             }
             else if(type === 'trapped') {
-                // LE PIÉGÉ (Saboteur) : Ressemble à civil mais aura rouge
                 el.classList.add('t-civil', 't-trapped'); 
-                
-                // Il pond des bombes tant qu'il est vivant !
                 const bombDropper = setInterval(() => {
                     if(el.parentElement && gameActive) {
-                        spawnEntity('bomb', false); // Spawn une bombe
+                        spawnEntity('bomb', false);
                     } else {
                         clearInterval(bombDropper);
                     }
                 }, 2000); 
-
-                // Il faut le tuer (contrairement au civil)
                 el.onpointerdown = (e) => { 
                     e.preventDefault(); 
                     clearInterval(bombDropper);
                     hitEnemy(el); 
                 };
-
                 setTimeout(() => { 
-                    if(el.parentElement) {
-                         clearInterval(bombDropper);
-                         el.remove(); 
-                    }
+                    if(el.parentElement) { clearInterval(bombDropper); el.remove(); }
                 }, 4000); 
             }
             else if(type === 'bomb') {
@@ -366,17 +305,20 @@
                 setTimeout(() => { if(el.parentElement && gameActive) gameOver("BOOM !"); }, 3500);
             }
 
-            // --- MOUVEMENT AVANCÉ (Rebond) ---
             if(moving && (type === 'enemy' || type === 'trapped' || type === 'civil')) {
-                // Vitesse aléatoire X et Y
-                const speed = 2 + Math.random() * 3; 
+                // VITESSE PROGRESSIVE : Augmente avec le niveau
+                // Niveau 1 = lent, Niveau 10 = rapide
+                const baseSpeed = 1 + (currentLevel * 0.4); 
+                const speed = baseSpeed + Math.random(); 
+
                 const angle = Math.random() * Math.PI * 2;
                 
-                // On stocke les données physiques dans l'élément DOM
                 el.dataset.vx = Math.cos(angle) * speed;
                 el.dataset.vy = Math.sin(angle) * speed;
                 el.dataset.x = x;
                 el.dataset.y = y;
+                // On met une taille (radius) pour la collision
+                el.dataset.radius = (type === 'enemy' ? 30 : 25); 
                 
                 movingTargets.push(el);
             }
@@ -384,7 +326,7 @@
             arena.appendChild(el);
         }
 
-        // Boucle d'animation pour les mouvements fluides et rebonds
+        // --- GESTION DES MOUVEMENTS ET COLLISIONS ---
         function startMovementLoop() {
             if(moveFrame) cancelAnimationFrame(moveFrame);
             
@@ -395,29 +337,63 @@
                 const maxX = arena.offsetWidth - 60;
                 const maxY = arena.offsetHeight - 60;
 
-                // On filtre les cibles qui n'existent plus
                 movingTargets = movingTargets.filter(el => document.body.contains(el));
 
+                // 1. Déplacement & Rebond Murs
                 movingTargets.forEach(el => {
                     let x = parseFloat(el.dataset.x);
                     let y = parseFloat(el.dataset.y);
                     let vx = parseFloat(el.dataset.vx);
                     let vy = parseFloat(el.dataset.vy);
 
-                    // Mise à jour pos
                     x += vx;
                     y += vy;
 
-                    // Rebond Bords
                     if(x <= 0 || x >= maxX) { vx *= -1; el.dataset.vx = vx; }
                     if(y <= 0 || y >= maxY) { vy *= -1; el.dataset.vy = vy; }
 
-                    // Sauvegarde et Applique
                     el.dataset.x = x;
                     el.dataset.y = y;
                     el.style.left = x + 'px';
                     el.style.top = y + 'px';
                 });
+
+                // 2. Gestion Collision entre cibles (Évite superposition Civil/Ennemi)
+                for (let i = 0; i < movingTargets.length; i++) {
+                    for (let j = i + 1; j < movingTargets.length; j++) {
+                        let t1 = movingTargets[i];
+                        let t2 = movingTargets[j];
+
+                        let x1 = parseFloat(t1.dataset.x) + parseFloat(t1.dataset.radius);
+                        let y1 = parseFloat(t1.dataset.y) + parseFloat(t1.dataset.radius);
+                        let x2 = parseFloat(t2.dataset.x) + parseFloat(t2.dataset.radius);
+                        let y2 = parseFloat(t2.dataset.y) + parseFloat(t2.dataset.radius);
+
+                        let dx = x2 - x1;
+                        let dy = y2 - y1;
+                        let distance = Math.sqrt(dx * dx + dy * dy);
+                        let minDist = parseFloat(t1.dataset.radius) + parseFloat(t2.dataset.radius);
+
+                        if (distance < minDist) {
+                            // COLLISION DÉTECTÉE : Échange de vélocité (Rebond simple)
+                            let tempVx = t1.dataset.vx;
+                            let tempVy = t1.dataset.vy;
+                            
+                            t1.dataset.vx = t2.dataset.vx;
+                            t1.dataset.vy = t2.dataset.vy;
+                            t2.dataset.vx = tempVx;
+                            t2.dataset.vy = tempVy;
+
+                            // Petite séparation pour éviter qu'ils restent collés
+                            let overlap = (minDist - distance) / 2;
+                            let angle = Math.atan2(dy, dx);
+                            t1.dataset.x = parseFloat(t1.dataset.x) - Math.cos(angle) * overlap;
+                            t1.dataset.y = parseFloat(t1.dataset.y) - Math.sin(angle) * overlap;
+                            t2.dataset.x = parseFloat(t2.dataset.x) + Math.cos(angle) * overlap;
+                            t2.dataset.y = parseFloat(t2.dataset.y) + Math.sin(angle) * overlap;
+                        }
+                    }
+                }
 
                 moveFrame = requestAnimationFrame(animate);
             }
@@ -450,19 +426,19 @@
                 try {
                     const userRef = doc(db, "users", currentUser.uid);
                     
-                    // On gagne le niveau max + on ajoute le temps restant au score total
+                    // --- CHANGEMENT CLASSEMENT ---
+                    // On incrémente 'minigameRevenue' à chaque fois qu'on gagne 1 CF.
                     await updateDoc(userRef, {
                         cfPoints: increment(1),
                         minigameMaxLevel: Math.max((await getDoc(userRef)).data().minigameMaxLevel || 0, currentLevel),
-                        totalTimeSaved: increment(timeLeft) // SCORE BASÉ SUR LE TEMPS RESTANT
+                        minigameRevenue: increment(1) // COMPTEUR ALL-TIME
                     });
                     
-                    // Mise à jour visuelle immédiate
                     const cfEl = document.getElementById('displayCF');
                     let current = parseInt(cfEl.innerText.replace(/\s/g, ''));
                     cfEl.innerText = (current + 1).toLocaleString();
                     
-                    document.getElementById('levelRewardMsg').innerHTML = `<span style="color:#ffc107; font-size:1.5rem;">+1 CF</span><br>Temps épargné: +${timeLeft} pts`;
+                    document.getElementById('levelRewardMsg').innerHTML = `<span style="color:#ffc107; font-size:1.5rem;">+1 CF</span><br>Ajouté à votre revenu total.`;
                 } catch(e) { console.error(e); }
             } else {
                 document.getElementById('levelRewardMsg').innerText = "Mode Entraînement (0 Gain)";
@@ -488,33 +464,31 @@
             document.getElementById('winScreen').style.display = 'flex';
         }
 
-        // CLASSEMENT BASÉ SUR LE TEMPS (JavaScript uniquement pour éviter les erreurs d'import)
         async function loadLeaderboard() {
             const modal = document.getElementById('leaderboardModal');
             const content = document.getElementById('lbContent');
             modal.style.display = 'flex';
-            content.innerHTML = 'Chargement des meilleurs chronos...';
+            content.innerHTML = 'Calcul des revenus...';
 
             try {
-                // On récupère tout et on trie en JS
                 const q = query(collection(db, "users"));
                 const snap = await getDocs(q);
                 let players = [];
                 
                 snap.forEach(d => {
                     const data = d.data();
-                    // On vérifie qu'ils ont un score de temps (sinon 0)
-                    players.push({ 
-                        name: data.pseudo || "Soldat Inconnu", 
-                        timeScore: data.totalTimeSaved || 0, 
-                        lvl: data.minigameMaxLevel || 0 
-                    });
+                    // On classe selon 'minigameRevenue' (Revenus totaux du jeu)
+                    if(data.minigameRevenue) {
+                        players.push({ 
+                            name: data.pseudo || "Soldat Inconnu", 
+                            revenue: data.minigameRevenue, 
+                            lvl: data.minigameMaxLevel || 0 
+                        });
+                    }
                 });
 
-                // TRI : Celui qui a le PLUS de temps sauvegardé est PREMIER
-                players.sort((a,b) => b.timeScore - a.timeScore);
-
-                // On ne garde que les 10 premiers
+                // Tri : Du plus riche au moins riche
+                players.sort((a,b) => b.revenue - a.revenue);
                 players = players.slice(0, 10);
 
                 let html = '';
@@ -524,11 +498,11 @@
                         <div class="lb-row">
                             <span style="color:${color}; width:30px;">#${i+1}</span>
                             <span style="flex:1; color:${color}">${p.name}</span>
-                            <span>${p.timeScore} pts <small>(Niv.${p.lvl})</small></span>
+                            <span>${p.revenue} CF <small>(Gagnés au total)</small></span>
                         </div>
                     `;
                 });
-                if(!html) html = "Aucun score enregistré.";
+                if(!html) html = "Aucun revenu enregistré.";
                 content.innerHTML = html;
 
             } catch(e) { 
