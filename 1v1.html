@@ -330,6 +330,16 @@
                 <option value="">Chargement des soldats...</option>
             </select>
 
+            <div style="margin-top:20px;">
+                <label style="color:#aaa; font-size:0.9rem; display:block; margin-bottom:8px;">
+                    💰 MISE (CF) - Maximum 100 CF
+                </label>
+                <input type="number" id="betAmount" min="0" max="100" value="0" style="width:100%; padding:10px; background:#222; border:1px solid #444; color:white; border-radius:4px; font-size:1rem; box-sizing:border-box;">
+                <div style="color:#888; font-size:0.8rem; margin-top:5px;">
+                    ⚠️ Si tu perds, tu perds cette mise. Si tu gagnes, tu gagne la mise totale.
+                </div>
+            </div>
+
             <div style="display:flex; gap:10px; margin-top:20px;">
                 <button onclick="document.getElementById('challengeModal').style.display='none'" style="flex:1; background:transparent; border:1px solid #555; color:white; padding:10px; cursor:pointer;">ANNULER</button>
                 <button onclick="createChallenge()" style="flex:1; background:var(--codm-yellow); border:none; color:black; padding:10px; font-weight:bold; cursor:pointer;">DÉFIER !</button>
@@ -473,6 +483,7 @@
                                 <div class="fighter-stats">OPPONENT</div>
                             </div>
                         </div>
+                        ${fight.betAmount > 0 ? `<div style="text-align:center; padding:10px; background:rgba(255,193,7,0.1); border-top:1px solid rgba(255,193,7,0.3); color:var(--codm-yellow); font-weight:bold;">💰 MISE: ${fight.betAmount} CF</div>` : ''}
                         ${adminControls}
                     </div>
                 `;
@@ -489,7 +500,10 @@
 
         window.createChallenge = async () => {
             const targetUid = opponentSelect.value;
+            const betAmount = parseInt(document.getElementById('betAmount').value) || 0;
+            
             if (!targetUid) return alert("Sélectionne un adversaire !");
+            if (betAmount < 0 || betAmount > 100) return alert("La mise doit être entre 0 et 100 CF !");
 
             // Récupérer les pseudos
             const challengerName = allUsersData.find(u => u.uid === currentUser.uid).pseudo;
@@ -501,11 +515,13 @@
                     challengerName: challengerName,
                     opponentUid: targetUid,
                     opponentName: opponentName,
+                    betAmount: betAmount,
                     status: 'pending',
                     timestamp: new Date()
                 });
-                alert("DÉFI LANCÉ ! Prépare tes armes.");
+                alert("DÉFI LANCÉ ! Prépare tes armes." + (betAmount > 0 ? `\n💰 Mise: ${betAmount} CF` : ""));
                 document.getElementById('challengeModal').style.display = 'none';
+                document.getElementById('betAmount').value = '0';
                 loadActiveFights(); // Refresh
             } catch (e) {
                 console.error(e);
@@ -518,22 +534,30 @@
             if(!confirm("Confirmer le résultat ? Cette action est irréversible.")) return;
 
             try {
-                // 1. Update Winner
+                // Récupérer les infos du défi (pour la mise)
+                const fightRef = doc(db, "challenges", fightId);
+                const fightSnap = await getDoc(fightRef);
+                const fightData = fightSnap.data();
+                const betAmount = fightData?.betAmount || 0;
+
+                // 1. Update Winner (ajouter la mise)
                 const winnerRef = doc(db, "users", winnerUid);
                 await updateDoc(winnerRef, {
-                    oneVsOneWins: increment(1)
+                    oneVsOneWins: increment(1),
+                    CF: increment(betAmount)
                 });
 
-                // 2. Update Loser
+                // 2. Update Loser (retirer la mise)
                 const loserRef = doc(db, "users", loserUid);
                 await updateDoc(loserRef, {
-                    oneVsOneLosses: increment(1)
+                    oneVsOneLosses: increment(1),
+                    CF: increment(-betAmount)
                 });
 
                 // 3. Delete Fight Card
                 await deleteDoc(doc(db, "challenges", fightId));
 
-                alert("Résultat enregistré. Classement mis à jour.");
+                alert("Résultat enregistré. Classement mis à jour." + (betAmount > 0 ? `\n💰 Mise transférée: ${betAmount} CF` : ""));
                 loadActiveFights();
                 loadUsersAndLadder();
 

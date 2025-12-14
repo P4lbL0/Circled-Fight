@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Historique & Stats - Circled Fight</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/paris.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    
+    <style>
+        * { box-sizing: border-box; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border: 2px solid #333;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+            min-height: 90px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--codm-yellow);
+        }
+        
+        .stat-card.red::before { background: var(--accent-red); }
+        .stat-card.green::before { background: #4CAF50; }
+        
+        .stat-label {
+            font-family: 'Orbitron';
+            font-size: 0.65rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-family: 'Orbitron';
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .stat-value.yellow { color: var(--codm-yellow); }
+        .stat-value.red { color: var(--accent-red); }
+        .stat-value.green { color: #4CAF50; }
+        
+        .tab-container {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+        
+        .tab-container::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .tab-container::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 2px;
+        }
+        
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #666;
+            padding: 12px 15px;
+            font-family: 'Orbitron';
+            font-size: 0.75rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: 0.3s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .tab-btn:hover { color: white; }
+        .tab-btn.active {
+            color: var(--codm-yellow);
+            border-bottom-color: var(--codm-yellow);
+        }
+        
+        .bet-history-item {
+            background: #141414;
+            border: 1px solid #333;
+            padding: 12px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bet-history-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+        }
+        
+        .bet-history-item.won::before { background: #4CAF50; }
+        .bet-history-item.lost::before { background: #f44336; }
+        .bet-history-item.pending::before { background: var(--codm-yellow); }
+        
+        .bet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+        
+        .bet-header > div {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .bet-header strong {
+            display: block;
+            word-break: break-word;
+            font-size: 0.9rem;
+        }
+        
+        .bet-status {
+            font-family: 'Orbitron';
+            font-size: 0.65rem;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .bet-status.won { background: #4CAF50; color: white; }
+        .bet-status.lost { background: #f44336; color: white; }
+        .bet-status.pending { background: var(--codm-yellow); color: black; }
+        
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #141414;
+            border: 1px solid #333;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+        
+        .leaderboard-rank {
+            font-family: 'Orbitron';
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-width: 40px;
+            flex-shrink: 0;
+        }
+        
+        .leaderboard-rank.first { color: #FFD700; }
+        .leaderboard-rank.second { color: #C0C0C0; }
+        .leaderboard-rank.third { color: #CD7F32; }
+        
+        .leaderboard-player {
+            flex: 1;
+            margin-left: 10px;
+            min-width: 0;
+        }
+        
+        .leaderboard-player strong {
+            display: block;
+            word-break: break-word;
+            font-size: 1rem;
+        }
+        
+        .leaderboard-stats {
+            text-align: right;
+            font-family: 'Orbitron';
+            flex-shrink: 0;
+        }
+        
+        .leaderboard-stats > div {
+            font-size: 1rem;
+        }
+        
+        .chart-container {
+            background: #141414;
+            border: 2px solid #333;
+            padding: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .prediction-details {
+            background: #0a0a0a;
+            padding: 10px;
+            margin-top: 10px;
+            border-left: 3px solid var(--codm-yellow);
+            font-size: 0.8rem;
+        }
+        
+        .bet-footer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px dashed #333;
+            font-size: 0.85rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-buttons button {
+            flex: 1;
+            min-width: 70px;
+            font-size: 0.75rem;
+            padding: 8px 12px;
+        }
+        
+        /* HEADER RESPONSIVE */
+        .header {
+            padding: 15px;
+        }
+        
+        .header h1 {
+            font-size: 1.3rem;
+        }
+        
+        .sub-header {
+            font-size: 0.65rem;
+        }
+        
+        .export-container {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-nav {
+            font-size: 0.7rem;
+            padding: 8px 12px;
+        }
+        
+        /* MOBILE OPTIMIZATIONS */
+        @media (max-width: 768px) {
+            main {
+                padding: 15px !important;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .stat-card {
+                padding: 12px;
+                min-height: 80px;
+            }
+            
+            .stat-label {
+                font-size: 0.6rem;
+            }
+            
+            .stat-value {
+                font-size: 1.2rem;
+            }
+            
+            .chart-container {
+                padding: 10px;
+            }
+            
+            .chart-container h3 {
+                font-size: 0.85rem !important;
+                margin-bottom: 15px !important;
+            }
+            
+            #balanceChart {
+                max-height: 200px !important;
+            }
+            
+            .tab-btn {
+                padding: 10px 12px;
+                font-size: 0.7rem;
+            }
+            
+            .bet-header strong {
+                font-size: 0.85rem;
+            }
+            
+            .bet-header small {
+                font-size: 0.7rem;
+            }
+            
+            .bet-status {
+                font-size: 0.6rem;
+                padding: 3px 8px;
+            }
+            
+            .prediction-details {
+                font-size: 0.75rem;
+                padding: 8px;
+            }
+            
+            .bet-footer {
+                font-size: 0.8rem;
+            }
+            
+            .leaderboard-rank {
+                font-size: 1rem;
+                min-width: 35px;
+            }
+            
+            .leaderboard-player strong {
+                font-size: 0.9rem;
+            }
+            
+            .leaderboard-player small {
+                font-size: 0.7rem;
+            }
+            
+            .leaderboard-stats > div {
+                font-size: 0.9rem;
+            }
+            
+            .empty-state {
+                padding: 30px 15px;
+            }
+            
+            .empty-state-icon {
+                font-size: 2.5rem;
+            }
+            
+            .empty-state p {
+                font-size: 0.9rem;
+            }
+            
+            .filter-buttons button {
+                font-size: 0.7rem;
+                padding: 6px 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.1rem;
+            }
+            
+            .sub-header {
+                font-size: 0.6rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-value {
+                font-size: 1.4rem;
+            }
+            
+            .btn-nav {
+                font-size: 0.65rem;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="prevention-banner">
+        <span class="warning-icon">⚠</span>
+        <span>JOUER COMPORTE DES RISQUES : ENDETTEMENT, DÉPENDANCE...</span>
+    </div>
+
+    <div class="header">
+        <div>
+            <h1>Circled <span>Fight</span></h1>
+            <div class="sub-header">HISTORIQUE & STATISTIQUES</div>
+        </div>
+        <div class="export-container">
+            <a href="paris.html" class="btn-nav">PARIS</a>
+            <a href="boutique.html" class="btn-nav">BOUTIQUE</a>
+            <span id="adminLink" style="display:none;">
+                <a href="admin.html" class="btn-nav btn-admin">CMD</a>
+            </span>
+        </div>
+    </div>
+
+    <main style="max-width: 1400px; margin: 0 auto; padding: 20px;">
+        
+        <!-- DASHBOARD STATS -->
+        <div class="stats-grid" id="dashboardStats">
+            <div class="stat-card">
+                <div class="stat-label">Solde</div>
+                <div class="stat-value yellow"><span id="currentBalance">---</span> <span style="font-size: 0.6em;">CF</span></div>
+            </div>
+            
+            <div class="stat-card green">
+                <div class="stat-label">Gagné</div>
+                <div class="stat-value green"><span id="totalWon">---</span> <span style="font-size: 0.6em;">CF</span></div>
+            </div>
+            
+            <div class="stat-card red">
+                <div class="stat-label">Misé</div>
+                <div class="stat-value red"><span id="totalBet">---</span> <span style="font-size: 0.6em;">CF</span></div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Win Rate</div>
+                <div class="stat-value" id="winRateValue">---%</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Paris</div>
+                <div class="stat-value"><span id="totalBets">---</span></div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Top Cote</div>
+                <div class="stat-value yellow">x<span id="bestOdd">---</span></div>
+            </div>
+        </div>
+
+        <!-- GRAPHIQUE ÉVOLUTION -->
+        <div class="chart-container">
+            <h3 style="color: white; font-family: 'Orbitron'; margin-bottom: 20px; border-left: 3px solid var(--codm-yellow); padding-left: 10px;">
+                📈 ÉVOLUTION
+            </h3>
+            <canvas id="balanceChart" style="max-height: 300px;"></canvas>
+        </div>
+
+        <!-- TABS -->
+        <div class="tab-container">
+            <button class="tab-btn active" onclick="switchTab('history')">📜 HISTORIQUE</button>
+            <button class="tab-btn" onclick="switchTab('leaderboard')">🏆 CLASSEMENT</button>
+            <button class="tab-btn" onclick="switchTab('ai')">🤖 IA</button>
+        </div>
+
+        <!-- TAB: HISTORIQUE -->
+        <div id="tab-history" class="tab-content">
+            <div class="filter-buttons">
+                <button class="btn-nav" onclick="filterBets('all')">TOUS</button>
+                <button class="btn-nav" onclick="filterBets('pending')">EN COURS</button>
+                <button class="btn-nav" onclick="filterBets('won')">GAGNÉS</button>
+                <button class="btn-nav" onclick="filterBets('lost')">PERDUS</button>
+            </div>
+            
+            <div id="historyList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📊</div>
+                    <p>Chargement...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CLASSEMENT -->
+        <div id="tab-leaderboard" class="tab-content" style="display: none;">
+            <h3 style="color: white; font-family: 'Orbitron'; margin-bottom: 20px; border-left: 3px solid var(--accent-red); padding-left: 10px; font-size: 0.9rem;">
+                👑 TOP 10
+            </h3>
+            <div id="leaderboardList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🏆</div>
+                    <p>Calcul en cours...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: ASSISTANT IA -->
+        <div id="tab-ai" class="tab-content" style="display: none;">
+            <h3 style="color: white; font-family: 'Orbitron'; margin-bottom: 20px; border-left: 3px solid var(--codm-yellow); padding-left: 10px; font-size: 0.9rem;">
+                🤖 SUGGESTIONS
+            </h3>
+            <div id="aiSuggestions" style="background: #141414; border: 2px solid #333; padding: 15px;">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🧠</div>
+                    <p>Analyse en cours...</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script type="module">
+        import { auth, db, doc, getDoc, collection, query, where, getDocs, onAuthStateChanged } from './js/firebase.js';
+        import { getAllPlayersWithStats, calculateRealTimeOdds } from './js/data-utils.js';
+        
+        const ADMIN_UID = "CZ0UeiyrPNVufTVnnYSH4YTnGP13";
+        
+        let currentUser = null;
+        let allBets = [];
+        let currentFilter = 'all';
+        let balanceChart = null;
+        
+        // === AUTHENTIFICATION ===
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                if (user.uid === ADMIN_UID) {
+                    document.getElementById('adminLink').style.display = 'inline-block';
+                }
+                await loadUserData();
+            } else {
+                window.location.href = 'paris.html';
+            }
+        });
+        
+        // === CHARGEMENT DES DONNÉES ===
+        async function loadUserData() {
+            try {
+                const userRef = doc(db, "users", currentUser.uid);
+                const userSnap = await getDoc(userRef);
+                const userData = userSnap.data();
+                
+                const betsQuery = query(
+                    collection(db, "bets"),
+                    where("userId", "==", currentUser.uid)
+                );
+                const betsSnapshot = await getDocs(betsQuery);
+                
+                allBets = [];
+                betsSnapshot.forEach(doc => {
+                    allBets.push({ id: doc.id, ...doc.data() });
+                });
+                
+                allBets.sort((a, b) => new Date(b.betTime) - new Date(a.betTime));
+                
+                calculateStats(userData);
+                displayBets();
+                loadLeaderboard();
+                generateAISuggestions();
+                
+            } catch (error) {
+                console.error("Erreur chargement:", error);
+            }
+        }
+        
+        // === CALCUL DES STATISTIQUES ===
+        function calculateStats(userData) {
+            const currentBalance = userData.cfPoints;
+            const settledBets = allBets.filter(b => b.isSettled);
+            const wonBets = settledBets.filter(b => b.status === 'won');
+            
+            const totalBet = settledBets.reduce((sum, b) => sum + b.amount, 0);
+            const totalWon = wonBets.reduce((sum, b) => sum + (b.gain || 0), 0);
+            const winRate = settledBets.length > 0 ? ((wonBets.length / settledBets.length) * 100).toFixed(1) : 0;
+            const bestOdd = Math.max(...allBets.map(b => b.totalOdd || 1), 0).toFixed(2);
+            
+            document.getElementById('currentBalance').textContent = currentBalance;
+            document.getElementById('totalWon').textContent = totalWon;
+            document.getElementById('totalBet').textContent = totalBet;
+            document.getElementById('totalBets').textContent = allBets.length;
+            document.getElementById('bestOdd').textContent = bestOdd;
+            
+            const winRateEl = document.getElementById('winRateValue');
+            winRateEl.textContent = winRate + '%';
+            winRateEl.className = 'stat-value ' + (winRate >= 50 ? 'green' : 'red');
+            
+            createBalanceChart(settledBets, userData.cfPoints);
+        }
+        
+        // === GRAPHIQUE ÉVOLUTION ===
+        function createBalanceChart(settledBets, currentBalance) {
+            const ctx = document.getElementById('balanceChart').getContext('2d');
+            
+            let balance = 100;
+            const data = [{ date: 'Début', balance: 100 }];
+            
+            settledBets.reverse().forEach(bet => {
+                if (bet.status === 'won') {
+                    balance += (bet.gain - bet.amount);
+                } else {
+                    balance -= bet.amount;
+                }
+                const date = new Date(bet.betTime).toLocaleDateString();
+                data.push({ date, balance });
+            });
+            
+            data.push({ date: 'Maintenant', balance: currentBalance });
+            
+            if (balanceChart) balanceChart.destroy();
+            
+            balanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.date),
+                    datasets: [{
+                        label: 'Solde CF',
+                        data: data.map(d => d.balance),
+                        borderColor: '#FFC107',
+                        backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#666', font: { size: 10 } },
+                            grid: { color: '#222' }
+                        },
+                        x: {
+                            ticks: { 
+                                color: '#666', 
+                                font: { size: 9 },
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: { color: '#222' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // === AFFICHAGE HISTORIQUE ===
+        function displayBets() {
+            const container = document.getElementById('historyList');
+            const filtered = currentFilter === 'all' 
+                ? allBets 
+                : allBets.filter(b => 
+                    currentFilter === 'pending' ? !b.isSettled : b.status === currentFilter
+                  );
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>Aucun pari ${currentFilter === 'all' ? '' : currentFilter === 'pending' ? 'en cours' : currentFilter === 'won' ? 'gagné' : 'perdu'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            filtered.forEach(bet => {
+                const date = new Date(bet.betTime).toLocaleString('fr-FR', { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                const statusClass = bet.isSettled ? bet.status : 'pending';
+                const statusText = bet.isSettled 
+                    ? (bet.status === 'won' ? '✅ GAGNÉ' : '❌ PERDU')
+                    : '⏳ EN COURS';
+                
+                const gain = bet.isSettled && bet.status === 'won' ? bet.gain : 0;
+                const profit = gain - bet.amount;
+                
+                let predictionsHTML = '';
+                for (const [player, rank] of Object.entries(bet.prediction)) {
+                    predictionsHTML += `<div style="margin-bottom: 3px;"><span style="color: var(--codm-yellow);">${player}</span> → Top ${rank}</div>`;
+                }
+                
+                html += `
+                    <div class="bet-history-item ${statusClass}">
+                        <div class="bet-header">
+                            <div>
+                                <strong style="color: white; font-family: 'Orbitron';">${bet.matchId}</strong>
+                                <br><small style="color: #888;">${date}</small>
+                            </div>
+                            <span class="bet-status ${statusClass}">${statusText}</span>
+                        </div>
+                        
+                        <div class="prediction-details">
+                            ${predictionsHTML}
+                        </div>
+                        
+                        <div class="bet-footer">
+                            <div>
+                                <span style="color: #888;">Mise:</span> <strong style="color: white;">${bet.amount} CF</strong><br>
+                                <span style="color: #888;">Cote:</span> <strong style="color: var(--codm-yellow);">x${bet.totalOdd.toFixed(2)}</strong>
+                            </div>
+                            <div style="text-align: right;">
+                                ${bet.isSettled ? `
+                                    <span style="color: #888;">Gain:</span> <strong style="color: ${gain > 0 ? '#4CAF50' : '#888'};">${gain} CF</strong><br>
+                                    <span style="color: #888;">Profit:</span> <strong style="color: ${profit > 0 ? '#4CAF50' : '#f44336'};">${profit > 0 ? '+' : ''}${profit} CF</strong>
+                                ` : `
+                                    <span style="color: #888;">Potentiel:</span><br>
+                                    <strong style="color: #4CAF50;">${Math.floor(bet.amount * bet.totalOdd)} CF</strong>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // === CLASSEMENT ===
+        async function loadLeaderboard() {
+            const container = document.getElementById('leaderboardList');
+            
+            try {
+                const allBetsQuery = query(
+                    collection(db, "bets"),
+                    where("isSettled", "==", true),
+                    where("status", "==", "won")
+                );
+                const allBetsSnapshot = await getDocs(allBetsQuery);
+                
+                const userStats = {};
+                
+                for (const betDoc of allBetsSnapshot.docs) {
+                    const bet = betDoc.data();
+                    const userId = bet.userId;
+                    
+                    if (!userStats[userId]) {
+                        const userRef = doc(db, "users", userId);
+                        const userSnap = await getDoc(userRef);
+                        const pseudo = userSnap.exists() ? userSnap.data().pseudo : "Inconnu";
+                        
+                        userStats[userId] = {
+                            pseudo,
+                            totalGain: 0,
+                            betsWon: 0
+                        };
+                    }
+                    
+                    userStats[userId].totalGain += (bet.gain || 0);
+                    userStats[userId].betsWon += 1;
+                }
+                
+                const leaderboard = Object.entries(userStats)
+                    .map(([userId, stats]) => ({ userId, ...stats }))
+                    .sort((a, b) => b.totalGain - a.totalGain)
+                    .slice(0, 10);
+                
+                if (leaderboard.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🏆</div>
+                            <p>Aucun gagnant</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                leaderboard.forEach((player, index) => {
+                    const rankClass = index === 0 ? 'first' : index === 1 ? 'second' : index === 2 ? 'third' : '';
+                    const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+                    
+                    html += `
+                        <div class="leaderboard-item">
+                            <div class="leaderboard-rank ${rankClass}">${medal} #${index + 1}</div>
+                            <div class="leaderboard-player">
+                                <strong style="color: white;">${player.pseudo}</strong>
+                                <br><small style="color: #888;">${player.betsWon} victoires</small>
+                            </div>
+                            <div class="leaderboard-stats">
+                                <div style="color: #4CAF50; font-weight: bold;">${player.totalGain} CF</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+                
+            } catch (error) {
+                console.error("Erreur classement:", error);
+            }
+        }
+        
+        // === ASSISTANT IA ===
+        function generateAISuggestions() {
+            const container = document.getElementById('aiSuggestions');
+            const allPlayers = getAllPlayersWithStats();
+            
+            const topPlayers = allPlayers.slice(0, 3);
+            const undervaluedPlayers = allPlayers.filter(p => 
+                p.gamesPlayed >= 5 && p.average >= 50 && p.stdDev < 15
+            ).slice(0, 3);
+            
+            let html = '<div style="margin-bottom: 15px;">';
+            html += '<p style="color: #888; font-size: 0.8rem; margin-bottom: 15px;">Basé sur 16 dernières semaines</p>';
+            
+            html += '<div style="background: #0a0a0a; border-left: 3px solid #4CAF50; padding: 12px; margin-bottom: 15px;">';
+            html += '<h4 style="color: #4CAF50; font-family: Orbitron; margin: 0 0 10px 0; font-size: 0.85rem;">💡 VALEURS SÛRES</h4>';
+            topPlayers.forEach(p => {
+                html += `<div style="margin-bottom: 8px; font-size: 0.8rem;">
+                    <strong style="color: white;">${p.name}</strong> 
+                    <span style="color: #888;">Moy: ${p.average.toFixed(1)}</span>
+                    <br><small style="color: #666;">→ Bon pour Top 3</small>
+                </div>`;
+            });
+            html += '</div>';
+            
+            if (undervaluedPlayers.length > 0) {
+                html += '<div style="background: #0a0a0a; border-left: 3px solid var(--codm-yellow); padding: 12px; margin-bottom: 15px;">';
+                html += '<h4 style="color: var(--codm-yellow); font-family: Orbitron; margin: 0 0 10px 0; font-size: 0.85rem;">🎯 VALEUR</h4>';
+                undervaluedPlayers.forEach(p => {
+                    html += `<div style="margin-bottom: 8px; font-size: 0.8rem;">
+                        <strong style="color: white;">${p.name}</strong> 
+                        <span style="color: #888;">★★★★★</span>
+                        <br><small style="color: #666;">→ Joueur stable</small>
+                    </div>`;
+                });
+                html += '</div>';
+            }
+            
+            html += '<div style="background: #3f1010; border-left: 3px solid var(--accent-red); padding: 12px;">';
+            html += '<h4 style="color: var(--accent-red); font-family: Orbitron; margin: 0 0 10px 0; font-size: 0.85rem;">⚠️ ATTENTION</h4>';
+            html += '<p style="color: #ccc; font-size: 0.75rem; margin: 0;">Évitez paris combinés 3+. Risque élevé !</p>';
+            html += '</div>';
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        // === FONCTIONS UTILITAIRES ===
+        window.switchTab = (tab) => {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('tab-history').style.display = tab === 'history' ? 'block' : 'none';
+            document.getElementById('tab-leaderboard').style.display = tab === 'leaderboard' ? 'block' : 'none';
+            document.getElementById('tab-ai').style.display = tab === 'ai' ? 'block' : 'none';
+        };
+        
+        window.filterBets = (filter) => {
+            currentFilter = filter;
+            displayBets();
+        };
+    </script>
+</body>
+</html>
