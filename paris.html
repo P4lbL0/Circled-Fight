@@ -98,7 +98,6 @@
     <script type="module">
         import { auth, db, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, onAuthStateChanged, signOut } from './js/firebase.js';
         import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { requestNotificationPermission, checkNewMatches, checkResults } from './js/notifications.js';
         
         // ⚠️ IMPORT DES NOUVEAUX CALCULATEURS DE COTES (TEMPS RÉEL)
         import { getAllPlayersWithStats, calculateRealTimeOdds } from './js/data-utils.js';
@@ -464,20 +463,6 @@
             if (user) {
                 authSection.style.display = 'none';
                 bettingSection.style.display = 'block';
-                const notifGranted = await requestNotificationPermission();
-        if (notifGranted) {
-            console.log("✅ Notifications activées");
-            
-            // Vérifier toutes les 2 minutes
-            setInterval(() => {
-                checkNewMatches();
-                checkResults(user.uid);
-            }, 120000);
-            
-            // Vérification immédiate
-            checkNewMatches();
-            checkResults(user.uid);
-        }
                 if (user.uid === ADMIN_UID) {
                     adminLink.style.display = 'inline-block';
                 }
