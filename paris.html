@@ -412,6 +412,41 @@
                  return;
             }
 
+            // ⭐ NOUVELLE VÉRIFICATION : Vérifier que l'utilisateur n'a pas déjà parié sur ces rangs
+            try {
+                const existingBetsQuery = query(collection(db, "bets"), 
+                    where("matchId", "==", matchId),
+                    where("userId", "==", auth.currentUser.uid),
+                    where("isSettled", "==", false)
+                );
+                const existingBetsSnap = await getDocs(existingBetsQuery);
+                
+                // Récupérer tous les rangs déjà pariés par cet utilisateur
+                const usedRanks = new Set();
+                existingBetsSnap.docs.forEach(doc => {
+                    const existingBet = doc.data();
+                    Object.values(existingBet.prediction).forEach(rank => {
+                        usedRanks.add(rank);
+                    });
+                });
+                
+                // Vérifier si les nouveaux rangs sélectionnés sont déjà utilisés
+                const conflictingRanks = [];
+                Object.entries(selectedPredictions).forEach(([player, rank]) => {
+                    if (usedRanks.has(rank)) {
+                        conflictingRanks.push(`Rang #${rank}`);
+                    }
+                });
+                
+                if (conflictingRanks.length > 0) {
+                    msgElement.className = "error-msg";
+                    msgElement.innerText = `❌ PARI REFUSÉ: Tu as déjà parié sur ${conflictingRanks.join(', ')}. Tu peux parier sur d'autres rangs, mais pas deux fois la même place!`;
+                    return;
+                }
+            } catch (e) {
+                console.error("Erreur vérification rangs:", e);
+            }
+
             try {
                 const newPoints = currentUserData.cfPoints - amount;
                 await updateDoc(doc(db, "users", auth.currentUser.uid), { cfPoints: newPoints });
