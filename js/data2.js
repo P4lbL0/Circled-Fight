@@ -23,6 +23,12 @@ export const detailedData = {
             "svp": 1,
             "k": 24,
             "a": 5
+        },
+        "S17": {
+            "w": 2,
+            "svp": 1,
+            "k": 32,
+            "a": 5
         }
     },
     "Angelos": {
@@ -49,6 +55,12 @@ export const detailedData = {
             "svp": 2,
             "k": 47,
             "a": 1
+        },
+        "S17": {
+            "w": 4,
+            "svp": 2,
+            "k": 66,
+            "a": 2
         }
     },
     "Seveun": {
@@ -63,6 +75,12 @@ export const detailedData = {
             "svp": 1,
             "k": 39,
             "a": 2
+        },
+        "S17": {
+            "w": 3,
+            "svp": 0,
+            "k": 56,
+            "a": 1
         }
     },
     "Silence": {
@@ -111,6 +129,12 @@ export const detailedData = {
             "svp": 0,
             "k": 12,
             "a": 0
+        },
+        "S17": {
+            "w": 1,
+            "svp": 0,
+            "k": 9,
+            "a": 0
         }
     },
     "Ghost": {
@@ -145,6 +169,12 @@ export const detailedData = {
             "svp": 0,
             "k": 16,
             "a": 2
+        },
+        "S17": {
+            "w": 4,
+            "svp": 0,
+            "k": 23,
+            "a": 1
         }
     },
     "Angel": {
@@ -181,6 +211,12 @@ export const detailedData = {
             "svp": 0,
             "k": 11,
             "a": 3
+        },
+        "S17": {
+            "w": 4,
+            "svp": 0,
+            "k": 14,
+            "a": 4
         }
     },
     "Deadshot": {
@@ -223,6 +259,12 @@ export const detailedData = {
             "svp": 0,
             "k": 17,
             "a": 0
+        },
+        "S17": {
+            "w": 4,
+            "svp": 0,
+            "k": 24,
+            "a": 3
         }
     },
     "Afro": {
@@ -231,6 +273,28 @@ export const detailedData = {
             "svp": 0,
             "k": 21,
             "a": 1
+        },
+        "S17": {
+            "w": 4,
+            "svp": 0,
+            "k": 25,
+            "a": 5
+        }
+    },
+    "Ghostface": {
+        "S17": {
+            "w": 4,
+            "svp": 2,
+            "k": 44,
+            "a": 1
+        }
+    },
+    "Excentrixc": {
+        "S17": {
+            "w": 1,
+            "svp": 0,
+            "k": 20,
+            "a": 0
         }
     }
 };

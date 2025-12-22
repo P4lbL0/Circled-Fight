@@ -1,4 +1,4 @@
-export const weeks = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14","S15","S16"];
+export const weeks = ["S1","S2","S3","S4","S5","S6","S7","S8","S9","S10","S11","S12","S13","S14","S15","S16","S17"];
 export let rawData = [
     {
         "name": "Dorian",
@@ -16,6 +16,7 @@ export let rawData = [
             null,
             null,
             54.5,
+            null,
             null,
             null,
             null
@@ -39,7 +40,8 @@ export let rawData = [
             69.5,
             68.5,
             80.5,
-            73.5
+            73.5,
+            92
         ]
     },
     {
@@ -60,7 +62,8 @@ export let rawData = [
             88.5,
             74,
             null,
-            45.5
+            45.5,
+            null
         ]
     },
     {
@@ -71,6 +74,7 @@ export let rawData = [
             null,
             33,
             21,
+            null,
             null,
             null,
             null,
@@ -102,7 +106,8 @@ export let rawData = [
             null,
             24,
             26.5,
-            22.5
+            22.5,
+            36
         ]
     },
     {
@@ -123,7 +128,8 @@ export let rawData = [
             60.5,
             64,
             54.5,
-            54.5
+            54.5,
+            47
         ]
     },
     {
@@ -134,6 +140,7 @@ export let rawData = [
             null,
             49,
             40,
+            null,
             null,
             null,
             null,
@@ -165,6 +172,7 @@ export let rawData = [
             null,
             null,
             null,
+            null,
             null
         ]
     },
@@ -180,6 +188,7 @@ export let rawData = [
             null,
             null,
             43,
+            null,
             null,
             null,
             null,
@@ -207,6 +216,7 @@ export let rawData = [
             null,
             null,
             null,
+            null,
             null
         ]
     },
@@ -220,6 +230,7 @@ export let rawData = [
             43,
             null,
             43.5,
+            null,
             null,
             null,
             null,
@@ -249,7 +260,8 @@ export let rawData = [
             22,
             null,
             null,
-            null
+            null,
+            14
         ]
     },
     {
@@ -270,7 +282,8 @@ export let rawData = [
             null,
             42,
             null,
-            43.5
+            43.5,
+            null
         ]
     },
     {
@@ -285,6 +298,7 @@ export let rawData = [
             41,
             45,
             30.5,
+            null,
             null,
             null,
             null,
@@ -312,6 +326,7 @@ export let rawData = [
             null,
             null,
             null,
+            null,
             null
         ]
     },
@@ -333,6 +348,7 @@ export let rawData = [
             34.5,
             17,
             null,
+            null,
             null
         ]
     },
@@ -350,6 +366,7 @@ export let rawData = [
             null,
             null,
             44,
+            null,
             null,
             null,
             null,
@@ -375,7 +392,8 @@ export let rawData = [
             null,
             39.5,
             31,
-            34
+            34,
+            null
         ]
     },
     {
@@ -396,7 +414,8 @@ export let rawData = [
             36,
             null,
             37,
-            null
+            null,
+            43
         ]
     },
     {
@@ -417,7 +436,8 @@ export let rawData = [
             75.5,
             90,
             51.5,
-            84
+            84,
+            null
         ]
     },
     {
@@ -438,7 +458,8 @@ export let rawData = [
             41,
             null,
             64,
-            null
+            null,
+            71
         ]
     },
     {
@@ -457,6 +478,7 @@ export let rawData = [
             null,
             null,
             40.5,
+            null,
             null,
             null,
             null
@@ -480,7 +502,8 @@ export let rawData = [
             null,
             null,
             27,
-            null
+            null,
+            45
         ]
     },
     {
@@ -501,7 +524,8 @@ export let rawData = [
             null,
             null,
             null,
-            26.5
+            26.5,
+            47
         ]
     }
 ];
