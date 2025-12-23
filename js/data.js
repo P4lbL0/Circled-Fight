@@ -63,7 +63,7 @@ export let rawData = [
             74,
             null,
             45.5,
-            null
+            70.5
         ]
     },
     {
