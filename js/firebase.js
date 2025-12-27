@@ -2,7 +2,7 @@
 
 // 1. On importe les outils Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 import { 
     getFirestore, 
@@ -51,6 +51,7 @@ export {
     getDocs,
     onAuthStateChanged, 
     signOut,
+    createUserWithEmailAndPassword,
     // --- NOUVEAUX EXPORTS POUR 1V1 ---
     addDoc,       
     deleteDoc,    

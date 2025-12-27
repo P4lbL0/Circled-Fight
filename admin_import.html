@@ -35,6 +35,30 @@
     <p style="text-align:center; color:#888;">Modifie directement les stats Win/Loss des joueurs.</p>
     <div id="listContainer">Chargement 1v1...</div>
 
+    <h1 style="margin-top: 60px;">AJOUTER UN NOUVEL UTILISATEUR</h1>
+    <p style="text-align:center; color:#888;">Crée un nouvel compte utilisateur.</p>
+    
+    <div style="background: #222; padding: 20px; margin-bottom: 30px; border: 1px solid #333; border-radius: 5px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 15px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; color: #ffc107;">Email(....@circledfight.clan):</label>
+                <input type="email" id="newUserEmail" placeholder="user@example.com" style="width: 100%; padding: 8px; box-sizing: border-box;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; color: #ffc107;">Pseudo:</label>
+                <input type="text" id="newUserPseudo" placeholder="Pseudo" style="width: 100%; padding: 8px; box-sizing: border-box;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; color: #ffc107;">Mot de passe:</label>
+                <input type="password" id="newUserPassword" placeholder="Mot de passe" style="width: 100%; padding: 8px; box-sizing: border-box;">
+            </div>
+            <div style="display: flex; align-items: flex-end;">
+                <button onclick="window.addNewUser()" style="width: 100%; padding: 8px; font-size: 1rem;">AJOUTER</button>
+            </div>
+        </div>
+        <div id="addUserMessage" style="text-align: center; color: #ffc107; min-height: 20px;"></div>
+    </div>
+
     <h1 style="margin-top: 60px;">CANDIDATURES (RECRUTEMENT)</h1>
     <p style="text-align:center; color:#888;">Liste des formulaires envoyés.</p>
     
@@ -55,10 +79,11 @@
     </table>
 
     <script type="module">
-        import { auth, db, collection, getDocs, doc, updateDoc, deleteDoc, onAuthStateChanged } from './js/firebase.js';
+        import { auth, db, collection, getDocs, doc, updateDoc, deleteDoc, onAuthStateChanged, createUserWithEmailAndPassword, setDoc } from './js/firebase.js';
 
         const listContainer = document.getElementById('listContainer');
         const recruitmentBody = document.getElementById('recruitmentBody');
+        const addUserMessage = document.getElementById('addUserMessage');
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) return window.location.href = "login.html"; // Sécurité de base
@@ -136,6 +161,55 @@
                 await deleteDoc(doc(db, "recruitment", docId));
                 loadRecruitment(); // Recharger la liste
             } catch (e) { console.error(e); alert("Erreur suppression"); }
+        };
+
+        // --- 3. AJOUTER NOUVEL UTILISATEUR ---
+        window.addNewUser = async () => {
+            const email = document.getElementById('newUserEmail').value.trim();
+            const pseudo = document.getElementById('newUserPseudo').value.trim();
+            const password = document.getElementById('newUserPassword').value.trim();
+
+            addUserMessage.textContent = '';
+
+            if (!email || !pseudo || !password) {
+                addUserMessage.textContent = '❌ Veuillez remplir tous les champs';
+                addUserMessage.style.color = '#d32f2f';
+                return;
+            }
+
+            try {
+                addUserMessage.textContent = '⏳ Création en cours...';
+                addUserMessage.style.color = '#ffc107';
+
+                // Créer l'utilisateur dans Authentication
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const uid = userCredential.user.uid;
+
+                // Créer le document utilisateur dans Firestore
+                await setDoc(doc(db, "users", uid), {
+                    email: email,
+                    pseudo: pseudo,
+                    oneVsOneWins: 0,
+                    oneVsOneLosses: 0,
+                    createdAt: new Date().toISOString()
+                });
+
+                addUserMessage.textContent = '✅ Utilisateur créé avec succès !';
+                addUserMessage.style.color = '#4caf50';
+
+                // Réinitialiser les champs
+                document.getElementById('newUserEmail').value = '';
+                document.getElementById('newUserPseudo').value = '';
+                document.getElementById('newUserPassword').value = '';
+
+                // Recharger la liste 1v1 immédiatement
+                await load1v1Stats();
+
+            } catch (e) {
+                console.error(e);
+                addUserMessage.textContent = '❌ ' + (e.message || 'Erreur lors de la création');
+                addUserMessage.style.color = '#d32f2f';
+            }
         };
     </script>
 </body>
