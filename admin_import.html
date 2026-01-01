@@ -35,6 +35,10 @@
     <p style="text-align:center; color:#888;">Modifie directement les stats Win/Loss des joueurs.</p>
     <div id="listContainer">Chargement 1v1...</div>
 
+    <h1 style="margin-top: 60px;">GESTION DES CF POINTS</h1>
+    <p style="text-align:center; color:#888;">Modifie les CF Points des joueurs.</p>
+    <div id="cfPointsContainer">Chargement CF Points...</div>
+
     <h1 style="margin-top: 60px;">AJOUTER UN NOUVEL UTILISATEUR</h1>
     <p style="text-align:center; color:#888;">Crée un nouvel compte utilisateur.</p>
     
@@ -84,11 +88,13 @@
         const listContainer = document.getElementById('listContainer');
         const recruitmentBody = document.getElementById('recruitmentBody');
         const addUserMessage = document.getElementById('addUserMessage');
+        const cfPointsContainer = document.getElementById('cfPointsContainer');
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) return window.location.href = "login.html"; // Sécurité de base
             
             await load1v1Stats();
+            await loadCFPoints();
             await loadRecruitment();
         });
 
@@ -115,6 +121,29 @@
                 `;
             });
             listContainer.innerHTML = html;
+        }
+
+        // --- 1B. CHARGEMENT CF POINTS ---
+        async function loadCFPoints() {
+            const snap = await getDocs(collection(db, "users"));
+            let html = '';
+
+            snap.forEach(d => {
+                const u = d.data();
+                if(u.pseudo === "Admin") return;
+
+                html += `
+                    <div class="user-row">
+                        <div class="user-name">${u.pseudo}</div>
+                        <div class="input-group">
+                            <label>CF Points:</label>
+                            <input type="number" id="cf-${d.id}" value="${u.cfPoints || 0}">
+                            <button onclick="window.saveCFPoints('${d.id}')">SAVE</button>
+                        </div>
+                    </div>
+                `;
+            });
+            cfPointsContainer.innerHTML = html;
         }
 
         // --- 2. CHARGEMENT RECRUTEMENT ---
@@ -152,6 +181,14 @@
             try {
                 await updateDoc(doc(db, "users", uid), { oneVsOneWins: w, oneVsOneLosses: l });
                 alert("Sauvegardé !");
+            } catch (e) { console.error(e); alert("Erreur"); }
+        };
+
+        window.saveCFPoints = async (uid) => {
+            const cf = parseInt(document.getElementById(`cf-${uid}`).value);
+            try {
+                await updateDoc(doc(db, "users", uid), { cfPoints: cf });
+                alert("CF Points sauvegardés !");
             } catch (e) { console.error(e); alert("Erreur"); }
         };
 

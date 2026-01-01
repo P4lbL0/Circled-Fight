@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retrospective Clan - Circled Fight</title>
+    <style>
+        /* --- DESIGN GLOBAL --- */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap');
+
+        :root {
+            --primary: #ffc107;
+            --secondary: #00e676;
+            --tertiary: #00bcd4;
+            --accent-red: #ff1744;
+            --bg: #050505;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --galaxy: linear-gradient(45deg, #ffc107, #ff6b00);
+            --magma: linear-gradient(45deg, #ff1744, #ff6b00);
+            --realgold: linear-gradient(45deg, #ffc107, #ffed4e, #ffc107);
+            --cyber: linear-gradient(45deg, #00bcd4, #00e676);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            scroll-snap-type: y mandatory;
+            height: 100vh;
+            overflow-y: scroll;
+        }
+
+        /* Fond animé */
+        .bg-gradient { position: fixed; inset: 0; background: radial-gradient(circle at 50% 50%, #0d1b2a 0%, #050505 100%); z-index: -1; }
+        .orb { position: absolute; width: 300px; height: 300px; border-radius: 50%; filter: blur(80px); opacity: 0.4; animation: float 10s infinite ease-in-out; }
+        .orb-1 { background: var(--secondary); top: -50px; left: -50px; }
+        .orb-2 { background: var(--primary); bottom: -50px; right: -50px; animation-delay: 5s; }
+
+        @keyframes float { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(30px, 50px); } }
+
+        /* Sections / Slides */
+        section {
+            height: 100vh; scroll-snap-align: start;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 20px; text-align: center; position: relative;
+            opacity: 0; transition: all 0.8s ease-out; transform: translateY(20px);
+        }
+        section.visible { opacity: 1; transform: translateY(0); }
+
+        h1, h2, h3 { font-family: 'Orbitron', sans-serif; margin-bottom: 15px; }
+        h1 { font-size: 2.5rem; background: -webkit-linear-gradient(45deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { color: var(--primary); }
+
+        .stat-card {
+            background: var(--card-bg); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; margin: 10px 0;
+        }
+
+        .big-number { font-size: 3.5rem; font-weight: 900; font-family: 'Orbitron'; color: var(--primary); text-shadow: 0 0 15px rgba(255, 193, 7, 0.5); }
+        .label { text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; opacity: 0.7; }
+
+        /* Badges Firebase */
+        .badge-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 15px; }
+        .badge { padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; font-family: 'Orbitron'; border: 1px solid rgba(255,255,255,0.3); display: inline-block; }
+        .badge-red { background: #d32f2f; color: #fff; }
+        .badge-orange { background: #f57c00; color: #fff; }
+        .badge-purple { background: #7b1fa2; color: #fff; }
+        .badge-cyan { background: #00bcd4; color: #000; }
+        .badge-black { background: #111; color: #fff; border-color: #444; }
+        .badge-galaxy { background: var(--galaxy); color: #fff; }
+        .badge-magma { background: var(--magma); color: #fff; }
+        .badge-realgold { background: var(--realgold); color: #000; }
+        .badge-cyber { background: var(--cyber); color: #000; }
+        .glitch { animation: glitch-anim 0.3s infinite; }
+        @keyframes glitch-anim { 0% { transform: translate(0); } 20% { transform: translate(-2px, 1px); } 40% { transform: translate(2px, -1px); } 100% { transform: translate(0); } }
+
+        .bar-container { background: rgba(255,255,255,0.1); border-radius: 10px; height: 8px; width: 100%; margin-top: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); width: 0%; transition: width 1.5s; }
+
+        .personal-comment { font-style: italic; color: #00e676; margin-top: 10px; font-size: 0.9rem; }
+        #loader { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; justify-content: center; align-items: center; color: white; font-family: 'Orbitron'; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-gradient"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+    <div id="loader">Chargement de ta légende...</div>
+
+    <section id="slide-welcome">
+        <p class="label">Rétrospective 2025</p>
+        <h1 id="user-pseudo">Chargement...</h1>
+        <div id="badge-list" class="badge-container"></div>
+        <div id="points-pill" style="margin-top:15px; color:var(--primary); font-family:'Orbitron';">0 CF POINTS</div>
+        <p style="margin-top:20px; font-size:0.9rem;">Prêt à voir ton bilan, Soldat ?</p>
+    </section>
+
+    <section id="slide-fidelity">
+        <h2>Ta Fidélité</h2>
+        <div class="stat-card">
+            <span class="label">Saisons MJ</span>
+            <div id="mj-seasons" class="big-number">0</div>
+            <span class="label">Saisons BR</span>
+            <div id="br-seasons" class="big-number" style="color:var(--primary)">0</div>
+        </div>
+        <p id="fidelity-comment">Tu n'as pas chômé cette année !</p>
+    </section>
+
+    <section id="slide-style">
+        <h2>Ton Style de Jeu</h2>
+        <div class="stat-card">
+            <h3 id="style-title">Analyse...</h3>
+            <p id="style-desc" style="font-size:0.9rem; opacity:0.8;">Détermination de ton profil de combat...</p>
+        </div>
+    </section>
+
+    <section id="slide-performance-mj">
+        <h2>Performance MJ</h2>
+        <div class="stat-card">
+            <div id="mj-rank" style="background:var(--primary); color:black; padding:5px 15px; border-radius:50px; display:inline-block; font-weight:bold; margin-bottom:10px;">Rang #--</div>
+            <br>
+            <span class="label">Moyenne MJ</span>
+            <div id="mj-avg" class="big-number">0.0</div>
+            <div class="bar-container"><div id="mj-bar" class="bar-fill"></div></div>
+            <p style="font-size:0.8rem; margin-top:5px;">Moyenne clan : <span id="clan-mj-avg">--</span></p>
+        </div>
+        <div class="stat-card" style="border-color:var(--secondary); padding:15px;">
+            <span class="label">Top MJ :</span> <span id="mj-best-val" style="color:var(--secondary);">--</span> (<span id="mj-best-name">S--</span>)
+        </div>
+        <div class="stat-card" style="border-color:var(--accent-red); padding:15px;">
+            <span class="label">Pire MJ :</span> <span id="mj-worst-val" style="color:var(--accent-red);">--</span> (<span id="mj-worst-name">S--</span>)
+        </div>
+        <p id="mj-comment" class="personal-comment"></p>
+    </section>
+
+    <section id="slide-performance-br">
+        <h2>Performance BR</h2>
+        <div class="stat-card">
+            <div id="br-rank" style="background:var(--tertiary); color:black; padding:5px 15px; border-radius:50px; display:inline-block; font-weight:bold; margin-bottom:10px;">Rang #--</div>
+            <br>
+            <span class="label">Moyenne BR</span>
+            <div id="br-avg" class="big-number" style="color:var(--tertiary)">0.0</div>
+            <div class="bar-container"><div id="br-bar" class="bar-fill" style="background:linear-gradient(90deg, var(--tertiary), var(--secondary))"></div></div>
+            <p style="font-size:0.8rem; margin-top:5px;">Moyenne clan : <span id="clan-br-avg">--</span></p>
+        </div>
+        <div class="stat-card" style="border-color:var(--secondary); padding:15px;">
+            <span class="label">Top BR :</span> <span id="br-best-val" style="color:var(--secondary);">--</span> (<span id="br-best-name">S--</span>)
+        </div>
+        <div class="stat-card" style="border-color:var(--accent-red); padding:15px;">
+            <span class="label">Pire BR :</span> <span id="br-worst-val" style="color:var(--accent-red);">--</span> (<span id="br-worst-name">S--</span>)
+        </div>
+        <p id="br-comment" class="personal-comment"></p>
+    </section>
+
+    <section id="slide-combat">
+        <h2>Stats de Combat</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 500px;">
+            <!-- KILLS -->
+            <div class="stat-card" style="padding:15px;">
+                <div id="k-rank" style="background:#ff1744; color:white; padding:3px 10px; border-radius:50px; display:inline-block; font-weight:bold; font-size:0.7rem; margin-bottom:8px;">Rang #--</div>
+                <span class="label">Kills</span>
+                <div id="total-k" class="big-number" style="font-size:2rem">0</div>
+                <div class="bar-container" style="margin-top:8px;"><div id="k-bar" class="bar-fill" style="background:linear-gradient(90deg, #ff1744, #ff6b00);"></div></div>
+                <p style="font-size:0.75rem; margin-top:5px; color:var(--text-muted);">Moy clan : <span id="clan-k-avg">--</span></p>
+            </div>
+            <!-- WINS -->
+            <div class="stat-card" style="padding:15px;">
+                <div id="w-rank" style="background:var(--primary); color:black; padding:3px 10px; border-radius:50px; display:inline-block; font-weight:bold; font-size:0.7rem; margin-bottom:8px;">Rang #--</div>
+                <span class="label">Wins</span>
+                <div id="total-w" class="big-number" style="font-size:2rem; color:var(--primary)">0</div>
+                <div class="bar-container" style="margin-top:8px;"><div id="w-bar" class="bar-fill" style="background:linear-gradient(90deg, var(--primary), #ffed4e);"></div></div>
+                <p style="font-size:0.75rem; margin-top:5px; color:var(--text-muted);">Moy clan : <span id="clan-w-avg">--</span></p>
+            </div>
+            <!-- ASSISTS -->
+            <div class="stat-card" style="padding:15px;">
+                <div id="a-rank" style="background:var(--secondary); color:black; padding:3px 10px; border-radius:50px; display:inline-block; font-weight:bold; font-size:0.7rem; margin-bottom:8px;">Rang #--</div>
+                <span class="label">Assists</span>
+                <div id="total-a" class="big-number" style="font-size:2rem; color:var(--secondary)">0</div>
+                <div class="bar-container" style="margin-top:8px;"><div id="a-bar" class="bar-fill" style="background:linear-gradient(90deg, var(--secondary), #00e676);"></div></div>
+                <p style="font-size:0.75rem; margin-top:5px; color:var(--text-muted);">Moy clan : <span id="clan-a-avg">--</span></p>
+            </div>
+            <!-- SVP -->
+            <div class="stat-card" style="padding:15px;">
+                <div id="svp-rank" style="background:var(--tertiary); color:black; padding:3px 10px; border-radius:50px; display:inline-block; font-weight:bold; font-size:0.7rem; margin-bottom:8px;">Rang #--</div>
+                <span class="label">SVP (Survies)</span>
+                <div id="total-svp" class="big-number" style="font-size:2rem; color:var(--tertiary)">0</div>
+                <div class="bar-container" style="margin-top:8px;"><div id="svp-bar" class="bar-fill" style="background:linear-gradient(90deg, var(--tertiary), #00e676);"></div></div>
+                <p style="font-size:0.75rem; margin-top:5px; color:var(--text-muted);">Moy clan : <span id="clan-svp-avg">--</span></p>
+            </div>
+        </div>
+        <p id="combat-comment" class="personal-comment" style="margin-top:20px;"></p>
+    </section>
+
+    <section id="slide-extra">
+        <h2>Duels & Minijeux</h2>
+        <div class="stat-card">
+            <div style="display:flex; justify-content: space-around;">
+                <div><span class="label">Wins 1v1</span><div id="1v1-w" style="color:var(--secondary); font-size:2rem; font-family:'Orbitron'">0</div></div>
+                <div><span class="label">Loss 1v1</span><div id="1v1-l" style="color:var(--accent-red); font-size:2rem; font-family:'Orbitron'">0</div></div>
+            </div>
+            <hr style="margin:15px 0; opacity:0.1;">
+            <span class="label">Niveau Minijeu Max</span>
+            <div id="minigame-lvl" style="font-size:2rem; font-family:'Orbitron'">0</div>
+        </div>
+    </section>
+
+    <section id="slide-outro">
+        <h1>GG WP</h1>
+        <p>Prêt pour l'année prochaine ?</p>
+        <div style="display:flex; gap:15px; margin-top:20px; justify-content:center;">
+            <button onclick="window.location.href='index.html'" style="padding:15px 30px; background:var(--primary); border:none; color:black; font-family:'Orbitron'; font-weight:bold; border-radius:5px; box-shadow:0 0 15px rgba(255, 193, 7, 0.4);">RETOUR AU CLAN</button>
+        </div>
+    </section>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script type="module">
+        import { rawData as mjRaw, weeks as mjWeeks } from './js/data.js';
+        import { detailedData } from './js/data2.js';
+        import { brData, weeks as brWeeks } from './js/data3.js';
+        import { auth, db, getDoc, doc, onAuthStateChanged } from './js/firebase.js';
+
+        // 1. VERIFICATION LOGIN
+        let user = localStorage.getItem('pseudo');
+        if (!user) { window.location.href = 'login4.html'; }
+
+        // 2. DONNÉES FIREBASE (Chargées dynamiquement)
+        let fbData = {
+            points: 0,
+            joinedAt: "",
+            w1v1: 0, l1v1: 0,
+            miniLvl: 0,
+            customBadges: [],
+            pseudo: ""  // Ajouter le pseudo depuis Firebase
+        };
+
+        // Variables globales pour les stats
+        let mjUser, mjScores, mjAvg, brUser, brScores, brAvg;
+
+        async function init() {
+            console.log("Initialisation lancée...");
+            document.getElementById('user-pseudo').innerText = `Bonjour ${user}`;
+            
+            try {
+                // Charger les données Firebase réelles
+                await loadFirebaseData();
+            } catch (err) {
+                console.error('Erreur Firebase:', err);
+            } finally {
+                continueInit(); // Toujours continuer
+                hideLoader(); // Toujours masquer le loader
+            }
+        }
+
+        // Charger les données Firebase réelles
+        async function loadFirebaseData() {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    if (!auth.currentUser) {
+                        console.log('Pas d\'utilisateur Firebase connecté');
+                        resolve();
+                        return;
+                    }
+                    
+                    const userDocRef = doc(db, "users", auth.currentUser.uid);
+                    const userDoc = await getDoc(userDocRef);
+                    
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        // Récupérer le pseudo depuis Firebase (IMPORTANT!)
+                        fbData.pseudo = userData.pseudo || user;
+                        user = fbData.pseudo;  // Mettre à jour la variable globale
+                        localStorage.setItem('pseudo', user);  // Mettre à jour localStorage
+                        
+                        fbData.points = userData.cfPoints || 0;  // C'est "cfPoints" dans Firebase, pas "points"
+                        fbData.joinedAt = userData.joinedAt || "";
+                        fbData.w1v1 = userData.w1v1 || 0;
+                        fbData.l1v1 = userData.l1v1 || 0;
+                        fbData.miniLvl = userData.miniLvl || 0;
+                        fbData.customBadges = userData.customBadges || [];
+                        
+                        console.log('Données Firebase chargées:', fbData);
+                        console.log('Pseudo mis à jour:', user);
+                    } else {
+                        console.log('Aucun document utilisateur trouvé');
+                    }
+                    resolve();
+                } catch(err) {
+                    console.error('Erreur chargement Firebase:', err);
+                    resolve(); // Continuer même en cas d'erreur
+                }
+            });
+        }
+
+        function continueInit() {
+            console.log('Recherche du pseudo:', user);
+            console.log('Pseudos disponibles MJ:', mjRaw.map(u => u.name));
+            
+            // Stats MJ - Recherche insensible à la casse et espaces
+            mjUser = mjRaw.find(u => u.name.trim().toLowerCase() === user.trim().toLowerCase());
+            mjScores = mjUser ? mjUser.scores.filter(s => s !== null) : [];
+            mjAvg = mjScores.length ? (mjScores.reduce((a,b)=>a+b,0)/mjScores.length).toFixed(1) : 0;
+            
+            if (!mjUser) console.warn('Pseudo MJ non trouvé:', user);
+            else console.log('Données MJ trouvées:', mjUser);
+            
+            // Stats BR - Recherche insensible à la casse et espaces
+            brUser = brData.find(u => u.name.trim().toLowerCase() === user.trim().toLowerCase());
+            brScores = brUser ? brUser.scores.filter(s => s !== null) : [];
+            brAvg = brScores.length ? (brScores.reduce((a,b)=>a+b,0)/brScores.length).toFixed(1) : 0;
+            
+            if (!brUser) console.warn('Pseudo BR non trouvé:', user);
+            else console.log('Données BR trouvées:', brUser);
+
+            // Affichage FIDELITÉ
+            animateValue("mj-seasons", 0, mjScores.length, 1500);
+            animateValue("br-seasons", 0, brScores.length, 1500);
+
+            // ===== AFFICHAGE FIREBASE =====
+            // Affichage FIREBASE
+            animateValue("points-pill", 0, fbData.points, 2000, " CF POINTS");
+            animateValue("1v1-w", 0, fbData.w1v1, 1000);
+            animateValue("1v1-l", 0, fbData.l1v1, 1000);
+            animateValue("minigame-lvl", 0, fbData.miniLvl, 1000);
+
+            // Génération Badges depuis Firebase (VRAIES DONNÉES UNIQUEMENT)
+            const container = document.getElementById('badge-list');
+            container.innerHTML = ''; // Vider la liste
+            
+            if (fbData.customBadges && Array.isArray(fbData.customBadges)) {
+                console.log('Affichage des badges:', fbData.customBadges);
+                fbData.customBadges.forEach(b => {
+                    const s = document.createElement('span');
+                    s.className = `badge badge-${b.color || 'black'}`;
+                    s.innerText = b.text || 'BADGE';
+                    
+                    // Ajouter l'effet si présent
+                    if(b.effect) s.classList.add(b.effect);
+                    
+                    // Ajouter les effets spéciaux selon le frame
+                    if(b.frame === "mythic") {
+                        s.style.boxShadow = "0 0 15px rgba(0, 230, 118, 0.6), inset 0 0 10px rgba(0, 230, 118, 0.3)";
+                        s.style.border = "2px solid #00e676";
+                    } else if(b.frame === "elite") {
+                        s.style.boxShadow = "0 0 15px rgba(255, 193, 7, 0.6), inset 0 0 10px rgba(255, 193, 7, 0.3)";
+                        s.style.border = "2px solid #ffc107";
+                    }
+                    
+                    container.appendChild(s);
+                });
+            } else {
+                console.log('Pas de badges Firebase');
+            }
+
+            // ===== STATS MJ ET BR =====
+
+            // LOGIQUE MJ (Classement & Best/Worst)
+            let allAvg = mjRaw.map(p => {
+                const s = p.scores.filter(x => x !== null);
+                return { name: p.name, avg: s.length ? s.reduce((a,b)=>a+b,0)/s.length : 0 };
+            }).sort((a,b) => b.avg - a.avg);
+            
+            const clanAvg = (allAvg.reduce((a,b)=>a+b.avg, 0) / allAvg.length).toFixed(1);
+            const myRank = allAvg.findIndex(p => p.name === user) + 1;
+
+            document.getElementById('mj-rank').innerText = `Rang #${myRank} / ${mjRaw.length}`;
+            document.getElementById('mj-avg').innerText = mjAvg;
+            document.getElementById('clan-mj-avg').innerText = clanAvg;
+            setTimeout(() => { document.getElementById('mj-bar').style.width = Math.min((mjAvg/100)*100, 100) + "%"; }, 1000);
+
+            if(mjScores.length) {
+                const max = Math.max(...mjScores);
+                const min = Math.min(...mjScores);
+                document.getElementById('mj-best-val').innerText = max;
+                document.getElementById('mj-best-name').innerText = mjWeeks[mjUser.scores.indexOf(max)];
+                document.getElementById('mj-worst-val').innerText = min;
+                document.getElementById('mj-worst-name').innerText = mjWeeks[mjUser.scores.indexOf(min)];
+            }
+
+            // LOGIQUE BR (Classement & Best/Worst)
+            let allBRAvg = brData.map(p => {
+                const s = p.scores.filter(x => x !== null);
+                return { name: p.name, avg: s.length ? s.reduce((a,b)=>a+b,0)/s.length : 0 };
+            }).sort((a,b) => b.avg - a.avg);
+            
+            const clanBRAvg = (allBRAvg.reduce((a,b)=>a+b.avg, 0) / allBRAvg.length).toFixed(1);
+            const myBRRank = allBRAvg.findIndex(p => p.name === user) + 1;
+
+            document.getElementById('br-rank').innerText = `Rang #${myBRRank} / ${brData.length}`;
+            document.getElementById('br-avg').innerText = brAvg;
+            document.getElementById('clan-br-avg').innerText = clanBRAvg;
+            setTimeout(() => { document.getElementById('br-bar').style.width = Math.min((brAvg/100)*100, 100) + "%"; }, 1000);
+
+            if(brScores.length) {
+                const maxBR = Math.max(...brScores);
+                const minBR = Math.min(...brScores);
+                document.getElementById('br-best-val').innerText = maxBR;
+                document.getElementById('br-best-name').innerText = brWeeks[brUser.scores.indexOf(maxBR)];
+                document.getElementById('br-worst-val').innerText = minBR;
+                document.getElementById('br-worst-name').innerText = brWeeks[brUser.scores.indexOf(minBR)];
+            }
+
+            // STYLE DE JEU
+            const stTitle = document.getElementById('style-title');
+            const stDesc = document.getElementById('style-desc');
+            if(mjScores.length > brScores.length) {
+                stTitle.innerText = "GUERRIER MJ";
+                stDesc.innerText = "Le multijoueur n'a aucun secret pour toi. Tu préfères l'action immédiate.";
+            } else {
+                stTitle.innerText = "SURVIVANT BR";
+                stDesc.innerText = "La stratégie et la survie sont tes plus grandes forces.";
+            }
+
+            // STATS DÉTAILLÉES (data2.js) - Calcul des totaux et classements
+            const det = detailedData[user];
+            if(det) {
+                let tk=0, tw=0, ta=0, tsvp=0;
+                Object.values(det).forEach(s => { tk+=s.k; tw+=s.w; ta+=s.a; tsvp+=s.svp; });
+                animateValue("total-k", 0, tk, 2000);
+                animateValue("total-w", 0, tw, 2000);
+                animateValue("total-a", 0, ta, 2000);
+                animateValue("total-svp", 0, tsvp, 2000);
+
+                // Calcul des classements et moyennes du clan pour chaque stat (TOUS LES JOUEURS)
+                let allKills = [], allWins = [], allAssists = [], allSVP = [];
+                Object.entries(detailedData).forEach(([name, seasons]) => {
+                    let k=0, w=0, a=0, svp=0;
+                    Object.values(seasons).forEach(s => { k+=s.k; w+=s.w; a+=s.a; svp+=s.svp; });
+                    allKills.push({name, val: k});
+                    allWins.push({name, val: w});
+                    allAssists.push({name, val: a});
+                    allSVP.push({name, val: svp});
+                });
+
+                allKills.sort((a,b) => b.val - a.val);
+                allWins.sort((a,b) => b.val - a.val);
+                allAssists.sort((a,b) => b.val - a.val);
+                allSVP.sort((a,b) => b.val - a.val);
+
+                // KILLS
+                const kRank = allKills.findIndex(p => p.name === user) + 1;
+                const kClanAvg = (allKills.reduce((a,b)=>a+b.val,0) / allKills.length).toFixed(1);
+                document.getElementById('k-rank').innerText = `Rang #${kRank} / ${allKills.length}`;
+                document.getElementById('clan-k-avg').innerText = kClanAvg;
+                setTimeout(() => { document.getElementById('k-bar').style.width = Math.min((tk/(kClanAvg*2))*100, 100) + "%"; }, 1000);
+
+                // WINS
+                const wRank = allWins.findIndex(p => p.name === user) + 1;
+                const wClanAvg = (allWins.reduce((a,b)=>a+b.val,0) / allWins.length).toFixed(1);
+                document.getElementById('w-rank').innerText = `Rang #${wRank} / ${allWins.length}`;
+                document.getElementById('clan-w-avg').innerText = wClanAvg;
+                setTimeout(() => { document.getElementById('w-bar').style.width = Math.min((tw/(wClanAvg*2))*100, 100) + "%"; }, 1000);
+
+                // ASSISTS
+                const aRank = allAssists.findIndex(p => p.name === user) + 1;
+                const aClanAvg = (allAssists.reduce((a,b)=>a+b.val,0) / allAssists.length).toFixed(1);
+                document.getElementById('a-rank').innerText = `Rang #${aRank} / ${allAssists.length}`;
+                document.getElementById('clan-a-avg').innerText = aClanAvg;
+                setTimeout(() => { document.getElementById('a-bar').style.width = Math.min((ta/(aClanAvg*2))*100, 100) + "%"; }, 1000);
+
+                // SVP
+                const svpRank = allSVP.findIndex(p => p.name === user) + 1;
+                const svpClanAvg = (allSVP.reduce((a,b)=>a+b.val,0) / allSVP.length).toFixed(1);
+                document.getElementById('svp-rank').innerText = `Rang #${svpRank} / ${allSVP.length}`;
+                document.getElementById('clan-svp-avg').innerText = svpClanAvg;
+                setTimeout(() => { document.getElementById('svp-bar').style.width = Math.min((tsvp/(svpClanAvg*2))*100, 100) + "%"; }, 1000);
+
+                // Déterminer le profil de combat basé sur les stats dominantes
+                const stats = {kills: tk, wins: tw, assists: ta, svp: tsvp};
+                const maxStat = Math.max(...Object.values(stats));
+                const statNames = {kills: 'Kills', wins: 'Wins', assists: 'Assists', svp: 'SVP'};
+                
+                let combatComment = "";
+                if(stats.kills === maxStat && tk > kClanAvg * 1.2) {
+                    combatComment = "💀 MEURTRIER : Tu sèmes la mort sur ton passage. Tes kills parlent pour toi !";
+                } else if(stats.wins === maxStat && tw > wClanAvg * 1.2) {
+                    combatComment = "👑 CHAMPION : Les victoires te suivent partout. Tes ennemis tremblent face à toi.";
+                } else if(stats.assists === maxStat && ta > aClanAvg * 1.2) {
+                    combatComment = "🤝 COÉQUIPIER : Tu aimes aider tes semblables. Ton support est invaluable pour le clan.";
+                } else if(stats.svp === maxStat && tsvp > svpClanAvg * 1.2) {
+                    combatComment = "🛡️ SURVIVANT : La vie en toi brûle intense. Tu survis où d'autres périraient.";
+                } else if(tk > 0 && tw > 0 && ta > 0) {
+                    combatComment = "⚔️ POLYVALENT : Un vrai soldat qui maîtrise tous les aspects du combat. Équilibré et redoutable.";
+                } else {
+                    combatComment = "🎖️ GUERRIER : Continue à progresser, chaque combat te rend plus fort.";
+                }
+
+                document.getElementById('combat-comment').innerText = combatComment;
+            }
+
+            // Masquer loader
+            setTimeout(() => {
+                const l = document.getElementById('loader');
+                l.style.opacity = '0';
+                setTimeout(() => l.remove(), 500);
+            }, 1000);
+        }
+
+        function animateValue(id, start, end, duration, suffix = "") {
+            const obj = document.getElementById(id);
+            if(!obj) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start) + suffix;
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function hideLoader() {
+            const l = document.getElementById('loader');
+            if (l) {
+                l.style.opacity = '0';
+                l.style.transition = 'opacity 0.5s ease-out';
+                setTimeout(() => {
+                    if (l.parentNode) l.remove();
+                }, 500);
+            }
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.3 });
+        document.querySelectorAll('section').forEach(s => observer.observe(s));
+
+        // Attendre l'authentification Firebase et initialiser
+        onAuthStateChanged(auth, (currentUser) => {
+            if (currentUser) {
+                console.log('Utilisateur Firebase connecté:', currentUser.uid);
+                init();
+            } else {
+                console.log('Aucun utilisateur Firebase connecté');
+                // Continuer même sans Firebase
+                continueInit();
+                hideLoader();
+            }
+        });
+    </script>
+</body>
+</html>

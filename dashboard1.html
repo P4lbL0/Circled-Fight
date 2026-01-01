@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Circled Fight - Scores Battle Royale</title>
+    <title>Circled Fight</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css"> 
+    <link rel="stylesheet" href="css/style.css">
     <style>
         .header { position: relative; }
         .hamburger-menu { position: absolute; top: 8px; right: 12px; background: transparent; border: 0; color: var(--codm-yellow); font-size: 1.6rem; padding: 6px; border-radius:6px; z-index:1200; cursor:pointer; }
@@ -24,6 +24,29 @@
         .sidebar-header { display: block; padding: 12px 15px; }
         .sidebar-header h3 { margin: 0 0 6px 0; }
         .sidebar-header .meta-line { display: flex; gap: 10px; align-items: center; }
+        @media (max-width: 768px) {
+    .export-container {
+        flex-direction: column;
+        align-items: stretch !important;
+        width: 100%;
+    }
+    
+    .buttons-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .export-btn {
+        flex: 1;
+        width: auto;
+    }
+    
+    .mvp-badge {
+        width: 93%;
+    }
+}
+                    
     </style>
 </head>
 <body>
@@ -36,6 +59,7 @@
         </div>
 
         <div class="export-container">
+            <button class="export-btn" onclick="window.location.href='dashboard.html'">📊 Voir Saison 2026</button>
             <button class="export-btn" onclick="exportChart()">📸 Export Graph</button>
             <div class="mvp-badge" id="mvpBadge">
                 <span>MVP SEMAINE ACTUELLE</span>
@@ -61,7 +85,7 @@
     </div>
 
     <script>
-        // Small hamburger toggle (réutilisé)
+        // Small hamburger toggle (non-intrusive)
         (function(){
             const btn = document.getElementById('hamburgerMenu');
             const hub = document.getElementById('dashboardMobileHub');
@@ -79,7 +103,7 @@
     <div class="container">
         <div class="sidebar">
             <div class="sidebar-header">
-                <h3>CLASSEMENT BR     </h3>
+                <h3>CLASSEMENT MJ     </h3>
                 <small style="color:#777;">Par Moyenne</small>
                 <div class="meta-line">
                     <small>Cliquer sur nom pour (dé)masquer sur le graphique</small>
@@ -95,41 +119,40 @@
         </div>
 
         <div class="main-content">
-            <div>
-                <div class="chart-wrapper">
-                    <canvas id="brClanChart"></canvas>
+            <div class="chart-wrapper">
+                <canvas id="clanChart"></canvas>
+            </div>
+            
+            <div class="versus-panel" id="versusPanel">
+                <div class="vs-player" id="p1-container">
+                    <div class="vs-name" id="p1-name" style="color:cyan">Player 1</div>
+                    <div class="vs-score" id="p1-avg">85.5</div>
+                    <div class="vs-stat">Moyenne</div>
                 </div>
-                <div class="versus-panel" id="brVersusPanel">
-                    <div class="vs-player" id="br-p1-container">
-                        <div class="vs-name" id="br-p1-name" style="color:#00bcd4">Player 1</div>
-                        <div class="vs-score" id="br-p1-avg">--</div>
-                        <div class="vs-stat">Moyenne</div>
-                    </div>
-                    <div class="vs-icon">VS</div>
-                    <div class="vs-player" id="br-p2-container">
-                        <div class="vs-name" id="br-p2-name" style="color:#00e676">Player 2</div>
-                        <div class="vs-score" id="br-p2-avg">--</div>
-                        <div class="vs-stat">Moyenne</div>
-                    </div>
+                <div class="vs-icon">VS</div>
+                <div class="vs-player" id="p2-container">
+                    <div class="vs-name" id="p2-name" style="color:orange">Player 2</div>
+                    <div class="vs-score" id="p2-avg">82.0</div>
+                    <div class="vs-stat">Moyenne</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="legend-panel" style="color: #777; text-align: center; padding: 15px;">
-        <small>Ce tableau de bord est dédié au Battle Royale. Les badges de statut ne sont pas appliqués ici.</small>
+    <div class="legend-panel">
+        <h4>LÉGENDE DES BADGES</h4>
+        <div class="badges-list">
+            <span>🔥N : Série de victoires (N semaines de participation consécutive sans absence).</span>
+            <span>🚀 Progression : 3 semaines consécutives de hausse de score.</span>
+            <span>💤 AFK : Aucune participation enregistrée sur les 2 dernières semaines.</span>
+        </div>
     </div>
 
     <script type="module">
-    // Importation UNIQUEMENT des données BR
-    import { weeks, brData } from "./js/data3.js";
+    import { weeks, rawData } from "./js/data.js";
+    import { detailedData } from "./js/data2.js";
 
-    // Restrict charts and averages to the last N weeks
-    const RECENT_N = 10;
-    const recentStart = Math.max(0, weeks.length - RECENT_N);
-    const recentWeeks = weeks.slice(recentStart);
-
-    // Fonction pour calculer l'écart-type
+        // Fonction pour calculer l'écart-type
         function calculateStdDev(scores) {
             const validScores = scores.filter(s => s !== null && s !== undefined);
             if (validScores.length < 2) return Infinity; 
@@ -138,82 +161,79 @@
             return Math.sqrt(variance);
         }
 
-        // --- 1. CALCULS, TRENDS & AWARDS ---
-        brData.forEach(player => {
-            const recentScores = (player.scores && player.scores.length) ? player.scores.slice(recentStart) : [];
-            const validScores = recentScores.filter(s => s !== null && s !== undefined);
+        // --- 1. CALCULS, TRENDS & AWARDS (sur toutes les semaines disponibles) ---
+        rawData.forEach(player => {
+            const validScores = (player.scores || []).filter(s => s !== null && s !== undefined);
             const sum = validScores.reduce((a, b) => a + b, 0);
-            player.avg = validScores.length ? Number((sum / validScores.length).toFixed(1)) : 0;
-            player.lastScore = recentScores.length ? (recentScores[recentScores.length - 1] || 0) : 0;
+            player.participations = validScores.length;  // Compter le nombre de participations
+            player.avg = validScores.length ? (sum / validScores.length).toFixed(1) : 0;
 
-            // 🏅 BADGES
-            player.stdDev = calculateStdDev(recentScores);
+            // lastScore: last non-null within full scores (or 0)
+            let lastScore = null;
+            for (let i = (player.scores || []).length - 1; i >= 0; i--) {
+                if (player.scores[i] !== null && player.scores[i] !== undefined) { lastScore = player.scores[i]; break; }
+            }
+            player.lastScore = lastScore !== null ? lastScore : 0;
 
-            // 💤 AFK Check (Absence sur les 2 dernières semaines de data)
-            const lastDataIndex = recentScores.length - 1;
-            player.isAFK = (recentScores.length >= 2 && recentScores[lastDataIndex] === null && recentScores[lastDataIndex - 1] === null);
+            // 🏅 BADGES (stdDev calculated on full scores)
+            player.stdDev = calculateStdDev(player.scores || []);
 
-            // 🚀 Progression Check (3 hausses consécutives parmi les scores enregistrés)
+            // 💤 AFK Check based on the last two full scores
+            const lastDataIndex = (player.scores || []).length - 1;
+            player.isAFK = (lastDataIndex >= 1) ? (player.scores[lastDataIndex] === null && player.scores[lastDataIndex - 1] === null) : false;
+
+            // 🚀 Progression Check (3 hausses consécutives) within full scores
             let consecutiveIncreases = 0;
-            player.isOnFire = false;
             player.isProgression = false;
-            for (let i = recentScores.length - 1; i >= 1; i--) {
-                const current = recentScores[i];
-                const previous = recentScores[i - 1];
-
+            for (let i = (player.scores || []).length - 1; i >= 1; i--) {
+                const current = player.scores[i];
+                const previous = player.scores[i - 1];
                 if (current !== null && previous !== null) {
                     if (current > previous) {
                         consecutiveIncreases++;
-                        if (consecutiveIncreases >= 3) {
-                            player.isProgression = true;
-                            break;
-                        }
-                    } else if (current < previous) {
-                        consecutiveIncreases = 0;
-                    }
+                        if (consecutiveIncreases >= 3) { player.isProgression = true; break; }
+                    } else if (current < previous) { consecutiveIncreases = 0; }
                 }
             }
 
-            // 🔥N STREAK (Participation consécutive)
+            // 🔥N STREAK (Participation consécutive) - check within full scores
             player.streak = 0;
-            for (let i = recentScores.length - 1; i >= 0; i--) {
-                if (recentScores[i] !== null && recentScores[i] !== undefined) {
-                    player.streak++;
-                } else {
-                    break;
-                }
+            for (let i = (player.scores || []).length - 1; i >= 0; i--) {
+                if (player.scores[i] !== null && player.scores[i] !== undefined) { player.streak++; }
+                else break;
             }
 
-            // 📈 TRENDS (Dernier score enregistré vs précédent) dans recentScores
+            // 📈 TRENDS (last vs previous) within full scores
             let lastRecordedScore = null;
             let prevRecordedScore = null;
-            for (let i = recentScores.length - 1; i >= 0; i--) {
-                if (recentScores[i] !== null) {
-                    if (lastRecordedScore === null) {
-                        lastRecordedScore = recentScores[i];
-                    } else if (prevRecordedScore === null) {
-                        prevRecordedScore = recentScores[i];
-                        break;
-                    }
+            for (let i = (player.scores || []).length - 1; i >= 0; i--) {
+                if (player.scores[i] !== null) {
+                    if (lastRecordedScore === null) lastRecordedScore = player.scores[i];
+                    else if (prevRecordedScore === null) { prevRecordedScore = player.scores[i]; break; }
                 }
             }
-            player.trend = lastRecordedScore !== null && prevRecordedScore !== null ? lastRecordedScore - prevRecordedScore : 0;
+            player.trend = (lastRecordedScore !== null && prevRecordedScore !== null) ? lastRecordedScore - prevRecordedScore : 0;
         });
 
 
 
 
         // Trier du meilleur au pire (Moyenne)
-        brData.sort((a, b) => b.avg - a.avg);
+        rawData.sort((a, b) => b.avg - a.avg);
+        
+        // Filtrer: Garder UNIQUEMENT ceux avec 3+ participations pour le classement et le graphique
+        const filteredData = rawData.filter(p => p.participations >= 3);
 
-        // --- 2. MOYENNE DU CLAN (Ligne Fantôme) sur les recentWeeks ---
-        const clanAverageScores = recentWeeks.map((_, idx) => {
-            const weekIndex = recentStart + idx;
+        // --- 2. MOYENNE DU CLAN (Ligne Fantôme) ---
+        const clanAverageScores = weeks.map((_, weekIndex) => {
             let weekTotal = 0;
             let weekCount = 0;
-            brData.forEach(player => {
-                const score = (player.scores && player.scores.length > weekIndex) ? player.scores[weekIndex] : null;
-                if (score !== null && score !== undefined) { weekTotal += score; weekCount++; }
+            rawData.forEach(player => {
+                const score = player.scores[weekIndex];
+                if (score !== null && score !== undefined) {
+                    weekTotal += score;
+                    weekCount++;
+                }
             });
             return weekCount > 0 ? (weekTotal / weekCount) : null;
         });
@@ -225,10 +245,10 @@
             return `hsl(${finalHue}, 100%, 60%)`;
         }
 
-        // Créer les datasets des joueurs
-        const playerDatasets = brData.map((player, index) => ({
+        // Créer les datasets des joueurs (UNIQUEMENT CEUX FILTRÉS)
+        const playerDatasets = filteredData.map((player, index) => ({
             label: player.name,
-            data: (player.scores && player.scores.length) ? player.scores.slice(recentStart) : [],
+            data: player.scores,
             borderColor: getNeonColor(index),
             backgroundColor: getNeonColor(index),
             borderWidth: 2,
@@ -278,10 +298,10 @@
         };
 
         // --- 4. INITIALISATION CHART ---
-        const ctx = document.getElementById('brClanChart').getContext('2d');
+        const ctx = document.getElementById('clanChart').getContext('2d');
         const chart = new Chart(ctx, {
             type: 'line',
-            data: { labels: recentWeeks, datasets: datasets },
+            data: { labels: weeks, datasets: datasets },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -333,14 +353,14 @@
 
         // --- 5. UI LOGIC ---
         const listContainer = document.getElementById('playerList');
-        const versusPanel = document.getElementById('brVersusPanel');
+        const versusPanel = document.getElementById('versusPanel');
 
         function renderList() {
             listContainer.innerHTML = '';
             
             // On boucle sur les datasets des joueurs (en sautant le premier qui est la moyenne du clan)
             chart.data.datasets.slice(1).forEach((ds, i) => { 
-                const player = brData[i];
+                const player = filteredData[i];
                 const li = document.createElement('li');
                 
                 let rankClass = '';
@@ -397,27 +417,37 @@
             checkVersusMode();
         }
 
-        // Expose toggleAll to global scope so inline `onclick` attributes work (module scope is not global)
+        // Expose pour les attributs inline onclick (module scope n'est pas global)
         window.toggleAll = toggleAll;
 
         // --- LOGIQUE MVP & VERSUS ---
         
         function findMVP() {
-            // Use the last week from the imported `weeks` array instead of a fixed index
-            const lastWeekIndex = (Array.isArray(weeks) && weeks.length) ? (weeks.length - 1) : 11;
-            let bestScore = -1;
+            // Trouver dynamiquement la dernière semaine qui contient au least une valeur
+            let lastWeekIndex = Math.max(0, weeks.length - 1);
+            for (let w = weeks.length - 1; w >= 0; w--) {
+                if (filteredData.some(p => p.scores[w] !== null && p.scores[w] !== undefined)) {
+                    lastWeekIndex = w;
+                    break;
+                }
+            }
+
+            let bestScore = -Infinity;
             let bestPlayer = "";
 
-            brData.forEach(p => {
-                const score = (p.scores && p.scores.length > lastWeekIndex) ? p.scores[lastWeekIndex] : null;
-                if (score !== null && score > bestScore) {
+            filteredData.forEach(p => {
+                const score = p.scores[lastWeekIndex];
+                if (score !== null && score !== undefined && score > bestScore) {
                     bestScore = score;
                     bestPlayer = p.name;
                 }
             });
 
-            if(bestPlayer) {
-                document.getElementById('mvpName').innerText = bestPlayer.toUpperCase() + " (" + bestScore + ")";
+            const mvpEl = document.getElementById('mvpName');
+            if (bestPlayer) {
+                mvpEl.innerText = bestPlayer.toUpperCase() + " (" + bestScore + ")";
+            } else {
+                mvpEl.innerText = "--";
             }
         }
 
@@ -429,18 +459,18 @@
                 versusPanel.style.display = 'flex';
                 
                 const p1 = visibleDS[0];
-                const p1Data = brData.find(r => r.name === p1.label);
+                const p1Data = rawData.find(r => r.name === p1.label);
                 
-                document.getElementById('br-p1-name').innerText = p1.label;
-                document.getElementById('br-p1-name').style.color = p1.borderColor;
-                document.getElementById('br-p1-avg').innerText = p1Data.avg;
+                document.getElementById('p1-name').innerText = p1.label;
+                document.getElementById('p1-name').style.color = p1.borderColor;
+                document.getElementById('p1-avg').innerText = p1Data.avg;
 
                 const p2 = visibleDS[1];
-                const p2Data = brData.find(r => r.name === p2.label);
+                const p2Data = rawData.find(r => r.name === p2.label);
                 
-                document.getElementById('br-p2-name').innerText = p2.label;
-                document.getElementById('br-p2-name').style.color = p2.borderColor;
-                document.getElementById('br-p2-avg').innerText = p2Data.avg;
+                document.getElementById('p2-name').innerText = p2.label;
+                document.getElementById('p2-name').style.color = p2.borderColor;
+                document.getElementById('p2-avg').innerText = p2Data.avg;
                 
             } else {
                 versusPanel.style.display = 'none';
@@ -449,7 +479,7 @@
 
         // --- 📸 EXPORT FUNCTION CORRIGÉE (avec Légende) ---
         function exportChart() {
-            const originalCanvas = document.getElementById('brClanChart');
+            const originalCanvas = document.getElementById('clanChart');
             
             // 1. Créer un conteneur et un canvas temporaires (cachés)
             const tempContainer = document.createElement('div');
@@ -461,15 +491,6 @@
 
             const tempCanvas = document.createElement('canvas');
             tempContainer.appendChild(tempCanvas);
-            // Match the temporary canvas size to the original canvas so exported image keeps correct dimensions
-            if (originalCanvas && originalCanvas.width) {
-                tempCanvas.width = originalCanvas.width;
-                tempCanvas.height = originalCanvas.height;
-            } else {
-                // Fallback sizes if original not available
-                tempCanvas.width = 1200;
-                tempCanvas.height = 600;
-            }
 
             // 2. Créer une instance temporaire du Chart, mais AVEC la légende
             const tempChart = new Chart(tempCanvas.getContext('2d'), {

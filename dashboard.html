@@ -24,7 +24,29 @@
         .sidebar-header { display: block; padding: 12px 15px; }
         .sidebar-header h3 { margin: 0 0 6px 0; }
         .sidebar-header .meta-line { display: flex; gap: 10px; align-items: center; }
-
+        @media (max-width: 768px) {
+    .export-container {
+        flex-direction: column;
+        align-items: stretch !important;
+        width: 100%;
+    }
+    
+    .buttons-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .export-btn {
+        flex: 1;
+        width: auto;
+    }
+    
+    .mvp-badge {
+        width: 93%;
+    }
+}
+                    
     </style>
 </head>
 <body>
@@ -37,7 +59,10 @@
         </div>
 
         <div class="export-container">
-            <button class="export-btn" onclick="exportChart()">📸 Export Graph</button>
+            <div class="buttons-row">
+                <button class="export-btn" onclick="window.location.href='dashboard1.html'">📊 Voir Saison 2025</button>
+                <button class="export-btn" onclick="exportChart()">📸 Export Graph</button>
+            </div>
             <div class="mvp-badge" id="mvpBadge">
                 <span>MVP SEMAINE ACTUELLE</span>
                 <strong id="mvpName">--</strong>
@@ -81,10 +106,16 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <h3>CLASSEMENT MJ     </h3>
-                <small style="color:#777;">Par Moyenne</small>
+                <small style="color:#777;" id="sortInfo">Par Total</small>
                 <div class="meta-line">
                     <small>Cliquer sur nom pour (dé)masquer sur le graphique</small>
-                    
+                </div>
+                <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn" onclick="changeSortBy('total')" id="sortBtn-total" style="flex: 1; font-size: 0.9em; padding: 6px;">Total</button>
+                    <button class="btn" onclick="changeSortBy('kills')" id="sortBtn-kills" style="flex: 1; font-size: 0.9em; padding: 6px;">K</button>
+                    <button class="btn" onclick="changeSortBy('assists')" id="sortBtn-assists" style="flex: 1; font-size: 0.9em; padding: 6px;">A</button>
+                    <button class="btn" onclick="changeSortBy('wins')" id="sortBtn-wins" style="flex: 1; font-size: 0.9em; padding: 6px;">W</button>
+                    <button class="btn" onclick="changeSortBy('svp')" id="sortBtn-svp" style="flex: 1; font-size: 0.9em; padding: 6px;">SVP</button>
                 </div>
             </div>
             <ul class="rank-list" id="playerList">
@@ -117,88 +148,368 @@
     </div>
 
     <div class="legend-panel">
-        <h4>LÉGENDE DES BADGES</h4>
+        <h4>LÉGENDE DES BADGES & STATISTIQUES</h4>
         <div class="badges-list">
             <span>🔥N : Série de victoires (N semaines de participation consécutive sans absence).</span>
             <span>🚀 Progression : 3 semaines consécutives de hausse de score.</span>
             <span>💤 AFK : Aucune participation enregistrée sur les 2 dernières semaines.</span>
+            <span><strong>K :</strong> Nombre total de kills.</span>
+            <span><strong>A :</strong> Nombre total d'assists.</span>
+            <span><strong>W :</strong> Nombre total de victoires.</span>
+            <span><strong>Calcul du Total :</strong> W×3 + SVP×3 + K×1 + A×0.5</span>
         </div>
     </div>
 
     <script type="module">
-    import { weeks, rawData } from "./js/data.js";
-    import { detailedData } from "./js/data2.js";
+    import { detailedData2026 } from "./js/data2026mj.js";
 
-        // Fonction pour calculer l'écart-type
-        function calculateStdDev(scores) {
-            const validScores = scores.filter(s => s !== null && s !== undefined);
-            if (validScores.length < 2) return Infinity; 
-            const mean = validScores.reduce((a, b) => a + b, 0) / validScores.length;
-            const variance = validScores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / validScores.length;
-            return Math.sqrt(variance);
+    // === CONVERSION DES DONNÉES 2026 EN FORMAT COMPATIBLE ===
+    // Calcul : W=3pts, SVP=3pts, K=1pt, A=0.5pt
+    
+    function convertData2026ToRawData(data2026) {
+        // Récupérer toutes les sessions disponibles
+        const allSessions = new Set();
+        Object.values(data2026).forEach(playerData => {
+            Object.keys(playerData).forEach(session => allSessions.add(session));
+        });
+        const weeks = Array.from(allSessions).sort(); // ["S13", "S14", "S15", ...]
+
+        // Convertir chaque joueur
+        const rawData = [];
+        for (const [playerName, sessions] of Object.entries(data2026)) {
+            const scores = weeks.map(week => {
+                if (sessions[week]) {
+                    const { w, svp, k, a } = sessions[week];
+                    // Calcul des points : w*3 + svp*3 + k*1 + a*0.5
+                    return (w * 3) + (svp * 3) + (k * 1) + (a * 0.5);
+                }
+                return null; // Pas de données pour cette semaine
+            });
+
+            // Stocker aussi les données brutes pour chaque semaine
+            const weeklyDetails = {};
+            weeks.forEach((week, index) => {
+                if (sessions[week]) {
+                    weeklyDetails[week] = sessions[week];
+                } else {
+                    weeklyDetails[week] = null;
+                }
+            });
+
+            // Calculer les totaux
+            const totalK = Object.values(sessions).reduce((sum, week) => sum + (week.k || 0), 0);
+            const totalA = Object.values(sessions).reduce((sum, week) => sum + (week.a || 0), 0);
+            const totalW = Object.values(sessions).reduce((sum, week) => sum + (week.w || 0), 0);
+            const totalSVP = Object.values(sessions).reduce((sum, week) => sum + (week.svp || 0), 0);
+
+            rawData.push({
+                name: playerName,
+                scores: scores,
+                weeklyDetails: weeklyDetails,
+                totalK: totalK,
+                totalA: totalA,
+                totalW: totalW,
+                totalSVP: totalSVP
+            });
         }
 
-        // --- 1. CALCULS, TRENDS & AWARDS (sur toutes les semaines disponibles) ---
+        return { rawData, weeks };
+    }
+
+    // Conversion des données
+    const { rawData, weeks } = convertData2026ToRawData(detailedData2026);
+    
+    // Variable globale pour le tri courant
+    let currentSortBy = 'total';
+
+    // Fonction pour recalculer les scores selon le tri
+    function recalculateScoresForSort(sortType) {
         rawData.forEach(player => {
-            const validScores = (player.scores || []).filter(s => s !== null && s !== undefined);
-            const sum = validScores.reduce((a, b) => a + b, 0);
-            player.avg = validScores.length ? (sum / validScores.length).toFixed(1) : 0;
-
-            // lastScore: last non-null within full scores (or 0)
-            let lastScore = null;
-            for (let i = (player.scores || []).length - 1; i >= 0; i--) {
-                if (player.scores[i] !== null && player.scores[i] !== undefined) { lastScore = player.scores[i]; break; }
-            }
-            player.lastScore = lastScore !== null ? lastScore : 0;
-
-            // 🏅 BADGES (stdDev calculated on full scores)
-            player.stdDev = calculateStdDev(player.scores || []);
-
-            // 💤 AFK Check based on the last two full scores
-            const lastDataIndex = (player.scores || []).length - 1;
-            player.isAFK = (lastDataIndex >= 1) ? (player.scores[lastDataIndex] === null && player.scores[lastDataIndex - 1] === null) : false;
-
-            // 🚀 Progression Check (3 hausses consécutives) within full scores
-            let consecutiveIncreases = 0;
-            player.isProgression = false;
-            for (let i = (player.scores || []).length - 1; i >= 1; i--) {
-                const current = player.scores[i];
-                const previous = player.scores[i - 1];
-                if (current !== null && previous !== null) {
-                    if (current > previous) {
-                        consecutiveIncreases++;
-                        if (consecutiveIncreases >= 3) { player.isProgression = true; break; }
-                    } else if (current < previous) { consecutiveIncreases = 0; }
+            player.scores = weeks.map(week => {
+                if (player.weeklyDetails[week]) {
+                    const { w, svp, k, a } = player.weeklyDetails[week];
+                    if (sortType === 'total') {
+                        return (w * 3) + (svp * 3) + (k * 1) + (a * 0.5);
+                    } else if (sortType === 'kills') {
+                        return k;
+                    } else if (sortType === 'assists') {
+                        return a;
+                    } else if (sortType === 'wins') {
+                        return w;
+                    } else if (sortType === 'svp') {
+                        return svp;
+                    }
                 }
-            }
-
-            // 🔥N STREAK (Participation consécutive) - check within full scores
-            player.streak = 0;
-            for (let i = (player.scores || []).length - 1; i >= 0; i--) {
-                if (player.scores[i] !== null && player.scores[i] !== undefined) { player.streak++; }
-                else break;
-            }
-
-            // 📈 TRENDS (last vs previous) within full scores
-            let lastRecordedScore = null;
-            let prevRecordedScore = null;
-            for (let i = (player.scores || []).length - 1; i >= 0; i--) {
-                if (player.scores[i] !== null) {
-                    if (lastRecordedScore === null) lastRecordedScore = player.scores[i];
-                    else if (prevRecordedScore === null) { prevRecordedScore = player.scores[i]; break; }
-                }
-            }
-            player.trend = (lastRecordedScore !== null && prevRecordedScore !== null) ? lastRecordedScore - prevRecordedScore : 0;
+                return null;
+            });
         });
+    }
 
+    // Fonction pour calculer l'écart-type
+    function calculateStdDev(scores) {
+        const validScores = scores.filter(s => s !== null && s !== undefined);
+        if (validScores.length < 2) return Infinity; 
+        const mean = validScores.reduce((a, b) => a + b, 0) / validScores.length;
+        const variance = validScores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / validScores.length;
+        return Math.sqrt(variance);
+    }
 
+    // --- 1. CALCULS, TRENDS & AWARDS (sur toutes les semaines disponibles) ---
+    rawData.forEach(player => {
+        const validScores = (player.scores || []).filter(s => s !== null && s !== undefined);
+        const sum = validScores.reduce((a, b) => a + b, 0);
+        player.avg = validScores.length ? (sum / validScores.length).toFixed(1) : 0;
 
+        // lastScore: last non-null within full scores (or 0)
+        let lastScore = null;
+        for (let i = (player.scores || []).length - 1; i >= 0; i--) {
+            if (player.scores[i] !== null && player.scores[i] !== undefined) { lastScore = player.scores[i]; break; }
+        }
+        player.lastScore = lastScore !== null ? lastScore : 0;
 
-        // Trier du meilleur au pire (Moyenne)
-        rawData.sort((a, b) => b.avg - a.avg);
+        // 🏅 BADGES (stdDev calculated on full scores)
+        player.stdDev = calculateStdDev(player.scores || []);
 
-        // --- 2. MOYENNE DU CLAN (Ligne Fantôme) ---
-        const clanAverageScores = weeks.map((_, weekIndex) => {
+        // 💤 AFK Check based on the last two full scores
+        const lastDataIndex = (player.scores || []).length - 1;
+        player.isAFK = (lastDataIndex >= 1) ? (player.scores[lastDataIndex] === null && player.scores[lastDataIndex - 1] === null) : false;
+
+        // 🚀 Progression Check (3 hausses consécutives) within full scores
+        let consecutiveIncreases = 0;
+        player.isProgression = false;
+        for (let i = (player.scores || []).length - 1; i >= 1; i--) {
+            const current = player.scores[i];
+            const previous = player.scores[i - 1];
+            if (current !== null && previous !== null) {
+                if (current > previous) {
+                    consecutiveIncreases++;
+                    if (consecutiveIncreases >= 3) { player.isProgression = true; break; }
+                } else if (current < previous) { consecutiveIncreases = 0; }
+            }
+        }
+
+        // 🔥N STREAK (Participation consécutive) - check within full scores
+        player.streak = 0;
+        for (let i = (player.scores || []).length - 1; i >= 0; i--) {
+            if (player.scores[i] !== null && player.scores[i] !== undefined) { player.streak++; }
+            else break;
+        }
+
+        // 📈 TRENDS (last vs previous) within full scores
+        let lastRecordedScore = null;
+        let prevRecordedScore = null;
+        for (let i = (player.scores || []).length - 1; i >= 0; i--) {
+            if (player.scores[i] !== null) {
+                if (lastRecordedScore === null) lastRecordedScore = player.scores[i];
+                else if (prevRecordedScore === null) { prevRecordedScore = player.scores[i]; break; }
+            }
+        }
+        player.trend = (lastRecordedScore !== null && prevRecordedScore !== null) ? lastRecordedScore - prevRecordedScore : 0;
+    });
+
+    // Trier du meilleur au pire (Moyenne)
+    rawData.sort((a, b) => b.avg - a.avg);
+
+    // --- 2. MOYENNE DU CLAN (Ligne Fantôme) ---
+    const clanAverageScores = weeks.map((_, weekIndex) => {
+        let weekTotal = 0;
+        let weekCount = 0;
+        rawData.forEach(player => {
+            const score = player.scores[weekIndex];
+            if (score !== null && score !== undefined) {
+                weekTotal += score;
+                weekCount++;
+            }
+        });
+        return weekCount > 0 ? (weekTotal / weekCount) : null;
+    });
+
+    function getNeonColor(index) {
+        const hues = [180, 300, 60, 120, 20, 250, 0, 330]; 
+        const hue = hues[index % hues.length]; 
+        const finalHue = hue + (Math.floor(index/hues.length) * 20);
+        return `hsl(${finalHue}, 100%, 60%)`;
+    }
+
+    // Créer les datasets des joueurs
+    const playerDatasets = rawData.map((player, index) => ({
+        label: player.name,
+        data: player.scores,
+        borderColor: getNeonColor(index),
+        backgroundColor: getNeonColor(index),
+        borderWidth: 2,
+        tension: 0.3,
+        pointRadius: 4,
+        pointBackgroundColor: '#121212', 
+        pointBorderWidth: 2,
+        spanGaps: true,
+        hidden: index > 4 
+    }));
+
+    // Dataset de la moyenne du clan (TOUJOURS en premier)
+    const clanAvgDataset = {
+        label: "Moyenne du Clan",
+        data: clanAverageScores,
+        borderColor: 'rgba(255, 255, 255, 0.5)', 
+        backgroundColor: 'rgba(255, 255, 255, 0.5)',
+        borderWidth: 2,
+        borderDash: [5, 5], 
+        tension: 0.3,
+        pointRadius: 0,
+        pointHoverRadius: 0,
+        fill: false,
+        hidden: false 
+    };
+
+    const datasets = [clanAvgDataset, ...playerDatasets]; 
+
+    // --- 3. CONFIG DU GRAPH (Plugin Background) ---
+    const rankZonesPlugin = {
+        id: 'rankZones',
+        beforeDraw: (chart) => {
+            const { ctx, chartArea: { top, bottom, left, right, width, height }, scales: { y } } = chart;
+            
+            const drawZone = (yMin, yMax, color) => {
+                const yTop = y.getPixelForValue(yMax);
+                const yBottom = y.getPixelForValue(yMin);
+                ctx.fillStyle = color;
+                ctx.fillRect(left, yTop, width, yBottom - yTop);
+            };
+
+            // Dessiner les zones (Backgrounds)
+            drawZone(80, 120, 'rgba(0, 230, 118, 0.05)'); // Vert/Légendaire
+            drawZone(40, 80, 'rgba(255, 193, 7, 0.05)');  // Jaune/Pro
+            drawZone(0, 40, 'rgba(255, 23, 68, 0.05)');   // Rouge/Rookie
+        }
+    };
+
+    // --- 4. INITIALISATION CHART ---
+    const ctx = document.getElementById('clanChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: weeks, datasets: datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'nearest',
+                intersect: false,
+                axis: 'x'
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: false,
+                axis: 'x'
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.9)',
+                    titleColor: '#ffc107',
+                    bodyFont: { family: 'Roboto' },
+                    borderColor: '#ffc107',
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        },
+        plugins: [rankZonesPlugin]
+    });
+
+    // --- 5. UI LOGIC ---
+    const listContainer = document.getElementById('playerList');
+    const versusPanel = document.getElementById('versusPanel');
+
+    function renderList() {
+        listContainer.innerHTML = '';
+        
+        chart.data.datasets.slice(1).forEach((ds, i) => { 
+            const player = rawData[i];
+            const li = document.createElement('li');
+            
+            let rankClass = '';
+            if(i === 0) rankClass = 'rank-1';
+            else if(i === 1) rankClass = 'rank-2';
+            else if(i === 2) rankClass = 'rank-3';
+
+            li.className = `player-card ${!ds.hidden ? 'active' : 'inactive'}`;
+            
+            let trendHTML = '';
+            if (player.trend > 0) {
+                trendHTML = `<span class="trend-up">+${Math.abs(player.trend).toFixed(1)} 🔼</span>`;
+            } else if (player.trend < 0) {
+                trendHTML = `<span class="trend-down">-${Math.abs(player.trend).toFixed(1)} 🔽</span>`;
+            }
+
+            let badgeHTML = '';
+            if (player.streak > 0) badgeHTML += `<span title="Série de victoires (${player.streak} semaines)">🔥${player.streak}</span>`;
+            if (player.isProgression) badgeHTML += '<span title="Progression (3 hausses consécutives)">🚀</span>';
+            if (player.isAFK) badgeHTML += '<span title="AFK (Inactif)">💤</span>';
+
+            let statsHTML = '';
+            if (currentSortBy === 'total') {
+                statsHTML = `<span class="player-avg">Moy: ${player.avg} | W: ${player.totalW} | SVP: ${player.totalSVP} | K: ${player.totalK} | A: ${player.totalA}</span>`;
+            } else if (currentSortBy === 'kills') {
+                statsHTML = `<span class="player-avg">K: ${player.totalK} | A: ${player.totalA} | W: ${player.totalW}</span>`;
+            } else if (currentSortBy === 'assists') {
+                statsHTML = `<span class="player-avg">A: ${player.totalA} | K: ${player.totalK} | W: ${player.totalW}</span>`;            } else if (currentSortBy === 'wins') {
+                statsHTML = `<span class="player-avg">W: ${player.totalW} | SVP: ${player.totalSVP} | K: ${player.totalK} | A: ${player.totalA}</span>`;
+            } else if (currentSortBy === 'svp') {
+                statsHTML = `<span class="player-avg">SVP: ${player.totalSVP} | W: ${player.totalW} | K: ${player.totalK} | A: ${player.totalA}</span>`;            }
+
+            li.innerHTML = `
+                <span class="rank-num ${rankClass}" style="margin-left:-10px">#${i+1}</span>
+                <div class="player-info">
+                    <span class="player-name" style="color:${ds.hidden ? '#aaa' : ds.borderColor}">${ds.label}</span>
+                    ${statsHTML}
+                    ${trendHTML}
+                </div>
+                <div class="player-badges">${badgeHTML}</div>
+            `;
+
+            li.onclick = () => {
+                ds.hidden = !ds.hidden;
+                chart.update();
+                renderList();
+                checkVersusMode();
+            };
+            listContainer.appendChild(li);
+        });
+    }
+
+    function toggleAll(show) {
+        chart.data.datasets.slice(1).forEach(ds => ds.hidden = !show);
+        chart.update();
+        renderList();
+        checkVersusMode();
+    }
+
+    window.toggleAll = toggleAll;
+
+    function changeSortBy(sortType) {
+        currentSortBy = sortType;
+        
+        // Recalculer les scores
+        recalculateScoresForSort(sortType);
+        
+        // Recalculer la moyenne du clan en fonction du nouveau tri
+        const newClanAverageScores = weeks.map((_, weekIndex) => {
             let weekTotal = 0;
             let weekCount = 0;
             rawData.forEach(player => {
@@ -210,15 +521,43 @@
             });
             return weekCount > 0 ? (weekTotal / weekCount) : null;
         });
-
-        function getNeonColor(index) {
-            const hues = [180, 300, 60, 120, 20, 250, 0, 330]; 
-            const hue = hues[index % hues.length]; 
-            const finalHue = hue + (Math.floor(index/hues.length) * 20);
-            return `hsl(${finalHue}, 100%, 60%)`;
+        clanAvgDataset.data = newClanAverageScores;
+        
+        // Retrier les données
+        if (sortType === 'total') {
+            rawData.sort((a, b) => b.avg - a.avg);
+            document.getElementById('sortInfo').innerText = 'Par Total';
+        } else if (sortType === 'kills') {
+            rawData.sort((a, b) => b.totalK - a.totalK);
+            document.getElementById('sortInfo').innerText = 'Par Kills';
+        } else if (sortType === 'assists') {
+            rawData.sort((a, b) => b.totalA - a.totalA);
+            document.getElementById('sortInfo').innerText = 'Par Assists';
+        } else if (sortType === 'wins') {
+            rawData.sort((a, b) => b.totalW - a.totalW);
+            document.getElementById('sortInfo').innerText = 'Par Wins';
+        } else if (sortType === 'svp') {
+            rawData.sort((a, b) => b.totalSVP - a.totalSVP);
+            document.getElementById('sortInfo').innerText = 'Par SVP';
         }
-
-        // Créer les datasets des joueurs
+        
+        // Recalculer les moyennes pour le tri total
+        if (sortType === 'total') {
+            rawData.forEach(player => {
+                const validScores = (player.scores || []).filter(s => s !== null && s !== undefined);
+                const sum = validScores.reduce((a, b) => a + b, 0);
+                player.avg = validScores.length ? (sum / validScores.length).toFixed(1) : 0;
+            });
+        }
+        
+        // Mettre à jour les boutons visuelement
+        document.getElementById('sortBtn-total').style.opacity = sortType === 'total' ? '1' : '0.5';
+        document.getElementById('sortBtn-kills').style.opacity = sortType === 'kills' ? '1' : '0.5';
+        document.getElementById('sortBtn-assists').style.opacity = sortType === 'assists' ? '1' : '0.5';
+        document.getElementById('sortBtn-wins').style.opacity = sortType === 'wins' ? '1' : '0.5';
+        document.getElementById('sortBtn-svp').style.opacity = sortType === 'svp' ? '1' : '0.5';
+        
+        // Mettre à jour les datasets du graphique avec les nouveaux scores
         const playerDatasets = rawData.map((player, index) => ({
             label: player.name,
             data: player.scores,
@@ -233,299 +572,139 @@
             hidden: index > 4 
         }));
 
-        // Dataset de la moyenne du clan (TOUJOURS en premier)
-        const clanAvgDataset = {
-            label: "Moyenne du Clan",
-            data: clanAverageScores,
-            borderColor: 'rgba(255, 255, 255, 0.5)', 
-            backgroundColor: 'rgba(255, 255, 255, 0.5)',
-            borderWidth: 2,
-            borderDash: [5, 5], 
-            tension: 0.3,
-            pointRadius: 0,
-            pointHoverRadius: 0,
-            fill: false,
-            hidden: false 
-        };
+        const datasets = [clanAvgDataset, ...playerDatasets];
+        chart.data.datasets = datasets;
+        
+        // Réinitialiser la liste et mettre à jour
+        renderList();
+        chart.update();
+        checkVersusMode();
+    }
 
-        const datasets = [clanAvgDataset, ...playerDatasets]; 
+    window.changeSortBy = changeSortBy;
 
-        // --- 3. CONFIG DU GRAPH (Plugin Background) ---
-        const rankZonesPlugin = {
-            id: 'rankZones',
-            beforeDraw: (chart) => {
-                const { ctx, chartArea: { top, bottom, left, right, width, height }, scales: { y } } = chart;
-                
-                const drawZone = (yMin, yMax, color) => {
-                    const yTop = y.getPixelForValue(yMax);
-                    const yBottom = y.getPixelForValue(yMin);
-                    ctx.fillStyle = color;
-                    ctx.fillRect(left, yTop, width, yBottom - yTop);
-                };
-
-                // Dessiner les zones (Backgrounds)
-                drawZone(80, 120, 'rgba(0, 230, 118, 0.05)'); // Vert/Légendaire
-                drawZone(40, 80, 'rgba(255, 193, 7, 0.05)');  // Jaune/Pro
-                drawZone(0, 40, 'rgba(255, 23, 68, 0.05)');   // Rouge/Rookie
+    function findMVP() {
+        let lastWeekIndex = Math.max(0, weeks.length - 1);
+        for (let w = weeks.length - 1; w >= 0; w--) {
+            if (rawData.some(p => p.scores[w] !== null && p.scores[w] !== undefined)) {
+                lastWeekIndex = w;
+                break;
             }
-        };
+        }
 
-        // --- 4. INITIALISATION CHART ---
-        const ctx = document.getElementById('clanChart').getContext('2d');
-        const chart = new Chart(ctx, {
+        let bestScore = -Infinity;
+        let bestPlayer = "";
+
+        rawData.forEach(p => {
+            const score = p.scores[lastWeekIndex];
+            if (score !== null && score !== undefined && score > bestScore) {
+                bestScore = score;
+                bestPlayer = p.name;
+            }
+        });
+
+        const mvpEl = document.getElementById('mvpName');
+        if (bestPlayer) {
+            mvpEl.innerText = bestPlayer.toUpperCase() + " (" + bestScore.toFixed(1) + ")";
+        } else {
+            mvpEl.innerText = "--";
+        }
+    }
+
+    function checkVersusMode() {
+        const visibleDS = chart.data.datasets.slice(1).filter(d => !d.hidden);
+        
+        if (visibleDS.length === 2) {
+            versusPanel.style.display = 'flex';
+            
+            const p1 = visibleDS[0];
+            const p1Data = rawData.find(r => r.name === p1.label);
+            
+            document.getElementById('p1-name').innerText = p1.label;
+            document.getElementById('p1-name').style.color = p1.borderColor;
+            document.getElementById('p1-avg').innerText = p1Data.avg;
+
+            const p2 = visibleDS[1];
+            const p2Data = rawData.find(r => r.name === p2.label);
+            
+            document.getElementById('p2-name').innerText = p2.label;
+            document.getElementById('p2-name').style.color = p2.borderColor;
+            document.getElementById('p2-avg').innerText = p2Data.avg;
+            
+        } else {
+            versusPanel.style.display = 'none';
+        }
+    }
+
+    function exportChart() {
+        const originalCanvas = document.getElementById('clanChart');
+        
+        const tempContainer = document.createElement('div');
+        tempContainer.style.width = originalCanvas.width + 'px';
+        tempContainer.style.height = originalCanvas.height + 'px';
+        tempContainer.style.position = 'absolute';
+        tempContainer.style.left = '-9999px';
+        document.body.appendChild(tempContainer);
+
+        const tempCanvas = document.createElement('canvas');
+        tempContainer.appendChild(tempCanvas);
+
+        const tempChart = new Chart(tempCanvas.getContext('2d'), {
             type: 'line',
-            data: { labels: weeks, datasets: datasets },
+            data: chart.data,
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                // --- NOUVEAU CODE ---
-                interaction: {
-                    mode: 'nearest', // Cherche le point le plus proche
-                    intersect: false, // Permet l'interaction même si le curseur n'est pas sur le point
-                    axis: 'x' // Limite l'interaction à l'axe des X (pour sélectionner la semaine)
-                },
-                hover: {
-                    mode: 'nearest',
-                    intersect: false,
-                    axis: 'x'
-                },
-                onTouch: {
-                    // C'est l'option clé pour le mobile. 
-                    // 'nearest' pour la détection du tapotement.
-                    mode: 'nearest',
-                    intersect: false,
-                    axis: 'x'
-                },
+                ...chart.options,
                 plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: 'rgba(0,0,0,0.9)',
-                        titleColor: '#ffc107',
-                        bodyFont: { family: 'Roboto' },
-                        borderColor: '#ffc107',
-                        borderWidth: 1,
-                        callbacks: {
-                             // Personnalise l'info bulle pour la moyenne du clan
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(context.parsed.y);
-                                }
-                                return label;
-                            }
+                    ...chart.options.plugins,
+                    legend: { 
+                        display: true,
+                        labels: { 
+                            color: 'white',
+                            font: { size: 14 }
                         }
                     }
                 }
             },
-            plugins: [rankZonesPlugin]
+            plugins: [rankZonesPlugin] 
         });
 
-        // --- 5. UI LOGIC ---
-        const listContainer = document.getElementById('playerList');
-        const versusPanel = document.getElementById('versusPanel');
-
-        function renderList() {
-            listContainer.innerHTML = '';
+        setTimeout(() => {
+            const finalCanvas = document.createElement('canvas');
+            finalCanvas.width = tempCanvas.width;
+            finalCanvas.height = tempCanvas.height;
+            const finalCtx = finalCanvas.getContext('2d');
             
-            // On boucle sur les datasets des joueurs (en sautant le premier qui est la moyenne du clan)
-            chart.data.datasets.slice(1).forEach((ds, i) => { 
-                const player = rawData[i];
-                const li = document.createElement('li');
-                
-                let rankClass = '';
-                if(i === 0) rankClass = 'rank-1';
-                else if(i === 1) rankClass = 'rank-2';
-                else if(i === 2) rankClass = 'rank-3';
-
-                li.className = `player-card ${!ds.hidden ? 'active' : 'inactive'}`;
-                
-                // 📈 HTML TRENDS
-                let trendHTML = '';
-                if (player.trend > 0) {
-                    trendHTML = `<span class="trend-up">+${Math.abs(player.trend).toFixed(1)} 🔼</span>`;
-                } else if (player.trend < 0) {
-                    trendHTML = `<span class="trend-down">-${Math.abs(player.trend).toFixed(1)} 🔽</span>`;
-                }
-
-                // 🏅 HTML BADGES
-                let badgeHTML = '';
-                // 1. 🔥N Streak
-                if (player.streak > 0) badgeHTML += `<span title="Série de victoires (${player.streak} semaines)">🔥${player.streak}</span>`;
-                // 3. 🚀 Progression (Ancien On Fire)
-                if (player.isProgression) badgeHTML += '<span title="Progression (3 hausses consécutives)">🚀</span>';
-                // 4. 💤 AFK
-                if (player.isAFK) badgeHTML += '<span title="AFK (Inactif)">💤</span>';
-
-
-                li.innerHTML = `
-                    <span class="rank-num ${rankClass}" style="margin-left:-10px">#${i+1}</span>
-                    <div class="player-info">
-                        <span class="player-name" style="color:${ds.hidden ? '#aaa' : ds.borderColor}">${ds.label}</span>
-                        <span class="player-avg">Moy: ${player.avg} ${trendHTML}</span>
-                    </div>
-                    <div class="player-badges">${badgeHTML}</div>
-                `;
-
-                li.onclick = () => {
-                    // L'index dans chart.datasets est i + 1 (à cause de la moyenne du clan à l'index 0)
-                    const dsIndex = i + 1;
-                    ds.hidden = !ds.hidden;
-                    chart.update();
-                    renderList();
-                    checkVersusMode();
-                };
-                listContainer.appendChild(li);
-            });
-        }
-
-        function toggleAll(show) {
-            // Boucle à partir de 1 pour ne pas masquer la Moyenne du Clan
-            chart.data.datasets.slice(1).forEach(ds => ds.hidden = !show);
-            chart.update();
-            renderList();
-            checkVersusMode();
-        }
-
-        // Expose pour les attributs inline onclick (module scope n'est pas global)
-        window.toggleAll = toggleAll;
-
-        // --- LOGIQUE MVP & VERSUS ---
-        
-        function findMVP() {
-            // Trouver dynamiquement la dernière semaine qui contient au moins une valeur
-            let lastWeekIndex = Math.max(0, weeks.length - 1);
-            for (let w = weeks.length - 1; w >= 0; w--) {
-                if (rawData.some(p => p.scores[w] !== null && p.scores[w] !== undefined)) {
-                    lastWeekIndex = w;
-                    break;
-                }
-            }
-
-            let bestScore = -Infinity;
-            let bestPlayer = "";
-
-            rawData.forEach(p => {
-                const score = p.scores[lastWeekIndex];
-                if (score !== null && score !== undefined && score > bestScore) {
-                    bestScore = score;
-                    bestPlayer = p.name;
-                }
-            });
-
-            const mvpEl = document.getElementById('mvpName');
-            if (bestPlayer) {
-                mvpEl.innerText = bestPlayer.toUpperCase() + " (" + bestScore + ")";
-            } else {
-                mvpEl.innerText = "--";
-            }
-        }
-
-        function checkVersusMode() {
-            // Filtre seulement les datasets des joueurs (index >= 1)
-            const visibleDS = chart.data.datasets.slice(1).filter(d => !d.hidden);
+            finalCtx.fillStyle = '#1e1e1e';
+            finalCtx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
             
-            if (visibleDS.length === 2) {
-                versusPanel.style.display = 'flex';
-                
-                const p1 = visibleDS[0];
-                const p1Data = rawData.find(r => r.name === p1.label);
-                
-                document.getElementById('p1-name').innerText = p1.label;
-                document.getElementById('p1-name').style.color = p1.borderColor;
-                document.getElementById('p1-avg').innerText = p1Data.avg;
+            finalCtx.drawImage(tempCanvas, 0, 0);
 
-                const p2 = visibleDS[1];
-                const p2Data = rawData.find(r => r.name === p2.label);
-                
-                document.getElementById('p2-name').innerText = p2.label;
-                document.getElementById('p2-name').style.color = p2.borderColor;
-                document.getElementById('p2-avg').innerText = p2Data.avg;
-                
-            } else {
-                versusPanel.style.display = 'none';
-            }
-        }
-
-        // --- 📸 EXPORT FUNCTION CORRIGÉE (avec Légende) ---
-        function exportChart() {
-            const originalCanvas = document.getElementById('clanChart');
+            const image = finalCanvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = image;
+            link.download = 'CircledFight_Graph_Saison2026.png';
+            document.body.appendChild(link);
+            link.click();
             
-            // 1. Créer un conteneur et un canvas temporaires (cachés)
-            const tempContainer = document.createElement('div');
-            tempContainer.style.width = originalCanvas.width + 'px'; // Garde la taille originale
-            tempContainer.style.height = originalCanvas.height + 'px';
-            tempContainer.style.position = 'absolute';
-            tempContainer.style.left = '-9999px'; // On le met hors écran
-            document.body.appendChild(tempContainer);
+            tempChart.destroy();
+            link.remove();
+            tempContainer.remove();
+            finalCanvas.remove();
+        }, 100);
+    }
 
-            const tempCanvas = document.createElement('canvas');
-            tempContainer.appendChild(tempCanvas);
+    window.exportChart = exportChart;
 
-            // 2. Créer une instance temporaire du Chart, mais AVEC la légende
-            const tempChart = new Chart(tempCanvas.getContext('2d'), {
-                type: 'line',
-                data: chart.data, // Utilise les données actuelles (avec les joueurs cachés/visibles)
-                options: {
-                    ...chart.options, // Garde toutes les options (échelles, couleurs, zones, etc.)
-                    plugins: {
-                        ...chart.options.plugins,
-                        legend: { 
-                            display: true, // <--- C'EST ÇA QUI AJOUTE LA LÉGENDE !
-                            labels: { 
-                                color: 'white',
-                                font: { size: 14 }
-                            }
-                        }
-                    }
-                },
-                // Réappliquer les plugins nécessaires, comme les zones de rangs
-                plugins: [rankZonesPlugin] 
-            });
+    // Lancement
+    findMVP();
+    renderList();
+    checkVersusMode();
+    
+    // Initialiser l'apparence des boutons
+    document.getElementById('sortBtn-total').style.opacity = '1';
+    document.getElementById('sortBtn-kills').style.opacity = '0.5';
+    document.getElementById('sortBtn-assists').style.opacity = '0.5';
+    document.getElementById('sortBtn-wins').style.opacity = '0.5';
+    document.getElementById('sortBtn-svp').style.opacity = '0.5'; 
 
-            // On attend un micro-moment pour que Chart.js rende le graphique avec la légende
-            setTimeout(() => {
-                // Créer un canvas final avec un fond noir (car le plugin ne dessine que la zone du graph)
-                const finalCanvas = document.createElement('canvas');
-                finalCanvas.width = tempCanvas.width;
-                finalCanvas.height = tempCanvas.height;
-                const finalCtx = finalCanvas.getContext('2d');
-                
-                // Dessiner le fond noir
-                finalCtx.fillStyle = '#1e1e1e';
-                finalCtx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-                
-                // Dessiner le graphique temporaire (avec légende) sur le fond noir
-                finalCtx.drawImage(tempCanvas, 0, 0);
-
-                // Exportation
-                const image = finalCanvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.href = image;
-                link.download = 'CircledFight_Graph_avec_Legende.png';
-                document.body.appendChild(link);
-                link.click();
-                
-                // Nettoyage
-                tempChart.destroy(); // Détruire l'instance
-                link.remove();
-                tempContainer.remove();
-                finalCanvas.remove();
-            }, 100);
-        }
-
-        // Expose export function to global scope for header button onclick
-        window.exportChart = exportChart;
-
-
-        // Lancement
-        findMVP();
-        renderList();
-        checkVersusMode(); 
-
-    </script>
-</body>
-</html>
+</script>
