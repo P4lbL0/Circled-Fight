@@ -203,8 +203,10 @@
                 <div><span class="label">Loss 1v1</span><div id="1v1-l" style="color:var(--accent-red); font-size:2rem; font-family:'Orbitron'">0</div></div>
             </div>
             <hr style="margin:15px 0; opacity:0.1;">
-            <span class="label">Niveau Minijeu Max</span>
-            <div id="minigame-lvl" style="font-size:2rem; font-family:'Orbitron'">0</div>
+            <div style="display:flex; justify-content: space-around;">
+                <div><span class="label">Niveau Minijeu Max</span><div id="minigame-lvl" style="color:var(--primary); font-size:2rem; font-family:'Orbitron'">0</div></div>
+                <div><span class="label">Gains Minijeux</span><div id="minigame-revenue" style="color:var(--secondary); font-size:2rem; font-family:'Orbitron'">0</div></div>
+            </div>
         </div>
     </section>
 
@@ -235,6 +237,7 @@
             joinedAt: "",
             w1v1: 0, l1v1: 0,
             miniLvl: 0,
+            miniRevenue: 0,
             customBadges: [],
             pseudo: ""  // Ajouter le pseudo depuis Firebase
         };
@@ -279,9 +282,10 @@
                         
                         fbData.points = userData.cfPoints || 0;  // C'est "cfPoints" dans Firebase, pas "points"
                         fbData.joinedAt = userData.joinedAt || "";
-                        fbData.w1v1 = userData.w1v1 || 0;
-                        fbData.l1v1 = userData.l1v1 || 0;
-                        fbData.miniLvl = userData.miniLvl || 0;
+                        fbData.w1v1 = userData.oneVsOneWins || 0;  // Champs correctes depuis Firebase
+                        fbData.l1v1 = userData.oneVsOneLosses || 0;
+                        fbData.miniLvl = userData.minigameMaxLevel || 0;  // Correct: minigameMaxLevel (minuscules)
+                        fbData.miniRevenue = userData.minigameRevenue || 0;  // Ajouter revenue
                         fbData.customBadges = userData.customBadges || [];
                         
                         console.log('Données Firebase chargées:', fbData);
@@ -327,6 +331,7 @@
             animateValue("1v1-w", 0, fbData.w1v1, 1000);
             animateValue("1v1-l", 0, fbData.l1v1, 1000);
             animateValue("minigame-lvl", 0, fbData.miniLvl, 1000);
+            animateValue("minigame-revenue", 0, fbData.miniRevenue, 1000);
 
             // Génération Badges depuis Firebase (VRAIES DONNÉES UNIQUEMENT)
             const container = document.getElementById('badge-list');
