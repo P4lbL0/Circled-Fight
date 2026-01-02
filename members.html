@@ -120,7 +120,79 @@
         @keyframes shineAnim { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
         @keyframes glitchAnim { 0% { clip-path: inset(0 0 0 0); } 5% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, 0); } 10% { clip-path: inset(80% 0 10% 0); transform: translate(2px, 0); filter: invert(1); } 15% { clip-path: inset(0 0 0 0); transform: translate(0); filter: none; } 100% { clip-path: inset(0 0 0 0); } }
         @keyframes burnAnim { from { box-shadow: 0 0 5px currentColor; } to { box-shadow: 0 0 15px currentColor, 0 0 5px #fff; } }
+/* --- NOUVEAUX BADGES SAISONNIERS --- */
 
+/* NOËL / GLACE */
+.badge-ice {
+    background: linear-gradient(135deg, #e0f7fa, #81d4fa, #e0f7fa);
+    background-size: 200% 200%;
+    color: #01579b;
+    border: 1px solid #ffffff;
+    text-shadow: 0 0 5px rgba(255,255,255,0.8);
+    animation: gradientMove 3s infinite;
+}
+
+/* HALLOWEEN / HORREUR */
+.badge-horror {
+    background: #1a0000;
+    color: #ff4444;
+    border: 1px solid #440000;
+    font-family: 'Orbitron';
+    letter-spacing: 1px;
+}
+
+/* --- NOUVEAUX EFFETS --- */
+
+/* Flocons de neige qui tombent */
+.effect-snow::before, .effect-snow::after {
+    content: '❄';
+    position: absolute;
+    top: -10px;
+    font-size: 8px;
+    color: white;
+    opacity: 0;
+    animation: snowFall 2s linear infinite;
+}
+.effect-snow::after { left: 80%; animation-delay: 1s; }
+.effect-snow::before { left: 20%; }
+
+@keyframes snowFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(20px) rotate(360deg); opacity: 0; }
+}
+
+/* Sang qui coule */
+.effect-blood-drip {
+    position: relative;
+    overflow: visible !important;
+}
+.effect-blood-drip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 20%;
+    width: 2px;
+    height: 0;
+    background: #ff0000;
+    box-shadow: 10px 0 #ff0000, 25px 0 #ff0000;
+    animation: drip 3s infinite;
+}
+
+@keyframes drip {
+    0% { height: 0; opacity: 1; }
+    50% { height: 8px; opacity: 1; }
+    100% { height: 12px; opacity: 0; }
+}
+
+/* BONUS : Effet Toxique (Vert brillant) */
+.effect-toxic {
+    box-shadow: 0 0 10px #2ecc71;
+    animation: toxicPulse 1.5s infinite alternate;
+}
+@keyframes toxicPulse {
+    from { text-shadow: 0 0 2px #2ecc71; }
+    to { text-shadow: 0 0 10px #2ecc71, 0 0 20px #2ecc71; }
+}
         /* --- LAYOUT UTILS --- */
         .tools-bar { max-width: 1200px; margin: 20px auto; padding: 0 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; }
         .search-box { flex: 1; min-width: 250px; background: #1a1a1a; border: 1px solid #444; color: white; padding: 12px; border-radius: 6px; font-family: 'Rajdhani'; font-size: 1.1rem; }
@@ -557,6 +629,7 @@
         function getColorsOptions(selected) {
             const opts = [
                 {g:'SPÉCIAL', om:[{v:'realgold',l:'⚠️ Vrai Or'},{v:'realsilver',l:'⚪ Vrai Argent'},{v:'realdiamond',l:'💎 Vrai Diamant'},{v:'galaxy',l:'🌌 Galaxy'},{v:'magma',l:'🔥 Magma'},{v:'obsidian',l:'🌑 Obsidian'}]},
+                {g:'SAISONNIER', om:[{v:'ice',l:'❄️ Glace (Noël)'},{v:'horror',l:'🎃 Horreur (Halloween)'}]},
                 {g:'FUN', om:[{v:'pigeon',l:'🐦 Pigeon (Argent)'},{v:'clown',l:'🤡 Clown (Pois)'}]},
                 {g:'BASIQUE', om:[{v:'gold',l:'Or'},{v:'red',l:'Rouge'},{v:'blue',l:'Bleu'},{v:'green',l:'Vert'},{v:'purple',l:'Violet'},{v:'cyan',l:'Cyan'},{v:'pink',l:'Rose'},{v:'orange',l:'Orange'},{v:'lime',l:'Lime'},{v:'black',l:'Noir'}]}
             ];
@@ -564,7 +637,7 @@
         }
 
         function getEffectsOptions(selected) {
-            const opts = [{v:'',l:'(Aucun Effet)'},{v:'holo',l:'🌈 Holographique'},{v:'lightning-red',l:'⚡ Contour Éclair Rouge'},{v:'shine',l:'✨ Shine'},{v:'electric',l:'⚡ Électrique'},{v:'pulse',l:'💓 Pulse'},{v:'glitch',l:'👾 Glitch'},{v:'burn',l:'🔥 Burn'}];
+            const opts = [{v:'',l:'(Aucun Effet)'},{v:'holo',l:'🌈 Holographique'},{v:'lightning-red',l:'⚡ Contour Éclair Rouge'},{v:'shine',l:'✨ Shine'},{v:'electric',l:'⚡ Électrique'},{v:'pulse',l:'💓 Pulse'},{v:'glitch',l:'👾 Glitch'},{v:'burn',l:'🔥 Burn'},{v:'snow',l:'❄️ Flocons de neige'},{v:'blood-drip',l:'🩸 Sang qui coule'},{v:'toxic',l:'☢️ Radiation Toxique'}];
             return opts.map(o => `<option value="${o.v}" ${selected===o.v?'selected':''}>${o.l}</option>`).join('');
         }
 
