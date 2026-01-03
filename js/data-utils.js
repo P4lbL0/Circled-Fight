@@ -4,7 +4,7 @@ import { rawData } from './data.js';
 // --- CONFIGURATION DU BOOKMAKER ---
 const BOOKMAKER_MARGIN = 1.15; // Marge de 15% 
 const MIN_COTE = 1.05;         // Cote minimale
-const MAX_COTE = 500.00;       // Plafond
+const MAX_COTE = 25.00;        // Plafond (divisé par 10 pour réalisme)
 
 /**
  * Calcule les statistiques d'un joueur en ignorant les 'null'
@@ -86,8 +86,7 @@ export function calculateRealTimeOdds(playerStats, targetRank, totalPlayers = 8)
     if (probability < 0.005) probability = 0.005;
 
     // --- 5. CONVERSION EN COTE ---
-    let rawCote = (1 / probability) * BOOKMAKER_MARGIN;
-    
+    let rawCote = ((1 / probability) * BOOKMAKER_MARGIN) / 10; // Divisé par 10 pour réalisme
     // Bonus Cote pour le rang 1 (c'est dur d'être 1er)
     if (targetRank === 1) rawCote *= 1.2;
 
