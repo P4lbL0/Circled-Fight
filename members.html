@@ -371,6 +371,8 @@
     <script type="module">
         import { auth, db, collection, getDocs, getDoc, doc, updateDoc, onAuthStateChanged, signOut } from './js/firebase.js';
         import { rawData } from './js/data.js';
+        import { detailedData } from './js/data2.js';
+        import { detailedData2026 } from './js/data2026mj.js';
 
         const authLock = document.getElementById('authLock');
         const membersContent = document.getElementById('membersContent');
@@ -431,6 +433,77 @@
             renderGrid(allMembersCache.filter(m => (m.pseudo || "").toLowerCase().includes(term)));
         };
 
+        // Fonction pour calculer les points depuis les données MJ (2025 + 2026)
+        function calculateMjPoints(pseudo) {
+            let points = 0;
+            
+            // 2025
+            let details2025 = detailedData[pseudo];
+            if (!details2025) {
+                const key2025 = Object.keys(detailedData).find(k => k.toLowerCase() === pseudo.toLowerCase());
+                if(key2025) details2025 = detailedData[key2025];
+            }
+            
+            if (details2025) {
+                Object.values(details2025).forEach(season => {
+                    points += (season.k || 0) * 1;         // 1 kill = 1 point
+                    points += (season.w || 0) * 3;         // 1 win = 3 points
+                    points += (season.a || 0) * 0.5;       // 1 assist = 0.5 point
+                    points += (season.svp || 0) * 3;       // 1 svp = 3 points
+                });
+            }
+            
+            // 2026
+            let details2026 = detailedData2026[pseudo];
+            if (!details2026) {
+                const key2026 = Object.keys(detailedData2026).find(k => k.toLowerCase() === pseudo.toLowerCase());
+                if(key2026) details2026 = detailedData2026[key2026];
+            }
+            
+            if (details2026) {
+                Object.values(details2026).forEach(season => {
+                    points += (season.k || 0) * 1;         // 1 kill = 1 point
+                    points += (season.w || 0) * 3;         // 1 win = 3 points
+                    points += (season.a || 0) * 0.5;       // 1 assist = 0.5 point
+                    points += (season.svp || 0) * 3;       // 1 svp = 3 points
+                });
+            }
+            
+            return Math.round(points * 10) / 10; // Arrondir à 1 décimale
+        }
+
+        // Fonction pour calculer la moyenne combinée (2025 + 2026)
+        function calculateCombinedAverage(pseudo) {
+            // Scores 2025
+            const localStats2025 = rawData.find(d => d.name.toLowerCase() === pseudo.toLowerCase());
+            let allScores = [];
+            
+            if (localStats2025) {
+                const validScores2025 = localStats2025.scores.filter(s => typeof s === 'number' && s !== null);
+                allScores = allScores.concat(validScores2025);
+            }
+            
+            // Calculer un score synthétique pour 2026 basé sur les points MJ
+            let details2026 = detailedData2026[pseudo];
+            if (!details2026) {
+                const key2026 = Object.keys(detailedData2026).find(k => k.toLowerCase() === pseudo.toLowerCase());
+                if(key2026) details2026 = detailedData2026[key2026];
+            }
+            
+            if (details2026) {
+                Object.values(details2026).forEach(season => {
+                    // Convertir les stats en score synthétique: k*1 + w*3 + a*0.5 + svp*3
+                    const syntheticScore = (season.k || 0) * 1 + (season.w || 0) * 3 + (season.a || 0) * 0.5 + (season.svp || 0) * 3;
+                    allScores.push(syntheticScore);
+                });
+            }
+            
+            if (allScores.length === 0) return "N/A";
+            const avg = (allScores.reduce((a, b) => a + b, 0) / allScores.length).toFixed(1);
+            return avg;
+        }
+
+
         function renderGrid(membersList) {
             memberCount.innerText = `${membersList.length} DOSSIERS`;
             let html = '';
@@ -439,26 +512,43 @@
             membersList.forEach(m => {
                 const pseudo = m.pseudo || "Soldat";
                 const points = m.cfPoints || 0;
+                const mjPoints = calculateMjPoints(pseudo);  // Calculer les points MJ (2025 + 2026)
                 const isMe = (m.uid === currentUserUid);
                 const cardClass = isMe ? 'member-card current-user-highlight' : 'member-card';
                 const tagHtml = isMe ? `<div class="current-user-tag">IDENTIFIÉ</div><button class="reorder-trigger" onclick="window.openReorderModal()" title="Réorganiser">⇄</button>` : '';
 
                 if(isMe) currentUserBadgesCache = m.customBadges || [];
 
-                const localStats = rawData.find(d => d.name.toLowerCase() === pseudo.toLowerCase());
-                let avg = "N/A"; let games = 0; let perfBadges = "";
-                if (localStats) {
-                    const validScores = localStats.scores.filter(s => typeof s === 'number' && s !== null);
-                    games = validScores.length;
-                    if (games > 0) avg = (validScores.reduce((a, b) => a + b, 0) / games).toFixed(1);
-                    if (games >= 8) perfBadges += `<span ></span>`;
-                    else if (games >= 4) perfBadges += `<span ></span>`;
-                    if (avg !== "N/A" && avg >= 60) perfBadges += `<span ></span>`;
+                // Utiliser la moyenne combinée (2025 + 2026)
+                const combinedAvg = calculateCombinedAverage(pseudo);
+                let avg = combinedAvg;
+                let games = 0;
+                let perfBadges = "";
+                
+                // Compter les matchs (2025 + 2026)
+                const localStats2025 = rawData.find(d => d.name.toLowerCase() === pseudo.toLowerCase());
+                if (localStats2025) {
+                    const validScores = localStats2025.scores.filter(s => typeof s === 'number' && s !== null);
+                    games += validScores.length;
                 }
+                
+                let details2026 = detailedData2026[pseudo];
+                if (!details2026) {
+                    const key2026 = Object.keys(detailedData2026).find(k => k.toLowerCase() === pseudo.toLowerCase());
+                    if(key2026) details2026 = detailedData2026[key2026];
+                }
+                if (details2026) {
+                    games += Object.keys(details2026).length; // Ajouter le nombre de saisons 2026
+                }
+                
+                if (games >= 8) perfBadges += `<span ></span>`;
+                else if (games >= 4) perfBadges += `<span ></span>`;
+                if (avg !== "N/A" && avg >= 60) perfBadges += `<span ></span>`;
 
                 let wealthBadges = '';
-                if (points > 10000) wealthBadges += `<span ></span>`;
-                else if (points > 5000) wealthBadges += `<span ></span>`;
+                const displayPoints = points;  // Garder les vrais CF Points
+                if (displayPoints > 10000) wealthBadges += `<span ></span>`;
+                else if (displayPoints > 5000) wealthBadges += `<span ></span>`;
 
                 let customBadgesHtml = '';
                 if (m.customBadges && Array.isArray(m.customBadges)) {
@@ -476,7 +566,7 @@
                         <div class="card-header"><div class="avatar">${initials}</div><div class="identity"><h3>${pseudo}</h3><div class="role">Opérateur</div></div></div>
                         <div class="badges-container">${wealthBadges} ${perfBadges} ${customBadgesHtml}</div>
                         <div class="card-stats" style="display:grid; grid-template-columns: 1fr 1fr 1fr; border-top:1px solid #333;">
-                            <div class="stat-box" style="border-right:1px solid #333;"><span class="stat-val" style="color:var(--codm-yellow)">${points}</span><span class="stat-label">CF Points</span></div>
+                            <div class="stat-box" style="border-right:1px solid #333;"><span class="stat-val" style="color:var(--codm-yellow)">${displayPoints}</span><span class="stat-label">CF Points</span></div>
                             <div class="stat-box" style="border-right:1px solid #333;"><span class="stat-val">${avg}</span><span class="stat-label">Moyenne</span></div>
                             <div class="stat-box"><span class="stat-val">${games}</span><span class="stat-label">Missions</span></div>
                         </div>

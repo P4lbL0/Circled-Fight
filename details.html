@@ -268,25 +268,48 @@
                     <span class="val" id="mjBestScore">--</span>
                     <span class="sub" id="mjBestSeasonName">S--</span>
                 </div>
-                <div class="stat-card" style="border-color: #d32f2f;">
-                    <h4>Total Kills</h4>
-                    <span class="val" id="mjTotalKills" style="color:#ff5252">--</span>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                    <div class="stat-card" style="border-color: #d32f2f;">
+                        <h4>Total Kills</h4>
+                        <span class="val" id="mjTotalKills" style="color:#ff5252">--</span>
+                    </div>
+                    <div class="stat-card" style="border-color: #d32f2f; opacity: 0.7;">
+                        <h4>Moy Kills/Saison</h4>
+                        <span class="val" id="mjAvgKills" style="color:#ff5252">--</span>
+                    </div>
                 </div>
-                <div class="stat-card" style="border-color: #4caf50;">
-                    <h4>Victoires</h4>
-                    <span class="val" id="mjTotalWins" style="color:#69f0ae">--</span>
-                    <span class="sub" id="mjWinRate">--% Win Rate</span>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                    <div class="stat-card" style="border-color: #4caf50;">
+                        <h4>Victoires</h4>
+                        <span class="val" id="mjTotalWins" style="color:#69f0ae">--</span>
+                        <span class="sub" id="mjWinRate">--% Win Rate</span>
+                    </div>
+                    <div class="stat-card" style="border-color: #4caf50; opacity: 0.7;">
+                        <h4>Moy Victoires/Saison</h4>
+                        <span class="val" id="mjAvgWins" style="color:#69f0ae">--</span>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h4>SVP</h4>
-                    <span class="val" id="mjTotalSvp">--</span>
-                    <span class="sub">Titres MVP perdants</span>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                    <div class="stat-card">
+                        <h4>SVP</h4>
+                        <span class="val" id="mjTotalSvp">--</span>
+                        <span class="sub">Titres MVP perdants</span>
+                    </div>
+                    <div class="stat-card" style="opacity: 0.7;">
+                        <h4>Moy SVP/Saison</h4>
+                        <span class="val" id="mjAvgSvp">--</span>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h4>Assists</h4>
-                    <span class="val" id="mjTotalAssists">--</span>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                    <div class="stat-card">
+                        <h4>Assists</h4>
+                        <span class="val" id="mjTotalAssists">--</span>
+                    </div>
+                    <div class="stat-card" style="opacity: 0.7;">
+                        <h4>Moy Assists/Saison</h4>
+                        <span class="val" id="mjAvgAssists">--</span>
+                    </div>
                 </div>
-            </div>
 
             <div class="chart-box">
                 <div class="chart-title">📈 ÉVOLUTION DES SCORES MJ</div>
@@ -351,8 +374,9 @@
 
     <script type="module">
         import { db, doc, getDoc } from './js/firebase.js';
-        import { rawData, weeks } from './js/data.js'; // Scores MJ
-        import { detailedData } from './js/data2.js'; // Détails MJ
+        import { rawData, weeks } from './js/data.js'; // Scores MJ 2025
+        import { detailedData } from './js/data2.js'; // Détails MJ 2025
+        import { detailedData2026 } from './js/data2026mj.js'; // Détails MJ 2026
         import { brData } from './js/data3.js';       // Scores BR (Corrigé)
 
         // Récupération de l'UID dans l'URL
@@ -419,6 +443,37 @@
             }
         }
 
+        // Fonction pour calculer la moyenne combinée (2025 + 2026)
+        function calculateCombinedAverage(pseudo) {
+            // Scores 2025
+            const localStats2025 = rawData.find(d => d.name.toLowerCase() === pseudo.toLowerCase());
+            let allScores = [];
+            
+            if (localStats2025) {
+                const validScores2025 = localStats2025.scores.filter(s => typeof s === 'number' && s !== null);
+                allScores = allScores.concat(validScores2025);
+            }
+            
+            // Calculer un score synthétique pour 2026 basé sur les points MJ
+            let details2026 = detailedData2026[pseudo];
+            if (!details2026) {
+                const key2026 = Object.keys(detailedData2026).find(k => k.toLowerCase() === pseudo.toLowerCase());
+                if(key2026) details2026 = detailedData2026[key2026];
+            }
+            
+            if (details2026) {
+                Object.values(details2026).forEach(season => {
+                    // Convertir les stats en score synthétique: k*1 + w*3 + a*0.5 + svp*3
+                    const syntheticScore = (season.k || 0) * 1 + (season.w || 0) * 3 + (season.a || 0) * 0.5 + (season.svp || 0) * 3;
+                    allScores.push(syntheticScore);
+                });
+            }
+            
+            if (allScores.length === 0) return { avg: 0, count: 0 };
+            const avg = (allScores.reduce((a, b) => a + b, 0) / allScores.length).toFixed(1);
+            return { avg: parseFloat(avg), count: allScores.length };
+        }
+
         function processMjData(pseudo) {
             // Recherche insensible à la casse
             const mjRecord = rawData.find(p => p.name.toLowerCase() === pseudo.toLowerCase());
@@ -431,17 +486,17 @@
                 if(key) details = detailedData[key];
             }
 
-            // A. STATS SCORES
-            let avg = 0, count = 0, best = 0, bestS = "";
+            // A. STATS SCORES - UTILISER MOYENNE COMBINÉE (2025 + 2026)
+            const avgData = calculateCombinedAverage(pseudo);
+            let avg = avgData.avg;
+            let count = avgData.count;
+            let best = 0, bestS = "";
             let scoresArray = [];
 
             if (mjRecord) {
                 scoresArray = mjRecord.scores; 
                 const validScores = scoresArray.filter(s => typeof s === 'number' && s !== null);
-                count = validScores.length;
-                if (count > 0) {
-                    const sum = validScores.reduce((a,b)=>a+b, 0);
-                    avg = (sum / count).toFixed(1);
+                if (validScores.length > 0) {
                     best = Math.max(...validScores);
                     const bestIndex = scoresArray.findIndex(s => s === best);
                     if(weeks[bestIndex]) bestS = weeks[bestIndex];
@@ -473,7 +528,27 @@
                     totalW += (s.w || 0);
                     totalSvp += (s.svp || 0);
                     totalA += (s.a || 0);
-                    labelsDetails.push(seasonKey);
+                    labelsDetails.push(seasonKey + " (2025)");
+                    dataKills.push(s.k || 0);
+                    dataWins.push(s.w || 0);
+                });
+            }
+
+            // Ajouter les données 2026
+            let details2026 = detailedData2026[pseudo];
+            if (!details2026) {
+                const key2026 = Object.keys(detailedData2026).find(k => k.toLowerCase() === pseudo.toLowerCase());
+                if(key2026) details2026 = detailedData2026[key2026];
+            }
+
+            if (details2026) {
+                Object.keys(details2026).forEach(seasonKey => {
+                    const s = details2026[seasonKey];
+                    totalK += (s.k || 0);
+                    totalW += (s.w || 0);
+                    totalSvp += (s.svp || 0);
+                    totalA += (s.a || 0);
+                    labelsDetails.push(seasonKey + " (2026)");
                     dataKills.push(s.k || 0);
                     dataWins.push(s.w || 0);
                 });
@@ -484,14 +559,26 @@
             document.getElementById('mjTotalSvp').innerText = totalSvp;
             document.getElementById('mjTotalAssists').innerText = totalA;
             
-            const seasonsPlayed = Object.keys(details || {}).length;
+            const seasonsPlayed = Object.keys(details || {}).length + Object.keys(details2026 || {}).length;
+            
+            // Calculer et afficher les moyennes par saison
+            const avgKillsPerSeason = seasonsPlayed > 0 ? (totalK / seasonsPlayed).toFixed(1) : 0;
+            const avgWinsPerSeason = seasonsPlayed > 0 ? (totalW / seasonsPlayed).toFixed(1) : 0;
+            const avgSvpPerSeason = seasonsPlayed > 0 ? (totalSvp / seasonsPlayed).toFixed(1) : 0;
+            const avgAssistsPerSeason = seasonsPlayed > 0 ? (totalA / seasonsPlayed).toFixed(1) : 0;
+            
+            document.getElementById('mjAvgKills').innerText = avgKillsPerSeason;
+            document.getElementById('mjAvgWins').innerText = avgWinsPerSeason;
+            document.getElementById('mjAvgSvp').innerText = avgSvpPerSeason;
+            document.getElementById('mjAvgAssists').innerText = avgAssistsPerSeason;
+            
             if(seasonsPlayed > 0) {
                 const wr = ((totalW / (seasonsPlayed * 6)) * 100).toFixed(0); 
                 document.getElementById('mjWinRate').innerText = `~${wr}% Win Rate (Est.)`;
             }
 
             // C. AFFICHAGE OU ERROR
-            if (count === 0 && !details) {
+            if (count === 0 && !details && !details2026) {
                 document.getElementById('mjDataContainer').style.display = 'none';
                 document.getElementById('mjNoData').style.display = 'block';
             } else {
