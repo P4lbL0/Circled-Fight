@@ -268,58 +268,53 @@
                     <span class="val" id="mjBestScore">--</span>
                     <span class="sub" id="mjBestSeasonName">S--</span>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px;">
-                    <div class="stat-card" style="border-color: #d32f2f;">
-                        <h4>Total Kills</h4>
-                        <span class="val" id="mjTotalKills" style="color:#ff5252">--</span>
-                    </div>
-                    <div class="stat-card" style="border-color: #d32f2f; opacity: 0.7;">
-                        <h4>Moy Kills/Saison</h4>
-                        <span class="val" id="mjAvgKills" style="color:#ff5252">--</span>
-                    </div>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px;">
-                    <div class="stat-card" style="border-color: #4caf50;">
-                        <h4>Victoires</h4>
-                        <span class="val" id="mjTotalWins" style="color:#69f0ae">--</span>
-                        <span class="sub" id="mjWinRate">--% Win Rate</span>
-                    </div>
-                    <div class="stat-card" style="border-color: #4caf50; opacity: 0.7;">
-                        <h4>Moy Victoires/Saison</h4>
-                        <span class="val" id="mjAvgWins" style="color:#69f0ae">--</span>
-                    </div>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px;">
-                    <div class="stat-card">
-                        <h4>SVP</h4>
-                        <span class="val" id="mjTotalSvp">--</span>
-                        <span class="sub">Titres MVP perdants</span>
-                    </div>
-                    <div class="stat-card" style="opacity: 0.7;">
-                        <h4>Moy SVP/Saison</h4>
-                        <span class="val" id="mjAvgSvp">--</span>
-                    </div>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 30px;">
-                    <div class="stat-card">
-                        <h4>Assists</h4>
-                        <span class="val" id="mjTotalAssists">--</span>
-                    </div>
-                    <div class="stat-card" style="opacity: 0.7;">
-                        <h4>Moy Assists/Saison</h4>
-                        <span class="val" id="mjAvgAssists">--</span>
-                    </div>
-                </div>
-
-            <div class="chart-box">
-                <div class="chart-title">📈 ÉVOLUTION DES SCORES MJ</div>
-                <canvas id="chartMjScores"></canvas>
             </div>
 
-            <div class="chart-box">
-                <div class="chart-title">📊 ANALYSE DÉTAILLÉE (Kills/Wins par Saison)</div>
-                <canvas id="chartMjDetails"></canvas>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px;">
+                <div class="stat-card" style="border-color: #d32f2f;">
+                    <h4>Total Kills</h4>
+                    <span class="val" id="mjTotalKills" style="color:#ff5252">--</span>
+                </div>
+                <div class="stat-card" style="border-color: #d32f2f; opacity: 0.7;">
+                    <h4>Moy Kills/Saison</h4>
+                    <span class="val" id="mjAvgKills" style="color:#ff5252">--</span>
+                </div>
             </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px;">
+                <div class="stat-card" style="border-color: #4caf50;">
+                    <h4>Victoires</h4>
+                    <span class="val" id="mjTotalWins" style="color:#69f0ae">--</span>
+                    <span class="sub" id="mjWinRate">--% Win Rate</span>
+                </div>
+                <div class="stat-card" style="border-color: #4caf50; opacity: 0.7;">
+                    <h4>Moy Victoires/Saison</h4>
+                    <span class="val" id="mjAvgWins" style="color:#69f0ae">--</span>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px;">
+                <div class="stat-card">
+                    <h4>SVP</h4>
+                    <span class="val" id="mjTotalSvp">--</span>
+                    <span class="sub">Titres MVP perdants</span>
+                </div>
+                <div class="stat-card" style="opacity: 0.7;">
+                    <h4>Moy SVP/Saison</h4>
+                    <span class="val" id="mjAvgSvp">--</span>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px;">
+                <div class="stat-card">
+                    <h4>Assists</h4>
+                    <span class="val" id="mjTotalAssists">--</span>
+                </div>
+                <div class="stat-card" style="opacity: 0.7;">
+                    <h4>Moy Assists/Saison</h4>
+                    <span class="val" id="mjAvgAssists">--</span>
+                </div>
+            </div>
+
+        </div>
+
         </div>
 
         <div id="mjNoData" class="no-data-msg" style="display:none;">
@@ -346,10 +341,7 @@
                 </div>
             </div>
 
-            <div class="chart-box">
-                <div class="chart-title">🏔️ ÉVOLUTION SCORES BATTLE ROYALE</div>
-                <canvas id="chartBrScores"></canvas>
-            </div>
+
         </div>
 
         <div id="brNoData" class="no-data-msg" style="display:none;">
@@ -431,11 +423,28 @@
                 document.getElementById('infoWealth').innerText = `${userData.cfPoints || 0} CF`;
 
                 // 3. ANALYSE DONNÉES LOCALES (MJ & BR)
-                processMjData(pseudo);
-                processBrData(pseudo);
-
+                try {
+                    console.log("Traitement MJ data...");
+                    processMjData(pseudo);
+                    console.log("MJ data OK");
+                } catch(err) {
+                    console.error("ERREUR MJ:", err);
+                }
+                
+                if (typeof processBrData !== 'undefined') {
+                    try {
+                        console.log("Traitement BR data...");
+                        processBrData(pseudo);
+                        console.log("BR data OK");
+                    } catch(err) {
+                        console.error("ERREUR BR:", err);
+                    }
+                }
+                
                 // Tout est chargé, on enlève l'écran de chargement
+                console.log("Enlèvement loading screen...");
                 document.getElementById('loadingScreen').style.display = 'none';
+                console.log("Terminé !");
 
             } catch (e) {
                 console.error("ERREUR CRITIQUE:", e);
@@ -581,51 +590,6 @@
             if (count === 0 && !details && !details2026) {
                 document.getElementById('mjDataContainer').style.display = 'none';
                 document.getElementById('mjNoData').style.display = 'block';
-            } else {
-                new Chart(document.getElementById('chartMjScores'), {
-                    type: 'line',
-                    data: {
-                        labels: weeks,
-                        datasets: [{
-                            label: 'Score MJ',
-                            data: scoresArray,
-                            borderColor: '#ffc107',
-                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.3,
-                            fill: true,
-                            spanGaps: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: { y: { beginAtZero: true, grid: { color: '#333' } }, x: { grid: { display: false } } },
-                        plugins: { legend: { display: false } }
-                    }
-                });
-
-                if (labelsDetails.length > 0) {
-                    new Chart(document.getElementById('chartMjDetails'), {
-                        type: 'bar',
-                        data: {
-                            labels: labelsDetails,
-                            datasets: [
-                                { label: 'Kills', data: dataKills, backgroundColor: 'rgba(211, 47, 47, 0.7)', borderColor: '#d32f2f', borderWidth: 1 },
-                                { label: 'Victoires', data: dataWins, backgroundColor: 'rgba(76, 175, 80, 0.7)', borderColor: '#4caf50', borderWidth: 1, yAxisID: 'y1' }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                y: { beginAtZero: true, grid: { color: '#333' }, title: {display:true, text:'Kills'} },
-                                y1: { position: 'right', beginAtZero: true, max: 5, grid: { display:false }, title: {display:true, text:'Victoires'} },
-                                x: { grid: { color: '#333' } }
-                            }
-                        }
-                    });
-                }
             }
         }
 
@@ -649,29 +613,6 @@
                     document.getElementById('brAvg').innerText = avg;
                     document.getElementById('brBest').innerText = best;
                     document.getElementById('brCount').innerText = count;
-
-                    new Chart(document.getElementById('chartBrScores'), {
-                        type: 'line',
-                        data: {
-                            labels: weeks, // On utilise les semaines globales
-                            datasets: [{
-                                label: 'Score BR',
-                                data: brRecord.scores,
-                                borderColor: '#00bcd4',
-                                backgroundColor: 'rgba(0, 188, 212, 0.1)',
-                                borderWidth: 2,
-                                tension: 0.3,
-                                fill: true,
-                                spanGaps: true
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: { y: { beginAtZero: true, grid: { color: '#333' } }, x: { grid: { display: false } } },
-                            plugins: { legend: { display: false } }
-                        }
-                    });
                 } else {
                     showBrEmpty();
                 }
