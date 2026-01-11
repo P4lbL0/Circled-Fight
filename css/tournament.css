@@ -41,29 +41,189 @@ body {
 @media (min-width: 900px) { .hamburger-menu { font-size: 1.4rem; top: 12px; right: 22px; } .mobile-hub { top: 52px; width: 260px; } }
 
 /* =========================================
-   3. CARROUSEL ORIGINAL (Style ajusté pour centrage)
+   3. POSTERS EN HTML/CSS (MJ & BR)
    ========================================= */
-.carousel { 
-    position: relative; 
-    width: 95%; 
-    max-width: 600px; 
-    margin: 20px auto; 
-    overflow: hidden; 
-    border-radius: 10px; 
-    border: 1px solid #333;
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+.posters-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 15px;
 }
-.carousel img { width: 100%; display: none; }
-.carousel img.active { display: block; }
-.carousel .prev, .carousel .next {
-    position: absolute; top: 50%; transform: translateY(-50%);
-    font-size: 2rem; color: white; background: rgba(0,0,0,0.4);
-    border-radius: 50%; width: 40px; height: 40px;
-    line-height: 36px; text-align: center; cursor: pointer;
-    user-select: none; z-index: 10;
+
+.poster-card {
+    border: 2px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    transition: all 0.3s ease;
 }
-.carousel .prev { left: 10px; }
-.carousel .next { right: 10px; }
+
+.poster-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8);
+    border-color: #555;
+}
+
+.mj-poster .poster-header {
+    background: linear-gradient(135deg, #FF2344 0%, #CC0000 100%);
+}
+
+.br-poster .poster-header {
+    background: linear-gradient(135deg, #FFC107 0%, #FFD700 100%);
+}
+
+.poster-header {
+    padding: 20px;
+    color: white;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.poster-emoji {
+    font-size: 2.5rem;
+}
+
+.poster-header h2 {
+    margin: 0;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.mj-poster .poster-header h2 { color: white; }
+.br-poster .poster-header h2 { color: black; }
+
+.poster-content {
+    padding: 25px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.top3-section, .date-section {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 3px solid var(--codm-yellow);
+}
+
+.top3-label, .date-label {
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.podium {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+}
+
+.podium-slot {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    border: 1px solid #444;
+    transition: all 0.3s ease;
+}
+
+.podium-slot:hover {
+    border-color: var(--codm-yellow);
+    box-shadow: 0 0 8px rgba(255, 193, 7, 0.2);
+}
+
+.podium-slot .rank {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #888;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.podium-slot .player-name {
+    margin: 5px 0 3px 0;
+    font-size: 0.95rem;
+    font-family: 'Orbitron', sans-serif;
+    color: #e0e0e0;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.podium-slot .player-score {
+    margin: 0;
+    font-size: 1.3rem;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    color: var(--codm-yellow);
+    text-shadow: 0 0 8px rgba(255, 193, 7, 0.3);
+}
+
+.score-label, .date-label {
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.best-score {
+    margin: 0;
+    font-size: 1.8rem;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    color: var(--codm-yellow);
+    text-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+}
+
+.tournament-date {
+    margin: 0;
+    font-size: 1.3rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    color: #e0e0e0;
+}
+
+@media (max-width: 768px) {
+    .posters-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin: 20px auto;
+    }
+
+    .poster-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .poster-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .poster-content {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 20px;
+    }
+}
 
 /* =========================================
    4. BOUTONS RÈGLES (Nouveau Style)

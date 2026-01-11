@@ -1,10 +1,16 @@
 export const detailedData2026 = {
-   "Rico": {
+    "Rico": {
         "S1": {
             "w": 4,
             "svp": 1,
-            "k": 39,
+            "k": 34,
             "a": 4
+        },
+        "S2": {
+            "w": 4,
+            "svp": 0,
+            "k": 41,
+            "a": 3
         }
     },
     "Angelos": {
@@ -21,6 +27,12 @@ export const detailedData2026 = {
             "svp": 0,
             "k": 18,
             "a": 2
+        },
+        "S2": {
+            "w": 3,
+            "svp": 0,
+            "k": 26,
+            "a": 2
         }
     },
     "Ghost": {
@@ -29,6 +41,12 @@ export const detailedData2026 = {
             "svp": 2,
             "k": 40,
             "a": 3
+        },
+        "S2": {
+            "w": 3,
+            "svp": 1,
+            "k": 39,
+            "a": 4
         }
     },
     "Capi": {
@@ -53,6 +71,12 @@ export const detailedData2026 = {
             "svp": 1,
             "k": 33,
             "a": 5
+        },
+        "S2": {
+            "w": 1,
+            "svp": 0,
+            "k": 13,
+            "a": 1
         }
     },
     "Afro": {
@@ -60,6 +84,38 @@ export const detailedData2026 = {
             "w": 1,
             "svp": 1,
             "k": 33,
+            "a": 2
+        }
+    },
+    "Paul": {
+        "S2": {
+            "w": 2,
+            "svp": 1,
+            "k": 19,
+            "a": 2
+        }
+    },
+    "Justdoit": {
+        "S2": {
+            "w": 3,
+            "svp": 1,
+            "k": 34,
+            "a": 0
+        }
+    },
+    "Beya": {
+        "S2": {
+            "w": 2,
+            "svp": 1,
+            "k": 31,
+            "a": 0
+        }
+    },
+    "Seveun": {
+        "S2": {
+            "w": 5,
+            "svp": 1,
+            "k": 52,
             "a": 2
         }
     }

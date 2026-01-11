@@ -30,13 +30,72 @@
 </header>
 
 <main>
-    <div class="carousel" id="carousel">
-        <span class="prev">&#10094;</span>
-        <span class="next">&#10095;</span>
-        <img src="img/MJ.png" class="active" alt="Affiche MJ">
-        <img src="img/BR.png" alt="Affiche BR">
-        <img src="img/HALLO.png" alt="Event Halloween">
-        <img src="img/NOEL.png" alt="Event Noël">
+    <div class="posters-container" id="postersContainer">
+        <div class="poster-card mj-poster">
+            <div class="poster-header">
+                <span class="poster-emoji">⚔️</span>
+                <h2>TOURNOI MULTIJOUEUR</h2>
+            </div>
+            <div class="poster-content">
+                <div class="top3-section">
+                    <p class="top3-label">🏆 TOP 3</p>
+                    <div class="podium" id="mjPodium">
+                        <div class="podium-slot">
+                            <p class="rank">-</p>
+                            <p class="player-name">-</p>
+                            <p class="player-score">-</p>
+                        </div>
+                        <div class="podium-slot">
+                            <p class="rank">-</p>
+                            <p class="player-name">-</p>
+                            <p class="player-score">-</p>
+                        </div>
+                        <div class="podium-slot">
+                            <p class="rank">-</p>
+                            <p class="player-name">-</p>
+                            <p class="player-score">-</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="date-section">
+                    <p class="date-label">📅 PROCHAIN TOURNOI</p>
+                    <p class="tournament-date" id="nextMJDate">-</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="poster-card br-poster">
+            <div class="poster-header">
+                <span class="poster-emoji">🎯</span>
+                <h2>TOURNOI BATTLE ROYALE</h2>
+            </div>
+            <div class="poster-content">
+                <div class="top3-section">
+                    <p class="top3-label">🏆 TOP 3</p>
+                    <div class="podium" id="brPodium">
+                        <div class="podium-slot">
+                            <p class="rank">-</p>
+                            <p class="player-name">-</p>
+                            <p class="player-score">-</p>
+                        </div>
+                        <div class="podium-slot">
+                            <p class="rank">-</p>
+                            <p class="player-name">-</p>
+                            <p class="player-score">-</p>
+                        </div>
+                        <div class="podium-slot">
+                            <p class="rank">-</p>
+                            <p class="player-name">-</p>
+                            <p class="player-score">-</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="date-section">
+                    <p class="date-label">📅 PROCHAIN TOURNOI</p>
+                    <p class="tournament-date" id="nextBRDate">-</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="rules-actions">
@@ -129,24 +188,150 @@
     backdrop.addEventListener('click', closeHub);
 })();
 
-// --- Carrousel (Ton code original) ---
-const carousel = document.getElementById('carousel');
-const slides = carousel.querySelectorAll('img');
-let current = 0;
-function showSlide(index){
-    slides.forEach(img => img.classList.remove('active'));
-    slides[index].classList.add('active');
+// --- ACTUALISATION AUTOMATIQUE DES DATES ET MEILLEURS SCORES ---
+
+// Fonction pour obtenir la date du prochain tournament
+function getNextTournamentDates() {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    
+    // Trouver le prochain vendredi (BR) et samedi (MJ)
+    let daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7;
+    let daysUntilSaturday = (6 - dayOfWeek + 7) % 7 || 7;
+    
+    if (dayOfWeek === 5) daysUntilFriday = 0; // Vendredi aujourd'hui
+    if (dayOfWeek === 6) daysUntilSaturday = 0; // Samedi aujourd'hui
+    
+    const nextFriday = new Date(today);
+    nextFriday.setDate(today.getDate() + daysUntilFriday);
+    
+    const nextSaturday = new Date(today);
+    nextSaturday.setDate(today.getDate() + daysUntilSaturday);
+    
+    const options = { weekday: 'long', day: 'numeric', month: 'long' };
+    
+    return {
+        br: nextFriday.toLocaleDateString('fr-FR', options).toUpperCase(),
+        mj: nextSaturday.toLocaleDateString('fr-FR', options).toUpperCase()
+    };
 }
-carousel.querySelector('.prev').addEventListener('click', ()=>{ current = (current -1 + slides.length)%slides.length; showSlide(current); });
-carousel.querySelector('.next').addEventListener('click', ()=>{ current = (current +1)%slides.length; showSlide(current); });
-let startX = 0;
-carousel.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
-carousel.addEventListener('touchend', e => {
-    let endX = e.changedTouches[0].clientX;
-    if(endX - startX > 50) current = (current -1 + slides.length)%slides.length;
-    else if(startX - endX > 50) current = (current +1)%slides.length;
-    showSlide(current);
-});
+
+// Fonction pour charger et afficher le top 3 des scores
+async function loadTop3Scores() {
+    try {
+        // ===== TOP 3 MJ =====
+        const mjModule = await import('./js/data2026mj.js');
+        const mjData = mjModule.detailedData2026;
+        
+        // Trouver la dernière saison automatiquement
+        let latestSeason = null;
+        Object.values(mjData).forEach(weeks => {
+            Object.keys(weeks).forEach(season => {
+                if (!latestSeason || season > latestSeason) {
+                    latestSeason = season;
+                }
+            });
+        });
+        
+        // Calculer les scores pour MJ uniquement avec la dernière saison (W*3 + K*1 + A*0  .5 + SVP*3)
+        const mjPlayers = Object.entries(mjData).map(([name, weeks]) => {
+            const seasonData = weeks[latestSeason] || { w: 0, k: 0, a: 0, svp: 0 };
+            const score = (seasonData.w || 0) * 3 + (seasonData.k || 0) * 1 + (seasonData.a || 0) * 0.5 + (seasonData.svp || 0) * 3;
+            return { name, score };
+        }).sort((a, b) => b.score - a.score).slice(0, 3);
+
+        // Afficher le top 3 MJ
+        const mjPodium = document.getElementById('mjPodium');
+        const mjSlots = mjPodium.querySelectorAll('.podium-slot');
+        mjSlots.forEach((slot, idx) => {
+            if (idx < mjPlayers.length) {
+                const player = mjPlayers[idx];
+                slot.querySelector('.rank').textContent = `#${idx + 1}`;
+                slot.querySelector('.player-name').textContent = player.name;
+                slot.querySelector('.player-score').textContent = Math.round(player.score * 10) / 10;
+            } else {
+                slot.querySelector('.rank').textContent = '-';
+                slot.querySelector('.player-name').textContent = '-';
+                slot.querySelector('.player-score').textContent = '-';
+            }
+        });
+
+        // ===== TOP 3 BR =====
+        const brModule = await import('./js/data2026br.js');
+        const brData = brModule.detailedbrData2026;
+        
+        // Trouver la dernière saison automatiquement
+        let latestBRSeason = null;
+        Object.values(brData).forEach(weeks => {
+            Object.keys(weeks).forEach(season => {
+                if (!latestBRSeason || season > latestBRSeason) {
+                    latestBRSeason = season;
+                }
+            });
+        });
+        
+        // Calculer les scores pour BR avec la dernière saison (W*3 + K*1 + A*0.5 + SVP*3)
+        const brPlayers = Object.entries(brData).map(([name, weeks]) => {
+            const seasonData = weeks[latestBRSeason] || { w: 0, k: 0, a: 0, svp: 0 };
+            const score = (seasonData.w || 0) * 3 + (seasonData.k || 0) * 1 + (seasonData.a || 0) * 0.5 + (seasonData.svp || 0) * 3;
+            return { name, score };
+        }).sort((a, b) => b.score - a.score).slice(0, 3);
+
+        // Afficher le top 3 BR
+        const brPodium = document.getElementById('brPodium');
+        const brSlots = brPodium.querySelectorAll('.podium-slot');
+        brSlots.forEach((slot, idx) => {
+            if (idx < brPlayers.length) {
+                const player = brPlayers[idx];
+                slot.querySelector('.rank').textContent = `#${idx + 1}`;
+                slot.querySelector('.player-name').textContent = player.name;
+                slot.querySelector('.player-score').textContent = player.score;
+            } else {
+                slot.querySelector('.rank').textContent = '-';
+                slot.querySelector('.player-name').textContent = '-';
+                slot.querySelector('.player-score').textContent = '-';
+            }
+        });
+
+    } catch (err) {
+        console.warn('Erreur chargement top 3:', err);
+    }
+}
+
+// Fonction pour actualiser les dates
+function updateTournamentDates() {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    
+    let daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7;
+    let daysUntilSaturday = (6 - dayOfWeek + 7) % 7 || 7;
+    
+    if (dayOfWeek === 5) daysUntilFriday = 0; // Vendredi aujourd'hui
+    if (dayOfWeek === 6) daysUntilSaturday = 0; // Samedi aujourd'hui
+    
+    const nextFriday = new Date(today);
+    nextFriday.setDate(today.getDate() + daysUntilFriday);
+    
+    const nextSaturday = new Date(today);
+    nextSaturday.setDate(today.getDate() + daysUntilSaturday);
+    
+    const options = { weekday: 'long', day: 'numeric', month: 'long' };
+    const brDateText = nextFriday.toLocaleDateString('fr-FR', options).toUpperCase() + ' À 21H';
+    const mjDateText = nextSaturday.toLocaleDateString('fr-FR', options).toUpperCase() + ' À 21H';
+    
+    document.getElementById('nextBRDate').textContent = brDateText;
+    document.getElementById('nextMJDate').textContent = mjDateText;
+}
+
+// Initialiser les données au chargement
+updateTournamentDates();
+loadTop3Scores();
+
+// Actualiser automatiquement chaque heure
+setInterval(() => {
+    updateTournamentDates();
+    loadTop3Scores();
+}, 3600000); // 1 heure
 
 // --- Modales Règles ---
 const rulesModal = document.getElementById('rulesModal');

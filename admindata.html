@@ -27,6 +27,9 @@
 
     <p>Colle ici ton <b>data3.js</b> :</p>
     <textarea id="data3"></textarea>
+
+    <p>Colle ici ton <b>data2026mj.js</b> :</p>
+    <textarea id="data2026mj"></textarea>
 </div>
 
 <div class="block">
@@ -58,6 +61,9 @@
 
     <button onclick="generateData3JS()">Générer data3.js</button>
     <textarea id="output3"></textarea>
+
+    <button onclick="generateData2026MJJS()">Générer data2026mj.js</button>
+    <textarea id="output4"></textarea>
 </div>
 
 
@@ -108,6 +114,17 @@ function parseData3(text) {
         return { weeks, brData };
     } catch (e) {
         alert("Erreur parsing data3.js : " + e);
+        return null;
+    }
+}
+
+// ----------- PARSE data2026mj.js -----------
+function parseData2026MJ(text) {
+    try {
+        const detailedData2026 = extractJSValue(text, /export\s+const\s+detailedData2026\s*=\s*({[\s\S]*});/);
+        return detailedData2026;
+    } catch (e) {
+        alert("Erreur parsing data2026mj.js : " + e);
         return null;
     }
 }
@@ -214,6 +231,37 @@ function generateData3JS() {
 export const brData = ${JSON.stringify(brData, null, 4)};`;
 
     document.getElementById("output3").value = finalTxt;
+}
+
+
+// ---------------------------------------------------
+//  Générateur data2026mj.js
+// ---------------------------------------------------
+function generateData2026MJJS() {
+    const raw = document.getElementById("data2026mj").value;
+    const detailedData2026 = parseData2026MJ(raw);
+    if (!detailedData2026) return;
+
+    const newWeek = document.getElementById("newWeek").value.trim();
+    const lines = document.getElementById("detailsInput").value.trim().split("\n");
+
+    const map = {};
+    lines.forEach(l => {
+        const [name, vals] = l.split(":").map(x => x.trim());
+        if (!name || !vals) return;
+        const [w, svp, k, a] = vals.split(",").map(v => parseInt(v.trim()));
+        map[name] = { w, svp, k, a };
+    });
+
+    for (const name in map) {
+        if (!detailedData2026[name]) detailedData2026[name] = {};
+        detailedData2026[name][newWeek] = map[name];
+    }
+
+    const finalTxt =
+`export const detailedData2026 = ${JSON.stringify(detailedData2026, null, 4)};`;
+
+    document.getElementById("output4").value = finalTxt;
 }
 
 </script>
