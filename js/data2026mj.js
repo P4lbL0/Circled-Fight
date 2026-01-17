@@ -11,6 +11,12 @@ export const detailedData2026 = {
             "svp": 0,
             "k": 41,
             "a": 3
+        },
+        "S3": {
+            "w": 2,
+            "svp": 0,
+            "k": 42,
+            "a": 5
         }
     },
     "Angelos": {
@@ -19,6 +25,12 @@ export const detailedData2026 = {
             "svp": 0,
             "k": 54,
             "a": 2
+        },
+        "S3": {
+            "w": 4,
+            "svp": 0,
+            "k": 38,
+            "a": 7
         }
     },
     "Excentrizc": {
@@ -33,6 +45,12 @@ export const detailedData2026 = {
             "svp": 0,
             "k": 26,
             "a": 2
+        },
+        "S3": {
+            "w": 3,
+            "svp": 0,
+            "k": 31,
+            "a": 3
         }
     },
     "Ghost": {
@@ -47,6 +65,12 @@ export const detailedData2026 = {
             "svp": 1,
             "k": 39,
             "a": 4
+        },
+        "S3": {
+            "w": 3,
+            "svp": 1,
+            "k": 37,
+            "a": 6
         }
     },
     "Capi": {
@@ -85,6 +109,12 @@ export const detailedData2026 = {
             "svp": 1,
             "k": 33,
             "a": 2
+        },
+        "S3": {
+            "w": 1,
+            "svp": 0,
+            "k": 23,
+            "a": 3
         }
     },
     "Paul": {
@@ -93,6 +123,12 @@ export const detailedData2026 = {
             "svp": 1,
             "k": 19,
             "a": 2
+        },
+        "S3": {
+            "w": 3,
+            "svp": 0,
+            "k": 9,
+            "a": 4
         }
     },
     "Justdoit": {
@@ -117,6 +153,36 @@ export const detailedData2026 = {
             "svp": 1,
             "k": 52,
             "a": 2
+        },
+        "S3": {
+            "w": 3,
+            "svp": 2,
+            "k": 62,
+            "a": 2
+        }
+    },
+    "Leo": {
+        "S3": {
+            "w": 2,
+            "svp": 2,
+            "k": 49,
+            "a": 3
+        }
+    },
+    "Dorian": {
+        "S3": {
+            "w": 6,
+            "svp": 0,
+            "k": 23,
+            "a": 10
+        }
+    },
+    "Angel": {
+        "S3": {
+            "w": 2,
+            "svp": 1,
+            "k": 31,
+            "a": 1
         }
     }
 };
