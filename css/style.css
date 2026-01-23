@@ -47,8 +47,8 @@ h1, h2, h3 {
 .mvp-badge {
     background: linear-gradient(45deg, #ff8f00, #ffc107);
     color: #000;
-    padding: 8px 15px;
-    border-radius: 4px;
+    padding: 15px 25px;
+    border-radius: 8px;
     font-weight: bold;
     box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
     display: flex;
@@ -56,8 +56,8 @@ h1, h2, h3 {
     align-items: center;
     text-align: center;
 }
-.mvp-badge span { font-size: 0.7rem; opacity: 0.8; }
-.mvp-badge strong { font-size: 1rem; font-family: 'Orbitron'; }
+.mvp-badge span { font-size: 1rem; opacity: 0.9; font-weight: 600; }
+.mvp-badge strong { font-size: 1.4rem; font-family: 'Orbitron'; margin-top: 5px; }
 
 /* EXPORT BUTTON */
 .export-container {
@@ -487,5 +487,36 @@ main {
             
             .modal-content-announcement p {
                  font-size: 0.95rem; /* Taille de police légèrement plus petite */
+            }
+
+            /* MVP Badge responsive */
+            .mvp-badge {
+                padding: 6px 10px;
+                font-size: 0.75rem;
+                min-width: auto;
+            }
+            .mvp-badge span { 
+                font-size: 0.6rem; 
+            }
+            .mvp-badge strong { 
+                font-size: 0.85rem;
+                word-break: break-word;
+                line-height: 1.2;
+            }
+
+            /* Header responsive */
+            .header {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .export-container {
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
+            }
+
+            .export-btn {
+                width: 100%;
             }
         }

@@ -36,6 +36,7 @@
         </div>
 
         <div class="export-container">
+            <button class="export-btn" onclick="window.location.href='br_dashboard1.html'">📊 Voir Saison 2025</button>
             <button class="export-btn" onclick="exportChart()">📸 Export Graph</button>
             <div class="mvp-badge" id="mvpBadge">
                 <span>MVP SEMAINE ACTUELLE</span>
@@ -122,7 +123,7 @@
 
     <script type="module">
     // Importation UNIQUEMENT des données BR
-    import { weeks, brData } from "./js/data3.js";
+    import { weeks, brData } from "./js/data2026br.js";
 
     // Restrict charts and averages to the last N weeks
     const RECENT_N = 10;
@@ -405,19 +406,22 @@
         function findMVP() {
             // Use the last week from the imported `weeks` array instead of a fixed index
             const lastWeekIndex = (Array.isArray(weeks) && weeks.length) ? (weeks.length - 1) : 11;
-            let bestScore = -1;
-            let bestPlayer = "";
+            
+            // Créer un array des joueurs avec leurs scores
+            const playersWithScores = brData
+                .map(p => ({
+                    name: p.name,
+                    score: (p.scores && p.scores.length > lastWeekIndex) ? p.scores[lastWeekIndex] : null
+                }))
+                .filter(p => p.score !== null) // Garder seulement ceux qui ont un score
+                .sort((a, b) => b.score - a.score) // Trier du meilleur au pire
+                .slice(0, 2); // Prendre les 2 meilleurs
 
-            brData.forEach(p => {
-                const score = (p.scores && p.scores.length > lastWeekIndex) ? p.scores[lastWeekIndex] : null;
-                if (score !== null && score > bestScore) {
-                    bestScore = score;
-                    bestPlayer = p.name;
-                }
-            });
-
-            if(bestPlayer) {
-                document.getElementById('mvpName').innerText = bestPlayer.toUpperCase() + " (" + bestScore + ")";
+            if(playersWithScores.length > 0) {
+                const mvpText = playersWithScores
+                    .map(p => `${p.name.toUpperCase()} (${p.score})`)
+                    .join(" & ");
+                document.getElementById('mvpName').innerText = mvpText;
             }
         }
 
