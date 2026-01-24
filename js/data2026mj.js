@@ -17,6 +17,12 @@ export const detailedData2026 = {
             "svp": 0,
             "k": 42,
             "a": 5
+        },
+        "S4": {
+            "w": 3,
+            "svp": 1,
+            "k": 41,
+            "a": 6
         }
     },
     "Angelos": {
@@ -31,6 +37,12 @@ export const detailedData2026 = {
             "svp": 0,
             "k": 38,
             "a": 7
+        },
+        "S4": {
+            "w": 3,
+            "svp": 1,
+            "k": 54,
+            "a": 1
         }
     },
     "Excentrizc": {
@@ -51,6 +63,12 @@ export const detailedData2026 = {
             "svp": 0,
             "k": 31,
             "a": 3
+        },
+        "S4": {
+            "w": 3,
+            "svp": 0,
+            "k": 25,
+            "a": 0
         }
     },
     "Ghost": {
@@ -71,6 +89,12 @@ export const detailedData2026 = {
             "svp": 1,
             "k": 37,
             "a": 6
+        },
+        "S4": {
+            "w": 4,
+            "svp": 2,
+            "k": 44,
+            "a": 5
         }
     },
     "Capi": {
@@ -79,6 +103,12 @@ export const detailedData2026 = {
             "svp": 1,
             "k": 33,
             "a": 9
+        },
+        "S4": {
+            "w": 3,
+            "svp": 0,
+            "k": 25,
+            "a": 5
         }
     },
     "Black": {
@@ -100,6 +130,12 @@ export const detailedData2026 = {
             "w": 1,
             "svp": 0,
             "k": 13,
+            "a": 1
+        },
+        "S4": {
+            "w": 2,
+            "svp": 1,
+            "k": 28,
             "a": 1
         }
     },
@@ -137,6 +173,12 @@ export const detailedData2026 = {
             "svp": 1,
             "k": 34,
             "a": 0
+        },
+        "S4": {
+            "w": 4,
+            "svp": 0,
+            "k": 33,
+            "a": 2
         }
     },
     "Beya": {
@@ -145,6 +187,12 @@ export const detailedData2026 = {
             "svp": 1,
             "k": 31,
             "a": 0
+        },
+        "S4": {
+            "w": 0,
+            "svp": 0,
+            "k": 10,
+            "a": 5
         }
     },
     "Seveun": {
@@ -167,6 +215,12 @@ export const detailedData2026 = {
             "svp": 2,
             "k": 49,
             "a": 3
+        },
+        "S4": {
+            "w": 5,
+            "svp": 0,
+            "k": 40,
+            "a": 3
         }
     },
     "Dorian": {
@@ -183,6 +237,14 @@ export const detailedData2026 = {
             "svp": 1,
             "k": 31,
             "a": 1
+        }
+    },
+    "Corbo": {
+        "S4": {
+            "w": 3,
+            "svp": 1,
+            "k": 43,
+            "a": 3
         }
     }
 };
