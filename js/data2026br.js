@@ -1,18 +1,20 @@
 // ...existing code...
-export const weeks = ["S1", "S2", "S3"];
+export const weeks = ["S1", "S2", "S3", "S4"];
 export const brData = [
     {
         "name": "Seveun",
         "scores": [
             72,
             54,
-            34
+            34,
+            43
         ]
     },
     {
         "name": "Venom",
         "scores": [
             72,
+            null,
             null,
             null
         ]
@@ -22,7 +24,8 @@ export const brData = [
         "scores": [
             31,
             37,
-            26
+            26,
+            38
         ]
     },
     {
@@ -30,7 +33,8 @@ export const brData = [
         "scores": [
             31,
             37,
-            26
+            26,
+            null
         ]
     },
     {
@@ -38,13 +42,15 @@ export const brData = [
         "scores": [
             24,
             17,
-            34
+            34,
+            43
         ]
     },
     {
         "name": "Black",
         "scores": [
             24,
+            null,
             null,
             null
         ]
@@ -54,7 +60,8 @@ export const brData = [
         "scores": [
             17,
             24,
-            null
+            null,
+            30
         ]
     },
     {
@@ -62,13 +69,15 @@ export const brData = [
         "scores": [
             17,
             null,
-            20
+            20,
+            30
         ]
     },
     {
         "name": "Seong",
         "scores": [
             15,
+            null,
             null,
             null
         ]
@@ -78,6 +87,7 @@ export const brData = [
         "scores": [
             15,
             null,
+            null,
             null
         ]
     },
@@ -86,7 +96,8 @@ export const brData = [
         "scores": [
             null,
             61,
-            46
+            46,
+            40
         ]
     },
     {
@@ -94,7 +105,8 @@ export const brData = [
         "scores": [
             null,
             61,
-            46
+            46,
+            40
         ]
     },
     {
@@ -102,6 +114,7 @@ export const brData = [
         "scores": [
             null,
             54,
+            null,
             null
         ]
     },
@@ -110,6 +123,7 @@ export const brData = [
         "scores": [
             null,
             42,
+            null,
             null
         ]
     },
@@ -118,6 +132,7 @@ export const brData = [
         "scores": [
             null,
             42,
+            null,
             null
         ]
     },
@@ -126,7 +141,8 @@ export const brData = [
         "scores": [
             null,
             24,
-            null
+            null,
+            38
         ]
     },
     {
@@ -134,6 +150,7 @@ export const brData = [
         "scores": [
             null,
             17,
+            null,
             null
         ]
     },
@@ -142,7 +159,26 @@ export const brData = [
         "scores": [
             null,
             null,
-            20
+            20,
+            null
+        ]
+    },
+    {
+        "name": "Corbo",
+        "scores": [
+            null,
+            null,
+            null,
+            22
+        ]
+    },
+    {
+        "name": "Killian",
+        "scores": [
+            null,
+            null,
+            null,
+            22
         ]
     }
 ];

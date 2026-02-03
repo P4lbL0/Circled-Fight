@@ -23,6 +23,12 @@ export const detailedData2026 = {
             "svp": 1,
             "k": 41,
             "a": 6
+        },
+        "S5": {
+            "w": 1,
+            "svp": 1,
+            "k": 8,
+            "a": 2
         }
     },
     "Angelos": {
@@ -43,6 +49,12 @@ export const detailedData2026 = {
             "svp": 1,
             "k": 54,
             "a": 1
+        },
+        "S5": {
+            "w": 2,
+            "svp": 1,
+            "k": 32,
+            "a": 2
         }
     },
     "Excentrizc": {
@@ -69,6 +81,12 @@ export const detailedData2026 = {
             "svp": 0,
             "k": 25,
             "a": 0
+        },
+        "S5": {
+            "w": 2,
+            "svp": 0,
+            "k": 20,
+            "a": 2
         }
     },
     "Ghost": {
@@ -109,6 +127,12 @@ export const detailedData2026 = {
             "svp": 0,
             "k": 25,
             "a": 5
+        },
+        "S5": {
+            "w": 1,
+            "svp": 1,
+            "k": 17,
+            "a": 1
         }
     },
     "Black": {
@@ -133,6 +157,12 @@ export const detailedData2026 = {
             "a": 1
         },
         "S4": {
+            "w": 2,
+            "svp": 1,
+            "k": 28,
+            "a": 1
+        },
+        "S5": {
             "w": 2,
             "svp": 1,
             "k": 28,
@@ -179,6 +209,12 @@ export const detailedData2026 = {
             "svp": 0,
             "k": 33,
             "a": 2
+        },
+        "S5": {
+            "w": 3,
+            "svp": 1,
+            "k": 22,
+            "a": 1
         }
     },
     "Beya": {
@@ -206,6 +242,12 @@ export const detailedData2026 = {
             "w": 3,
             "svp": 2,
             "k": 62,
+            "a": 2
+        },
+        "S5": {
+            "w": 2,
+            "svp": 1,
+            "k": 46,
             "a": 2
         }
     },
@@ -239,12 +281,34 @@ export const detailedData2026 = {
             "a": 1
         }
     },
+    "Gabriel": {
+        "S5": {
+            "w": 2,
+            "svp": 2,
+            "k": 18,
+            "a": 3
+        }
+    },
+    "Killian": {
+        "S5": {
+            "w": 3,
+            "svp": 1,
+            "k": 28,
+            "a": 2
+        }
+    },
     "Corbo": {
         "S4": {
             "w": 3,
             "svp": 1,
             "k": 43,
             "a": 3
+        },
+        "S5": {
+            "w": 2,
+            "svp": 1,
+            "k": 21,
+            "a": 2
         }
     }
 };
