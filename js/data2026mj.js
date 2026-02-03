@@ -26,9 +26,9 @@ export const detailedData2026 = {
         },
         "S5": {
             "w": 1,
-            "svp": 1,
-            "k": 8,
-            "a": 2
+            "svp": 2,
+            "k": 20,
+            "a": 4
         }
     },
     "Angelos": {
@@ -51,9 +51,9 @@ export const detailedData2026 = {
             "a": 1
         },
         "S5": {
-            "w": 2,
+            "w": 4,
             "svp": 1,
-            "k": 32,
+            "k": 41,
             "a": 2
         }
     },
@@ -83,10 +83,10 @@ export const detailedData2026 = {
             "a": 0
         },
         "S5": {
-            "w": 2,
+            "w": 3,
             "svp": 0,
-            "k": 20,
-            "a": 2
+            "k": 34,
+            "a": 7
         }
     },
     "Ghost": {
@@ -129,9 +129,9 @@ export const detailedData2026 = {
             "a": 5
         },
         "S5": {
-            "w": 1,
-            "svp": 1,
-            "k": 17,
+            "w": 4,
+            "svp": 0,
+            "k": 18,
             "a": 1
         }
     },
@@ -163,9 +163,9 @@ export const detailedData2026 = {
             "a": 1
         },
         "S5": {
-            "w": 2,
+            "w": 1,
             "svp": 1,
-            "k": 28,
+            "k": 38,
             "a": 1
         }
     },
@@ -213,8 +213,8 @@ export const detailedData2026 = {
         "S5": {
             "w": 3,
             "svp": 1,
-            "k": 22,
-            "a": 1
+            "k": 33,
+            "a": 0
         }
     },
     "Beya": {
@@ -245,9 +245,9 @@ export const detailedData2026 = {
             "a": 2
         },
         "S5": {
-            "w": 2,
+            "w": 4,
             "svp": 1,
-            "k": 46,
+            "k": 51,
             "a": 2
         }
     },
@@ -283,17 +283,17 @@ export const detailedData2026 = {
     },
     "Gabriel": {
         "S5": {
-            "w": 2,
-            "svp": 2,
-            "k": 18,
+            "w": 3,
+            "svp": 0,
+            "k": 23,
             "a": 3
         }
     },
     "Killian": {
         "S5": {
             "w": 3,
-            "svp": 1,
-            "k": 28,
+            "svp": 0,
+            "k": 33,
             "a": 2
         }
     },
@@ -305,10 +305,10 @@ export const detailedData2026 = {
             "a": 3
         },
         "S5": {
-            "w": 2,
-            "svp": 1,
-            "k": 21,
-            "a": 2
+            "w": 3,
+            "svp": 0,
+            "k": 28,
+            "a": 3
         }
     }
 };
