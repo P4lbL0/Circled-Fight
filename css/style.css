@@ -30,12 +30,14 @@ h1, h2, h3 {
 .header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     padding-bottom: 20px;
     border-bottom: 2px solid var(--codm-yellow);
     margin-bottom: 20px;
     flex-wrap: wrap; 
     gap: 10px;
+    position: relative;
+    padding-right: 60px;
 }
 
 .header h1 {
