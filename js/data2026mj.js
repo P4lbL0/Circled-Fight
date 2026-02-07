@@ -55,6 +55,12 @@ export const detailedData2026 = {
             "svp": 1,
             "k": 41,
             "a": 2
+        },
+        "S6": {
+            "w": 5,
+            "svp": 1,
+            "k": 53,
+            "a": 3
         }
     },
     "Excentrizc": {
@@ -87,6 +93,12 @@ export const detailedData2026 = {
             "svp": 0,
             "k": 34,
             "a": 7
+        },
+        "S6": {
+            "w": 4,
+            "svp": 2,
+            "k": 46,
+            "a": 1
         }
     },
     "Ghost": {
@@ -133,6 +145,12 @@ export const detailedData2026 = {
             "svp": 0,
             "k": 18,
             "a": 1
+        },
+        "S6": {
+            "w": 3,
+            "svp": 1,
+            "k": 30,
+            "a": 4
         }
     },
     "Black": {
@@ -167,6 +185,12 @@ export const detailedData2026 = {
             "svp": 1,
             "k": 38,
             "a": 1
+        },
+        "S6": {
+            "w": 4,
+            "svp": 2,
+            "k": 30,
+            "a": 3
         }
     },
     "Afro": {
@@ -195,6 +219,12 @@ export const detailedData2026 = {
             "svp": 0,
             "k": 9,
             "a": 4
+        },
+        "S6": {
+            "w": 2,
+            "svp": 0,
+            "k": 10,
+            "a": 3
         }
     },
     "Justdoit": {
@@ -287,11 +317,23 @@ export const detailedData2026 = {
             "svp": 0,
             "k": 23,
             "a": 3
+        },
+        "S6": {
+            "w": 1,
+            "svp": 0,
+            "k": 18,
+            "a": 3
         }
     },
     "Killian": {
         "S5": {
             "w": 3,
+            "svp": 0,
+            "k": 33,
+            "a": 2
+        },
+        "S6": {
+            "w": 4,
             "svp": 0,
             "k": 33,
             "a": 2
@@ -309,6 +351,14 @@ export const detailedData2026 = {
             "svp": 0,
             "k": 28,
             "a": 3
+        }
+    },
+    "Karantrwa": {
+        "S6": {
+            "w": 1,
+            "svp": 0,
+            "k": 19,
+            "a": 1
         }
     }
 };
