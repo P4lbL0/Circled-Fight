@@ -120,7 +120,7 @@
         </select>
 
         <label for="retard">RAPPORT (Retard / Commentaire)</label>
-        <textarea id="retard" placeholder="Ex: Présent à 21h10..." rows="2"></textarea>
+        <textarea id="retard" placeholder="Ex: Présent à 21h30..." rows="2"></textarea>
 
         <button id="submitBtn" class="cta-submit">CONFIRMER L'INSCRIPTION</button>
     </div>
@@ -256,42 +256,66 @@ async function loadTop3Scores() {
             }
         });
 
-        // ===== TOP 3 BR =====
+        // ===== TOP 2 BR (Duos avec mêmes scores) =====
         const brModule = await import('./js/data2026br.js');
-        const brData = brModule.detailedbrData2026;
+        const brDataArray = brModule.brData;
         
-        // Trouver la dernière saison automatiquement
-        let latestBRSeason = null;
-        Object.values(brData).forEach(weeks => {
-            Object.keys(weeks).forEach(season => {
-                if (!latestBRSeason || season > latestBRSeason) {
-                    latestBRSeason = season;
-                }
-            });
-        });
+        // Trouver la dernière semaine avec données
+        let lastWeekIndex = 0;
+        if (brDataArray.length > 0 && brDataArray[0].scores) {
+            lastWeekIndex = brDataArray[0].scores.length - 1;
+        }
         
-        // Calculer les scores pour BR avec la dernière saison (W*3 + K*1 + A*0.5 + SVP*3)
-        const brPlayers = Object.entries(brData).map(([name, weeks]) => {
-            const seasonData = weeks[latestBRSeason] || { w: 0, k: 0, a: 0, svp: 0 };
-            const score = (seasonData.w || 0) * 3 + (seasonData.k || 0) * 1 + (seasonData.a || 0) * 0.5 + (seasonData.svp || 0) * 3;
-            return { name, score };
-        }).sort((a, b) => b.score - a.score).slice(0, 3);
+        // Prendre le score de la dernière semaine pour chaque joueur
+        const brPlayers = brDataArray
+            .map(player => ({
+                name: player.name,
+                score: (player.scores && player.scores[lastWeekIndex]) || 0
+            }))
+            .filter(p => p.score > 0)
+            .sort((a, b) => b.score - a.score);
 
-        // Afficher le top 3 BR
+        // Afficher les 2 meilleurs (avec gestion des duos)
         const brPodium = document.getElementById('brPodium');
         const brSlots = brPodium.querySelectorAll('.podium-slot');
-        brSlots.forEach((slot, idx) => {
-            if (idx < brPlayers.length) {
-                const player = brPlayers[idx];
-                slot.querySelector('.rank').textContent = `#${idx + 1}`;
-                slot.querySelector('.player-name').textContent = player.name;
-                slot.querySelector('.player-score').textContent = player.score;
+        
+        let slotIdx = 0;
+        let currentRank = 1;
+        let i = 0;
+        
+        while (slotIdx < 3 && i < brPlayers.length) {
+            const currentPlayer = brPlayers[i];
+            const slot = brSlots[slotIdx];
+            
+            // Trouver tous les joueurs avec le même score (duos)
+            const duoPlayers = brPlayers.filter(p => p.score === currentPlayer.score);
+            
+            if (duoPlayers.length > 1) {
+                // C'est un duo, affiche les 2 premier avec le même score
+                const duoName = `${duoPlayers[0].name} & ${duoPlayers[1].name}`;
+                slot.querySelector('.rank').textContent = `#${currentRank}`;
+                slot.querySelector('.player-name').textContent = duoName;
+                slot.querySelector('.player-score').textContent = currentPlayer.score;
+                i += duoPlayers.length;
             } else {
-                slot.querySelector('.rank').textContent = '-';
-                slot.querySelector('.player-name').textContent = '-';
-                slot.querySelector('.player-score').textContent = '-';
+                slot.querySelector('.rank').textContent = `#${currentRank}`;
+                slot.querySelector('.player-name').textContent = currentPlayer.name;
+                slot.querySelector('.player-score').textContent = currentPlayer.score;
+                i++;
             }
-        });
+            
+            slotIdx++;
+            currentRank++;
+        }
+        
+        // Remplir les slots vides
+        while (slotIdx < 3) {
+            const slot = brSlots[slotIdx];
+            slot.querySelector('.rank').textContent = '-';
+            slot.querySelector('.player-name').textContent = '-';
+            slot.querySelector('.player-score').textContent = '-';
+            slotIdx++;
+        }
 
     } catch (err) {
         console.warn('Erreur chargement top 3:', err);
@@ -316,8 +340,8 @@ function updateTournamentDates() {
     nextSaturday.setDate(today.getDate() + daysUntilSaturday);
     
     const options = { weekday: 'long', day: 'numeric', month: 'long' };
-    const brDateText = nextFriday.toLocaleDateString('fr-FR', options).toUpperCase() + ' À 21H';
-    const mjDateText = nextSaturday.toLocaleDateString('fr-FR', options).toUpperCase() + ' À 21H';
+    const brDateText = nextFriday.toLocaleDateString('fr-FR', options).toUpperCase() + ' À 21H30';
+    const mjDateText = nextSaturday.toLocaleDateString('fr-FR', options).toUpperCase() + ' À 21H30';
     
     document.getElementById('nextBRDate').textContent = brDateText;
     document.getElementById('nextMJDate').textContent = mjDateText;
@@ -438,6 +462,7 @@ async function loadInscrits() {
         const header = rows[0].map(h => (h || '').toString().trim().replace(/^"|"$/g, '').toLowerCase());
         let pseudoIdx = header.findIndex(h => /pseudo|player|name|nom/.test(h));
         let modeIdx = header.findIndex(h => /mode|type|gamemode/.test(h));
+        let timestampIdx = header.findIndex(h => /timestamp|heure|date|time/.test(h));
         if (pseudoIdx === -1) pseudoIdx = 0;
         if (modeIdx === -1) modeIdx = 1;
 
@@ -449,6 +474,21 @@ async function loadInscrits() {
             const pseudo = (row[pseudoIdx] || '').toString().trim().replace(/^"|"$/g, '');
             const mode = (row[modeIdx] || '').toString().trim().replace(/^"|"$/g, '').toUpperCase();
             if (!pseudo) continue;
+
+            // Vérifier si l'inscription est après 12h du jour du tournoi
+            let isAfterNoon = false;
+            if (timestampIdx !== -1 && row[timestampIdx]) {
+                const timestamp = (row[timestampIdx] || '').toString().trim();
+                // Google Forms format: "jj/mm/yyyy hh:mm:ss"
+                const timeMatch = timestamp.match(/(\d{1,2}):(\d{2}):(\d{2})/);
+                if (timeMatch) {
+                    const hours = parseInt(timeMatch[1], 10);
+                    isAfterNoon = hours >= 12; // Masquer les inscriptions après 12h
+                }
+            }
+            
+            // Ignorer les inscriptions après 12h
+            if (isAfterNoon) continue;
 
             const li = document.createElement('li');
             li.innerHTML = `<span style="color:#666; margin-right:8px;">▸</span> ${pseudo}`;
@@ -469,3 +509,7 @@ loadInscrits();
 
 </body>
 </html>	
+
+<footer style="text-align:center; margin:30px 0 10px 0; color:#888; font-size:0.95em; letter-spacing:0.5px;">
+    Réalisé par <strong>Angelos</strong> &mdash; <a href="https://github.com/P4lbL0?tab=repositories" target="_blank" style="color:#ffc107; text-decoration:underline;">Voir mes autres projets</a>
+</footer>
